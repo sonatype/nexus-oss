@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.common.app.SystemStatus;
@@ -98,6 +99,7 @@ public class ErrorPageServlet
     this.webUtils = checkNotNull(webUtils);
   }
 
+  @SuppressWarnings("unused")
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response)
       throws ServletException, IOException
@@ -108,9 +110,8 @@ public class ErrorPageServlet
     String requestUri = (String) request.getAttribute(ERROR_REQUEST_URI);
     Integer errorCode = (Integer) request.getAttribute(ERROR_STATUS_CODE);
     String errorMessage = (String) request.getAttribute(ERROR_MESSAGE);
-    Class causeType = (Class) request.getAttribute(ERROR_EXCEPTION_TYPE);
+    Class<?> causeType = (Class<?>) request.getAttribute(ERROR_EXCEPTION_TYPE);
     Throwable cause = (Throwable) request.getAttribute(ERROR_EXCEPTION);
-    String errorName = null;
 
     // this happens if someone browses directly to the error page
     if (errorCode == null) {
@@ -125,34 +126,27 @@ public class ErrorPageServlet
 
     // ensure sanity of passed in strings which are used to render html content
     errorMessage = StringEscapeUtils.escapeHtml(errorMessage);
-    if (errorName != null) {
-      errorName = StringEscapeUtils.escapeHtml(errorName);
-    }
-    else {
-      errorName = "";
-    }
 
-    response.setStatus(errorCode, errorName);
-    render(response, errorCode, errorName, errorMessage);
+    response.setStatus(errorCode);
+    render(response, errorMessage);
   }
 
   /**
    * Render error page.
    */
   private void render(final HttpServletResponse response,
-                      final int errorCode,
-                      final String errorName,
                       final String errorMessage)
       throws IOException
   {
     SystemStatus status = systemStatus.get();
-    Map<String, Object> dataModel = Maps.newHashMapWithExpectedSize(5);
+    int errorCode = response.getStatus();
+    Map<String, Object> dataModel = Maps.newHashMapWithExpectedSize(7);
     dataModel.put("nexusRoot", BaseUrlHolder.get());
     dataModel.put("nexusVersion", status.getVersion());
     dataModel.put("nexusEdition", status.getEditionShort());
     dataModel.put("urlSuffix", status.getVersion()); // for cache busting
     dataModel.put("errorCode", errorCode);
-    dataModel.put("errorName", errorName);
+    dataModel.put("errorName", Status.fromStatusCode(errorCode).getReasonPhrase());
     dataModel.put("errorDescription", errorMessage);
 
     String html = templateEngine.render(this, "errorPageContentHtml.vm", dataModel);
@@ -160,17 +154,6 @@ public class ErrorPageServlet
     try (PrintWriter out = new PrintWriter(new OutputStreamWriter(response.getOutputStream()))) {
       out.println(html);
     }
-  }
-
-  /**
-   * Returns the message of given throwable, or if message is null will toString throwable.
-   */
-  private static String messageOf(final Throwable cause) {
-    String message = cause.getMessage();
-    if (message == null) {
-      return cause.toString();
-    }
-    return message;
   }
 
   /**

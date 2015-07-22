@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -319,6 +319,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-transaction</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-validation</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
@@ -352,6 +358,36 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-test-common</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-siestajs-testsupport</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-maven-test-data</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-nuget-test-data</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-raw-test-data</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-ssl-test-data</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -572,7 +608,7 @@
         <plugin>
           <groupId>org.apache.karaf.tooling</groupId>
           <artifactId>karaf-maven-plugin</artifactId>
-          <version>3.0.3</version>
+          <version>3.0.4</version>
           <extensions>true</extensions>
           <configuration>
             <excludedArtifactIds>
@@ -635,9 +671,12 @@
               <exclude>**/assemblies/**/src/main/resources/overlay/**</exclude>
 
               <!--
-              Exclude test resource files, many of these need specific content w/o headers.
+              Exclude (most) test resource files, many of these need specific content w/o headers.
               -->
-              <exclude>**/src/test/*resources/**</exclude>
+              <exclude>**/src/test/resources/**</exclude>
+              <exclude>**/src/test/filtered-resources/**</exclude>
+              <exclude>**/src/test/it-resources/**</exclude>
+              <exclude>**/*-test-data/**/resources/**</exclude>
 
               <!--
               Exclude third-party resources.
@@ -653,6 +692,12 @@
               -->
               <exclude>**/nexus-extdirect-plugin/**/com/softwarementors/**</exclude>
               <exclude>**/nexus-ldap-plugin/**/org/sonatype/nexus/ldap/internal/connector/dao/LdapEncoder.java</exclude>
+
+              <!--
+              Exclude functional-testsuite overlay resources
+              -->
+              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite-lib/**</exclude>
+              <exclude>**/testsuite/functional-testsuite/src/test/ft-resources/testsuite.html</exclude>
             </excludes>
           </configuration>
         </plugin>

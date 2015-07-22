@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -39,7 +39,7 @@ Use this config to create Maven proxy repository, use name `maven2-proxy` (or as
   },
   "proxy" : {
     "remoteUrl" : "http://repo1.maven.org/maven2/",
-    "artifactMaxAge" : 3600
+    "contentMaxAge" : 3600
   },
   "httpclient" : {
     "connection" : {

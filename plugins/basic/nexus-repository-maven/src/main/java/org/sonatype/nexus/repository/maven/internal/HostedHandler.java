@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,7 +31,6 @@ import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.hash.HashCode;
-import com.google.common.net.HttpHeaders;
 
 import static org.sonatype.nexus.repository.http.HttpMethods.DELETE;
 import static org.sonatype.nexus.repository.http.HttpMethods.GET;
@@ -99,11 +98,11 @@ public class HostedHandler
   }
 
   /**
-   * Adds {@link HttpHeaders#ETAG} header if not present. In case of hosted repositories, this is safe and even
-   * good thing to do, as the content is hosted here only and NX is content authority.
+   * Adds {@link Content#CONTENT_ETAG} content attribute if not present. In case of hosted repositories, this is safe
+   * and even good thing to do, as the content is hosted here only and NX is content authority.
    */
   private void mayAddETag(final Content content) {
-    if (content.getAttributes().get(Content.CONTENT_ETAG, String.class) != null) {
+    if (content.getAttributes().contains(Content.CONTENT_ETAG)) {
       return;
     }
     final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes()

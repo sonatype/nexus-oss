@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -22,7 +22,11 @@ Ext.define('NX.util.Utf8', {
   singleton: true,
 
   /**
+   * Encode string as UTF-8.
+   *
    * @public
+   * @param {String} string
+   * @return UTF-8 encoded string.
    */
   encode: function (string) {
     var utftext = "",
@@ -52,7 +56,11 @@ Ext.define('NX.util.Utf8', {
   },
 
   /**
+   * Decode UTF-8 string.
+   *
    * @public
+   * @param {String} utftext
+   * @return String.
    */
   decode: function (utftext) {
     var string = "",

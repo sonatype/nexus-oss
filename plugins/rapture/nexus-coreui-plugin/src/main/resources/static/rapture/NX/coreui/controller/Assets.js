@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,20 +18,25 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Assets', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    'NX.I18n'
+    'NX.I18n',
+    'Ext.util.Format'
   ],
 
   views: [
     'component.AssetContainer',
     'component.AssetInfo',
+    'component.AssetAttributes',
     'component.AssetList',
     'component.ComponentDetails'
   ],
 
   refs: [
-    {ref: 'assetContainer', selector: 'nx-coreui-component-assetcontainer'}
+    {ref: 'assetContainer', selector: 'nx-coreui-component-assetcontainer'},
+    {ref: 'assetList', selector: 'grid[assetContainerSource=true]'},
+    {ref: 'assetInfo', selector: 'nx-coreui-component-assetinfo'},
+    {ref: 'deleteAssetButton', selector: 'nx-coreui-component-assetinfo button[action=deleteAsset]'}
   ],
 
   /**
@@ -41,10 +46,22 @@ Ext.define('NX.coreui.controller.Assets', {
     var me = this;
 
     me.getApplication().getIconController().addIcons({
-      'asset-type-default': {file: 'file_extension_default.png', variants: ['x16', 'x32']},
-      'asset-type-application-java-archive': {file: 'file_extension_jar.png', variants: ['x16', 'x32']},
-      'asset-type-text-xml': {file: 'file_extension_xml.png', variants: ['x16', 'x32']},
-      'asset-type-application-xml': {file: 'file_extension_xml.png', variants: ['x16', 'x32']}
+      'asset-type-default': {
+        file: 'page_white.png',
+        variants: ['x16', 'x32']
+      },
+      'asset-type-application-java-archive': {
+        file: 'file_extension_jar.png',
+        variants: ['x16', 'x32']
+      },
+      'asset-type-text-xml': {
+        file: 'page_white_code.png',
+        variants: ['x16', 'x32']
+      },
+      'asset-type-application-xml': {
+        file: 'page_white_code.png',
+        variants: ['x16', 'x32']
+      }
     });
 
     me.listen({
@@ -56,29 +73,45 @@ Ext.define('NX.coreui.controller.Assets', {
           updated: me.showComponentDetails
         },
         'nx-coreui-component-asset-list': {
-          updated: me.loadAssets,
+          updated: me.loadAssets
+        },
+        'grid[assetContainerSource=true]': {
           cellclick: me.updateAssetContainer
+        },
+        'nx-coreui-component-assetinfo button[action=deleteAsset]': {
+          click: me.deleteAsset
         }
       }
     });
   },
 
   /**
-   * @private
    * Shows information about selected component/asset.
+   *
+   * @private
+   * @param {NX.coreui.view.component.AssetContainer} container asset container
+   * @param {NX.coreui.model.Asset} assetModel selected asset
    */
-  showAssetInfo: function(container, componentModel, assetModel) {
-    var panel = container.down('nx-coreui-component-assetinfo'),
-        info = {};
+  showAssetInfo: function(container, assetModel) {
+    var info = container.down('nx-coreui-component-assetinfo'),
+      attributes = container.down('nx-coreui-component-assetattributes'),
+      panel;
 
-    if (!panel) {
-      panel = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
+    if (!info) {
+      info = container.add({xtype: 'nx-coreui-component-assetinfo', weight: 10});
     }
+    info.setAssetModel(assetModel);
 
-    info[NX.I18n.get('Assets_Info_Name')] = assetModel.get('name');
-    info[NX.I18n.get('Assets_Info_ContentType')] = assetModel.get('contentType');
-
-    panel.showInfo(info);
+    if (!attributes) {
+      attributes = Ext.create('widget.nx-coreui-component-assetattributes');
+      panel = Ext.create('Ext.Panel', {
+        ui: 'nx-inset',
+        weight: 10
+      });
+      panel.add(attributes);
+      container.add(panel);
+    }
+    attributes.setAssetModel(assetModel);
   },
 
   showComponentDetails: function(container, componentModel) {
@@ -142,15 +175,56 @@ Ext.define('NX.coreui.controller.Assets', {
   },
 
   /**
-   * @private
-   *
    * Update asset shown in asset container.
+   *
+   * @private
    */
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
-    var me = this,
-        assetContainer = me.getAssetContainer();
+    this.getAssetContainer().refreshInfo(assetModel);
+    this.bindDeleteAssetButton(this.getDeleteAssetButton());
+  },
 
-    assetContainer.refreshInfo(gridView.up('grid').componentModel, assetModel);
+  /**
+   * Enable 'Delete' when user has 'delete' permission.
+   *
+   * @protected
+   */
+  bindDeleteAssetButton: function(button) {
+    var assetModel = this.getAssetContainer().assetModel;
+    button.mon(
+        NX.Conditions.isPermitted(
+            'nexus:repository-view:' + assetModel.get('format') + ':' + assetModel.get('repositoryName') + ':delete'
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
+  },
+
+  /**
+   * @private
+   * Remove selected asset.
+   */
+  deleteAsset: function () {
+    var me = this,
+        assetList = me.getAssetList(),
+        assetInfo = me.getAssetInfo();
+
+    if (assetInfo) {
+      var asset = assetInfo.assetModel;
+      NX.Dialogs.askConfirmation(NX.I18n.get('AssetInfo_Delete_Title'), asset.get('name'), function () {
+        NX.direct.coreui_Component.deleteAsset(asset.getId(), asset.get('repositoryName'), function (response) {
+          if (Ext.isObject(response) && response.success) {
+            assetList.getSelectionModel().deselectAll();
+            assetList.getStore().load();
+            Ext.util.History.back();
+            NX.Messages.add({ text: NX.I18n.format('AssetInfo_Delete_Success', asset.get('name')), type: 'success' });
+          }
+        });
+      });
+    }
   }
 
 });

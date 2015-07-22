@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-coreui-nuget-apikeydetails',
   requires: [
     'NX.Icons',
@@ -26,13 +26,9 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
     'NX.I18n',
     'NX.util.Url'
   ],
+  ui: 'nx-inset',
 
   title: 'NuGet API Key',
-  autoShow: true,
-  modal: true,
-  constrain: true,
-  width: 640,
-  resizable: false,
 
   /**
    * @cfg {String} NuGet API Key
@@ -45,9 +41,10 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
   initComponent: function() {
     var me = this;
 
+    me.setWidth(me.LARGE_MODAL);
+
     me.items = {
       xtype: 'form',
-      bodyPadding: 10,
       items: [
         {
           xtype: 'panel',
@@ -95,7 +92,7 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKeyDetails', {
                 padding: '2px',
                 'font-family': 'monospace'
               }
-            },
+            }
           ]
         },
         {

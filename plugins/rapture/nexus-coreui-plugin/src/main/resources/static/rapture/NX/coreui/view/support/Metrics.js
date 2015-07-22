@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,6 +24,7 @@ Ext.define('NX.coreui.view.support.Metrics', {
   requires: [
     'Ext.chart.Chart',
     'Ext.data.ArrayStore',
+    'NX.Assert',
     'NX.I18n'
   ],
   autoScroll: true,
@@ -204,23 +205,39 @@ Ext.define('NX.coreui.view.support.Metrics', {
   },
 
   /**
+   * Load the data into the store of the component referred to by the query.
+   *
+   * @private
+   * @param data to be loaded
+   * @param query used to find the component
+   */
+  loadStoreByQuery: function (data, query) {
+    var p = this.down(query);
+    //<if assert>
+    NX.Assert.assert(p, "Expected this.down('" + query + "') to return component");
+    //</if>
+    if (!p) return;
+    p.getStore().loadData(data);
+  },
+
+  /**
    * @public
    */
   setTotalData: function (data) {
-    this.down('panel #memoryUsage').getStore().loadData(data);
+    this.loadStoreByQuery(data, 'panel #memoryUsage');
   },
 
   /**
    * @public
    */
   setMemoryDistData: function (data) {
-    this.down('panel #memoryDist').getStore().loadData(data);
+    this.loadStoreByQuery(data, 'panel #memoryDist');
   },
 
   /**
    * @public
    */
   setThreadStatesData: function (data) {
-    this.down('panel #threadStates').getStore().loadData(data);
+    this.loadStoreByQuery(data, 'panel #threadStates');
   }
 });

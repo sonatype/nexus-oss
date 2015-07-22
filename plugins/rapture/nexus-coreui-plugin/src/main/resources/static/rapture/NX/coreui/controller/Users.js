@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -117,7 +117,7 @@ Ext.define('NX.coreui.controller.Users', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRelatedStores
+          refresh: me.loadStores
         }
       },
       store: {
@@ -130,7 +130,7 @@ Ext.define('NX.coreui.controller.Users', {
       },
       component: {
         'nx-coreui-user-list': {
-          beforerender: me.loadRelatedStores
+          beforerender: me.loadStores
         },
         'nx-coreui-user-list button[action=new]': {
           click: me.showAddWindow
@@ -183,14 +183,14 @@ Ext.define('NX.coreui.controller.Users', {
     if (Ext.isDefined(model)) {
       if (model.get('external')) {
         if (!externalSettingsPanel) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-user-settings-external', title: 'Settings', weight: 10 });
+          me.addTab({ xtype: 'nx-coreui-user-settings-external', title: 'Settings', weight: 10 });
           externalSettingsPanel = me.getExternalSettings();
         }
         externalSettingsPanel.loadRecord(model)
       }
       else {
         if (!settingsPanel) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-user-settings', title: 'Settings', weight: 10 });
+          me.addTab({ xtype: 'nx-coreui-user-settings', title: 'Settings', weight: 10 });
           settingsPanel = me.getSettings();
         }
         settingsPanel.loadRecord(model)
@@ -198,12 +198,12 @@ Ext.define('NX.coreui.controller.Users', {
 
       if (model.get('external')) {
         if (settingsPanel) {
-          me.getFeature().removeTab(settingsPanel);
+          me.removeTab(settingsPanel);
         }
       }
       else {
         if (externalSettingsPanel) {
-          me.getFeature().removeTab(externalSettingsPanel);
+          me.removeTab(externalSettingsPanel);
         }
       }
     }
@@ -213,11 +213,10 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    */
   showAddWindow: function() {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Users_Create_Title'));
+    me.setItemName(1, NX.I18n.get('Users_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-user-add'));
   },
 
@@ -225,8 +224,7 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    */
   showChangePasswordWindowForSelection: function() {
-    var me = this,
-        list = me.getList(),
+    var list = this.getList(),
         userId = list.getSelectionModel().getSelection()[0].getId();
 
     NX.Security.doWithAuthenticationToken(
@@ -281,21 +279,21 @@ Ext.define('NX.coreui.controller.Users', {
           if (Ext.isFunction(cb)) {
             cb(records, operation, success);
           }
-          me.reselect();
         }
       });
     }
   },
 
   /**
-   * @private
-   * (Re)load related stores.
+   * @override
+   * Load all of the stores associated with this controller
    */
-  loadRelatedStores: function() {
+  loadStores: function() {
     var me = this,
         list = me.getList();
 
     if (list) {
+      me.loadStore();
       me.getStore('UserSource').load();
       me.getStore('Role').load();
     }
@@ -306,8 +304,7 @@ Ext.define('NX.coreui.controller.Users', {
    * (Re)create user source filters.
    */
   onUserSourceLoad: function(store) {
-    var me = this,
-        list = me.getList(),
+    var list = this.getList(),
         userSourceButton;
 
     if (list) {
@@ -410,10 +407,7 @@ Ext.define('NX.coreui.controller.Users', {
    * @private
    */
   onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-user-add');
-
-    me.getStore('User').load();
+    this.getStore('User').load();
   },
 
   /**
@@ -465,13 +459,12 @@ Ext.define('NX.coreui.controller.Users', {
    * Enable 'More' actions as appropriate for user's permissions.
    */
   bindMoreButton: function(button) {
-    var me = this,
-        setMenuItem = button.down('menuitem[action=setpassword]');
+    var setMenuItem = button.down('menuitem[action=setpassword]');
 
     button.mon(
         NX.Conditions.and(
             NX.Conditions.isPermitted('nexus:userschangepw:create'),
-            NX.Conditions.gridHasSelection(me.masters[0], function(model) {
+            NX.Conditions.gridHasSelection(this.masters[0], function(model) {
               return !model.get('external') && model.getId() !== NX.State.getValue('anonymousUsername');
             })
         ),

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -55,8 +55,7 @@ Ext.define('NX.coreui.view.repository.facet.HttpClientFacet', {
                 value: 'username' ,
                 listeners: {
                   'change': function(combo) {
-                    var me = this,
-                        ntlmFields = me.up('form').down('#ntlmFields');
+                    var ntlmFields = this.up('form').down('#ntlmFields');
 
                     if(combo.getValue() === 'ntlm') {
                       ntlmFields.show();

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,7 +19,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import com.sonatype.nexus.repository.nuget.internal.ComponentQuery;
+import org.sonatype.nexus.repository.storage.ComponentQuery;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.apache.http.NameValuePair;

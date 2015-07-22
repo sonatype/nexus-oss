@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,22 +18,17 @@
  * @since 3.0
  */
 Ext.define('NX.view.Authenticate', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-authenticate',
   requires: [
+    'NX.Icons',
     'NX.I18n'
   ],
   ui: 'nx-inset',
 
   title: NX.I18n.get('Authenticate_Title'),
 
-  layout: 'fit',
-  autoShow: true,
-  modal: true,
-  constrain: true,
-  width: 320,
   defaultFocus: 'password',
-  resizable: false,
 
   /**
    * @cfg message Message to be shown
@@ -45,6 +40,8 @@ Ext.define('NX.view.Authenticate', {
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.SMALL_MODAL);
 
     if (!me.message) {
       me.message = NX.I18n.get('Authenticate_Help_Text');

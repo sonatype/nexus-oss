@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -100,12 +100,12 @@ Ext.define('NX.coreui.controller.Tasks', {
       },
       controller: {
         '#Refresh': {
-          refresh: me.onRefresh
+          refresh: me.loadStores
         }
       },
       component: {
         'nx-coreui-task-list': {
-          beforerender: me.onRefresh
+          beforerender: me.loadStores
         },
         'nx-coreui-task-list button[action=new]': {
           click: me.showSelectTypePanel
@@ -156,13 +156,13 @@ Ext.define('NX.coreui.controller.Tasks', {
       taskTypeModel = me.getStore('TaskType').getById(model.get('typeId'));
       if (taskTypeModel) {
         if (!settings) {
-          me.getFeature().addTab({ xtype: 'nx-coreui-task-settings', title: NX.I18n.get('Tasks_Settings_Title'), weight: 20 });
+          me.addTab({ xtype: 'nx-coreui-task-settings', title: NX.I18n.get('Tasks_Settings_Title'), weight: 20 });
         }
         me.showSettings(model);
       }
       else {
         if (settings) {
-          me.getFeature().removeTab(settings);
+          me.removeTab(settings);
         }
       }
     }
@@ -174,8 +174,7 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @param {NX.coreui.model.Task} model task model
    */
   showSummary: function(model) {
-    var me = this,
-      info = {};
+    var info = {};
 
     info[NX.I18n.get('Tasks_ID_Info')] = model.getId();
     info[NX.I18n.get('Tasks_Name_Info')] = model.get('name');
@@ -185,7 +184,7 @@ Ext.define('NX.coreui.controller.Tasks', {
     info[NX.I18n.get('Tasks_LastRun_Info')] = model.get('lastRun');
     info[NX.I18n.get('Tasks_LastResult_Info')] = model.get('lastRunResult');
 
-    me.getInfo().showInfo(info);
+    this.getInfo().showInfo(info);
   },
 
   /**
@@ -201,14 +200,13 @@ Ext.define('NX.coreui.controller.Tasks', {
    * @private
    */
   showSelectTypePanel: function() {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     //clear any filters that may previously have been applied
     me.getStore('TaskType').clearFilter();
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Tasks_Select_Title'));
+    me.setItemName(1, NX.I18n.get('Tasks_Select_Title'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -227,11 +225,10 @@ Ext.define('NX.coreui.controller.Tasks', {
    */
   showAddPanel: function(list, td, cellIndex, model) {
     var me = this,
-      feature = me.getFeature(),
       panel;
 
     // Show the second panel in the create wizard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.format('Tasks_Create_Title', model.get('name')));
+    me.setItemName(2, NX.I18n.format('Tasks_Create_Title', model.get('name')));
     me.loadCreateWizard(2, true, panel = Ext.widget({
       xtype: 'panel',
       layout: {
@@ -247,19 +244,6 @@ Ext.define('NX.coreui.controller.Tasks', {
       ]
     }));
     panel.down('nx-settingsform').loadRecord(me.getTaskModel().create({typeId: model.getId(), enabled: true}));
-  },
-
-  /**
-   * @private
-   * (Re)load task type store && reset all cached combo stores.
-   */
-  onRefresh: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('TaskType').load();
-    }
   },
 
   /**

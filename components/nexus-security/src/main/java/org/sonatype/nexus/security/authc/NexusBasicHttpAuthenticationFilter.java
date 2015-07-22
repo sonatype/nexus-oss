@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -10,7 +10,6 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 package org.sonatype.nexus.security.authc;
 
 import java.io.IOException;
@@ -120,8 +119,11 @@ public class NexusBasicHttpAuthenticationFilter
   }
 
   @Override
-  protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
-      ServletResponse response) throws Exception
+  protected boolean onLoginSuccess(AuthenticationToken token,
+                                   Subject subject,
+                                   ServletRequest request,
+                                   ServletResponse response)
+      throws Exception
   {
     if (request instanceof HttpServletRequest) {
       // Prefer the subject principal over the token's, as these could be different for token-based auth
@@ -132,8 +134,8 @@ public class NexusBasicHttpAuthenticationFilter
       String userId = principal.toString();
 
       // Attach principal+userId to request so we can use that in the request-log
-      ((HttpServletRequest) request).setAttribute(ATTR_USER_PRINCIPAL, principal);
-      ((HttpServletRequest) request).setAttribute(ATTR_USER_ID, userId);
+      request.setAttribute(ATTR_USER_PRINCIPAL, principal);
+      request.setAttribute(ATTR_USER_ID, userId);
     }
     return super.onLoginSuccess(token, subject, request, response);
   }

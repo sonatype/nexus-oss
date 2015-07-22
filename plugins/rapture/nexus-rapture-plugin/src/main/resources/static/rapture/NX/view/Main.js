@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -49,17 +49,6 @@ Ext.define('NX.view.Main', {
       border: true
     },
 
-    //{
-    //  xtype: 'nx-message-panel',
-    //  region: 'east',
-    //  border: true,
-    //  resizable: true,
-    //  resizeHandles: 'w',
-    //
-    //  // default to hidden, header button toggles
-    //  hidden: true
-    //},
-
     {
       xtype: 'nx-footer',
       region: 'south',
@@ -82,6 +71,9 @@ Ext.define('NX.view.Main', {
     }
   ],
 
+  /**
+   * @override
+   */
   initComponent: function () {
     var me = this;
 
@@ -100,7 +92,6 @@ Ext.define('NX.view.Main', {
       ' ',
       { xtype: 'nx-header-quicksearch', hidden: true },
       '->',
-      //{ xtype: 'nx-header-messages', ui: 'nx-header' },
       { xtype: 'nx-header-refresh', ui: 'nx-header' },
       { xtype: 'nx-header-help', ui: 'nx-header' },
       {

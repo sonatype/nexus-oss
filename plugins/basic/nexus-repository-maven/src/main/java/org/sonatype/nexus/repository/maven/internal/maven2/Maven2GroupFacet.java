@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -43,6 +43,7 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Response;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -119,9 +120,18 @@ public class Maven2GroupFacet
     if (content == null) {
       return null;
     }
-    return cacheMetadata(mavenPath, content);
+    cacheMetadata(mavenPath, content);
+    return content; // content is reusable, so just return it
   }
 
+  /**
+   * Merges the contents of passed in metadata and returns the {@link Content} of the resulting merge. The content
+   * returned by this method is kept in memory, is reusable and should be passed back to caller as is.
+   *
+   * @return {@code null} if no merge possible for various reasons (ie. corrupted metadata). If non-null is returned,
+   * the {@link Content} contains merged metadata and is reusable.
+   */
+  @Nullable
   private Content mergeMetadata(final MavenPath mavenPath,
                                 final LinkedHashMap<Repository, Content> metadataContents) throws IOException
   {
@@ -163,7 +173,10 @@ public class Maven2GroupFacet
     return content;
   }
 
-  private Content cacheMetadata(final MavenPath mavenPath, final Content content) throws IOException {
+  /**
+   * Caches the merged metadata and it's Maven2 format required sha1/md5 hashes along.
+   */
+  private void cacheMetadata(final MavenPath mavenPath, final Content content) throws IOException {
     final Map<HashAlgorithm, HashCode> hashCodes = content.getAttributes().require(
         Content.CONTENT_HASH_CODES_MAP, TypeTokens.HASH_CODES_MAP);
     final DateTime now = content.getAttributes().require(Content.CONTENT_LAST_MODIFIED, DateTime.class);
@@ -178,8 +191,6 @@ public class Maven2GroupFacet
         mavenFacet.put(mavenPath.hash(hashType), hashContent);
       }
     }
-    // reload it from cache
-    return mavenFacet.get(mavenPath);
   }
 
   @Subscribe
@@ -190,6 +201,7 @@ public class Maven2GroupFacet
       final MavenPath mavenPath = mavenFacet.getMavenPathParser().parsePath(path);
       // group deletes md + hashes, but it should do only on md change in member
       if (!mavenPath.isHash() && mavenFacet.getMavenPathParser().isRepositoryMetadata(mavenPath)) {
+        UnitOfWork.begin(getRepository().facet(StorageFacet.class).txSupplier());
         try {
           final List<MavenPath> paths = Lists.newArrayList();
           paths.add(mavenPath.main());
@@ -201,6 +213,9 @@ public class Maven2GroupFacet
         catch (IOException e) {
           log.warn("Could not evict merged metadata from {} cache at {}", getRepository().getName(),
               mavenPath.getPath(), e);
+        }
+        finally {
+          UnitOfWork.end();
         }
       }
     }

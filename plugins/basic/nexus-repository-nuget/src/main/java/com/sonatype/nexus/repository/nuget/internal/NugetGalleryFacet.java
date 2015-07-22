@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,9 +19,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.view.Payload;
-
-import org.joda.time.DateTime;
+import org.sonatype.nexus.repository.cache.CacheInfo;
+import org.sonatype.nexus.repository.view.Content;
 
 /**
  * Provides persistent storage for Nuget content.
@@ -45,24 +44,18 @@ public interface NugetGalleryFacet
   /**
    * Attach content to pre-existing metadata.
    */
-  void putContent(String id, String version, InputStream content) throws IOException;
+  Content putContent(String id, String version, Content content) throws IOException;
 
   /**
    * Get a package, or {@code null} if not found.
    */
   @Nullable
-  Payload get(String id, String version) throws IOException;
-
-  /**
-   * Gets when we last checked that the content was up to date relative to the remote server, or {@code null} if not
-   * found.
-   */
-  DateTime getLastVerified(String id, String version);
+  Content get(String id, String version) throws IOException;
 
   /**
    * Sets when we last checked that the content was up to date relative to the remote server.
    */
-  void setLastVerified(String id, String version, DateTime date);
+  void setCacheInfo(String id, String version, CacheInfo cacheInfo);
 
   /**
    * Delete a package and return whether it existed.

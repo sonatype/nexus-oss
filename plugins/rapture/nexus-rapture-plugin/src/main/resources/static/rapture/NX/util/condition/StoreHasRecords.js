@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,10 +21,16 @@ Ext.define('NX.util.condition.StoreHasRecords', {
   extend: 'NX.util.condition.Condition',
 
   /**
-   * @cfg {String} Id of store to be monitored
+   * Id of store to be monitored.
+   *
+   * @cfg {String}
    */
   store: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.StoreHasRecords}
+   */
   bind: function () {
     var me = this,
         store;
@@ -43,6 +49,9 @@ Ext.define('NX.util.condition.StoreHasRecords', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function (store) {
     var me = this;
 
@@ -51,9 +60,12 @@ Ext.define('NX.util.condition.StoreHasRecords', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ store=' + me.store + ' }';
+    return this.self.getName() + '{ store=' + this.store + ' }';
   }
 
 });

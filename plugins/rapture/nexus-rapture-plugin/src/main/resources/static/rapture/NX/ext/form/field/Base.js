@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,11 +31,15 @@ Ext.define('NX.ext.form.field.Base', {
    */
   hideIfUndefined: false,
 
+  // used to track if helpText has already been placed
+  isHelpTextPlaced: false,
+
   initComponent: function () {
     var me = this;
 
-    if (me.helpText) {
-      me.afterLabelTpl = '<span style="font-size: 10px;">' + me.helpText + '</span>';
+    if (me.helpText && !me.isHelpTextPlaced) {
+      me.beforeSubTpl = '<span class="nx-boxlabel">' + me.helpText + '</span>';
+      me.isHelpTextPlaced = true;
     }
 
     me.callParent(arguments);

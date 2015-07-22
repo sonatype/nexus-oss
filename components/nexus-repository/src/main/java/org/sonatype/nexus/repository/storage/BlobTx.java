@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -60,7 +60,7 @@ class BlobTx
     final MultiHashingInputStream hashingStream = new MultiHashingInputStream(hashAlgorithms, inputStream);
     Blob blob = blobStore.create(hashingStream, headers);
     BlobRef blobRef = new BlobRef(localNodeAccess.getId(), blobStore.getBlobStoreConfiguration().getName(), blob.getId().asUniqueString());
-    AssetBlob assetBlob = new AssetBlob(blobRef, hashingStream.count(), contentType, hashingStream.hashes());
+    AssetBlob assetBlob = new AssetBlob(blobRef, blob, hashingStream.count(), contentType, hashingStream.hashes());
     newlyCreatedBlobs.add(assetBlob);
     return assetBlob;
   }

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -80,7 +80,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRecipe
+          refresh: me.loadStores
         }
       },
       store: {
@@ -96,7 +96,7 @@ Ext.define('NX.coreui.controller.Blobstores', {
           click: me.showAddWindow
         },
         'nx-coreui-blobstore-settings-form': {
-          submitted: me.onSettingsSubmitted
+          submitted: me.loadStores
         }
       }
     });
@@ -113,10 +113,8 @@ Ext.define('NX.coreui.controller.Blobstores', {
    * @override
    */
   onSelection: function(list, model) {
-    var me = this;
-
     if (Ext.isDefined(model)) {
-      me.getSettings().loadRecord(model);
+      this.getSettings().loadRecord(model);
     }
   },
 
@@ -124,11 +122,10 @@ Ext.define('NX.coreui.controller.Blobstores', {
    * @private
    */
   showAddWindow: function() {
-    var me = this,
-        feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Blobstores_Create_Title'));
+    me.setItemName(1, NX.I18n.get('Blobstores_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-blobstore-add'));
   },
 
@@ -142,16 +139,6 @@ Ext.define('NX.coreui.controller.Blobstores', {
     if (list) {
       me.getStore('BlobstoreType').load();
     }
-  },
-
-  /**
-   * @private
-   */
-  onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-blobstore-add');
-
-    me.getStore('Blobstore').load();
   },
 
   /**

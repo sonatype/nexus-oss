@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -37,7 +37,6 @@ import org.sonatype.sisu.litmus.testsupport.junit.TestIndexRule;
 import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.junit.After;
@@ -53,17 +52,11 @@ import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionConfigurationFileExtendOption;
 import org.ops4j.pax.exam.options.MavenUrlReference;
+import org.ops4j.pax.exam.options.ProvisionOption;
 import org.slf4j.Logger;
 
-import static org.ops4j.pax.exam.CoreOptions.composite;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.propagateSystemProperty;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.ops4j.pax.exam.CoreOptions.systemTimeout;
-import static org.ops4j.pax.exam.CoreOptions.vmOptions;
-import static org.ops4j.pax.exam.CoreOptions.when;
-import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.ops4j.pax.exam.CoreOptions.*;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 /**
@@ -73,10 +66,10 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
  *
  * <pre>
  * &#064;Configuration
- * public static Option[] config() {
- *   return options(
- *       nexusDistribution(&quot;org.sonatype.nexus.assemblies&quot;, &quot;nexus-base-template&quot;),
- *       nexusPlugin(&quot;org.sonatype.nexus.plugins&quot;, &quot;nexus-repository-raw&quot;)
+ * public static Option[] configureNexus() {
+ *   return options( //
+ *       nexusDistribution(&quot;org.sonatype.nexus.assemblies&quot;, &quot;nexus-base-template&quot;), //
+ *       nexusPlugin(&quot;org.sonatype.nexus.plugins&quot;, &quot;nexus-repository-raw&quot;) //
  *   );
  * }
  * </pre>
@@ -91,6 +84,8 @@ public abstract class NexusPaxExamSupport
   public static final String NEXUS_PAX_EXAM_TIMEOUT_KEY = "nexus.pax.exam.timeout";
 
   public static final int NEXUS_PAX_EXAM_TIMEOUT_DEFAULT = 300000;
+
+  public static final int NEXUS_TEST_START_LEVEL = 200;
 
   // -------------------------------------------------------------------------
 
@@ -123,12 +118,11 @@ public abstract class NexusPaxExamSupport
   @Inject
   protected TaskScheduler taskScheduler;
 
-  protected final Logger log = (Logger) Preconditions.checkNotNull(this.createLogger());
+  protected final Logger log = checkNotNull(createLogger());
 
   protected Logger createLogger() {
     return Loggers.getLogger(this);
   }
-
 
   // -------------------------------------------------------------------------
 
@@ -277,6 +271,9 @@ public abstract class NexusPaxExamSupport
   // -------------------------------------------------------------------------
 
   /**
+   * To test a different version set the 'it.nexus.bundle.version' system property.<br>
+   * You can also override the 'groupId', 'artifactId', and 'classifier' the same way.
+   *
    * @return Pax-Exam option to install a Nexus distribution based on groupId and artifactId
    */
   public static Option nexusDistribution(final String groupId, final String artifactId) {
@@ -284,6 +281,9 @@ public abstract class NexusPaxExamSupport
   }
 
   /**
+   * To test a different version set the 'it.nexus.bundle.version' system property.<br>
+   * You can also override the 'groupId', 'artifactId', and 'classifier' the same way.
+   *
    * @return Pax-Exam option to install a Nexus distribution based on groupId, artifactId and classifier
    */
   public static Option nexusDistribution(final String groupId, final String artifactId, final String classifier) {
@@ -321,6 +321,10 @@ public abstract class NexusPaxExamSupport
     }
 
     boolean debugging = Boolean.parseBoolean(System.getProperty("it.debug"));
+
+    // allow overriding of the out-of-the-box logback configuration
+    File logbackProperties = resolveBaseFile("target/test-classes/logback.properties");
+    File logbackNexusXml = resolveBaseFile("target/test-classes/logback-nexus.xml");
 
     return composite(
 
@@ -360,9 +364,10 @@ public abstract class NexusPaxExamSupport
         wrappedBundle(maven("org.hamcrest", "hamcrest-library").versionAsInProject()) //
             .instructions("Fragment-Host=org.ops4j.pax.tipi.hamcrest.core"),
 
-        // move work directory inside unpacked distribution
-        editConfigurationFilePut("etc/nexus.properties", //
-            "nexus-work", "${nexus-base}/sonatype-work/nexus"),
+        when(logbackProperties.canRead()).useOptions( //
+            replaceConfigurationFile("data/etc/logback.properties", logbackProperties)),
+        when(logbackNexusXml.canRead()).useOptions( //
+            replaceConfigurationFile("data/etc/logback-nexus.xml", logbackNexusXml)),
 
         // randomize ports...
         editConfigurationFilePut("etc/nexus.properties", //
@@ -387,10 +392,10 @@ public abstract class NexusPaxExamSupport
   /**
    * @return Pax-Exam option to enable HTTPS support in the Nexus distribution
    */
-  public static Option withHttps() {
+  public static Option withHttps(final File keystore) {
     return composite(
         editConfigurationFileExtend("etc/custom.properties", "nexus-args", "${karaf.base}/etc/jetty-https.xml"),
-        replaceConfigurationFile("etc/ssl/keystore.jks", resolveBaseFile("src/test/it-resources/ssl/nexus.jks")));
+        replaceConfigurationFile("etc/ssl/keystore.jks", keystore));
   }
 
   /**
@@ -414,15 +419,21 @@ public abstract class NexusPaxExamSupport
   public static Option[] options(final Option... options) {
     final List<Option> result = new ArrayList<>();
 
-    // filter out the individual nexus-features values
     final List<String> nexusFeatures = new ArrayList<>();
     for (final Option o : OptionUtils.expand(options)) {
+
+      // filter out the individual nexus-features values
       if (o instanceof KarafDistributionConfigurationFileExtendOption) {
         if ("nexus-features".equals(((KarafDistributionConfigurationFileExtendOption) o).getKey())) {
           nexusFeatures.add(((KarafDistributionConfigurationFileExtendOption) o).getValue());
           continue;
         }
       }
+      // provide default start level for any additional test bundles
+      else if (o instanceof ProvisionOption<?> && ((ProvisionOption<?>) o).getStartLevel() == null) {
+        ((ProvisionOption<?>) o).startLevel(NEXUS_TEST_START_LEVEL);
+      }
+
       result.add(o);
     }
 
@@ -433,6 +444,13 @@ public abstract class NexusPaxExamSupport
     }
 
     return result.toArray(new Option[result.size()]);
+  }
+
+  /**
+   * Processes two sequences of options and combines them into a single sequence.
+   */
+  public static Option[] options(final Option[] options1, final Option... options2) {
+    return options(OptionUtils.combine(options1, options2));
   }
 
   // -------------------------------------------------------------------------
@@ -465,7 +483,7 @@ public abstract class NexusPaxExamSupport
    */
   private static Option nexusPaxExam() {
     final String version = MavenUtils.getArtifactVersion("org.sonatype.nexus", "nexus-pax-exam");
-    Option result = mavenBundle("org.sonatype.nexus", "nexus-pax-exam", version);
+    Option result = mavenBundle("org.sonatype.nexus", "nexus-pax-exam", version).startLevel(0);
 
     final File nexusPaxExam = resolveBaseFile("target/nexus-pax-exam-" + version + ".jar");
     if (nexusPaxExam.isFile()) {

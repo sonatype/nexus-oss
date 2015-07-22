@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -64,6 +64,16 @@ public class MapdbBlobMetadataStore
 
   private TxMaker database;
 
+  /**
+   * The number of records counted when last cacheing size
+   */
+  private long numRecords = 0L;
+
+  /**
+   * The cached number of bytes stored.
+   */
+  private long cachedSize = 0L;
+
   private MapdbBlobMetadataStore(final File directory) {
     checkNotNull(directory);
     this.file = new File(directory, directory.getName() + ".db");
@@ -94,6 +104,7 @@ public class MapdbBlobMetadataStore
     DirSupport.mkdir(file.getParentFile());
     this.database = DBMaker.newFileDB(file)
         .checksumEnable()
+        .mmapFileEnableIfSupported()
         .makeTxMaker();
   }
 
@@ -108,7 +119,9 @@ public class MapdbBlobMetadataStore
   }
 
   private HTreeMap<BlobId, MetadataRecord> entries(final DB db) {
-    return db.getHashMap("entries");
+    return db.createHashMap("entries")
+        .counterEnable()
+        .makeOrGet();
   }
 
   private NavigableSet<BlobId> states(final DB db, final BlobState state) {
@@ -427,12 +440,50 @@ public class MapdbBlobMetadataStore
   public long getTotalSize() {
     ensureStarted();
 
+    return getMetadataSize() + getBlobSize();
+  }
+
+  @Override
+  public long getMetadataSize() {
+    ensureStarted();
+
     // sum all file bytes in the database root
     long bytes = 0;
     for (File file : listFiles()) {
       bytes += file.length();
     }
     return bytes;
+  }
+
+  @Override
+  public long getBlobSize() {
+    ensureStarted();
+    return database.execute(new Fun.Function1<Long, DB>()
+    {
+      @Override
+      public Long run(final DB db) {
+        long totalSize = 0L;
+        HTreeMap<BlobId, MetadataRecord> entries = entries(db);
+        if (entries.sizeLong() == numRecords) {
+          log.debug("Returning cached blob size");
+          return cachedSize;
+        }
+
+        log.debug("Cached data is invalid, recalculating size of blobs");
+
+        for (MetadataRecord metadataRecord : entries.values()) {
+          if (metadataRecord.size != null) {
+            totalSize += metadataRecord.size;
+          }
+          else {
+            log.warn("Blob metadata has no size indicated for sha1: {}", metadataRecord.sha1);
+          }
+        }
+        numRecords = entries.sizeLong();
+        cachedSize = totalSize;
+        return cachedSize;
+      }
+    });
   }
 
   @Override

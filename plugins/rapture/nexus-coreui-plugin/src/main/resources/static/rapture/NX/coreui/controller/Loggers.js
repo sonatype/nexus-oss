@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -26,7 +26,7 @@ Ext.define('NX.coreui.controller.Loggers', {
     'NX.Messages',
     'NX.I18n'
   ],
-
+  detail: 'nx-coreui-logger-list',
   stores: [
     'Logger'
   ],
@@ -43,6 +43,9 @@ Ext.define('NX.coreui.controller.Loggers', {
     { ref: 'list', selector: 'nx-coreui-logger-list' }
   ],
 
+  /**
+   * @override
+   */
   init: function () {
     var me = this;
 
@@ -110,8 +113,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Loads logger store.
    */
   loadStore: function () {
-    var me = this,
-        list = me.getList();
+    var list = this.getList();
 
     if (list) {
       list.getStore().load();
@@ -123,9 +125,7 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Shows success messages after records has been written (create/update).
    */
   onWrite: function (store, operation) {
-    var me = this;
-
-    me.loadStore();
+    this.loadStore();
     if (operation.success) {
       Ext.Array.each(operation.records, function (model) {
         NX.Messages.add({ text: NX.I18n.format('Loggers_Write_Success', operation.action, model.get('name')), type: 'success' });
@@ -138,11 +138,10 @@ Ext.define('NX.coreui.controller.Loggers', {
    * Shows add logger window.
    */
   showAddWindow: function (button) {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Loggers_Create_Title'));
+    me.setItemName(1, NX.I18n.get('Loggers_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-logger-add'));
   },
 

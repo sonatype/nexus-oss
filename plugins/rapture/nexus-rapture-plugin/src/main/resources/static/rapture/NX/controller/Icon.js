@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,16 +18,13 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Icon', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.Error',
     'Ext.util.CSS',
     'NX.util.Url',
     'NX.Icons'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   models: [
     'Icon'
@@ -60,14 +57,13 @@ Ext.define('NX.controller.Icon', {
 
   /**
    * @private
-   * @param url
+   * @param {String} url
    */
   preloadImage: function(url) {
-    var me = this,
-        img;
+    var img;
 
     //<if debug>
-    me.logDebug('Preloading: ' + url);
+    this.logTrace('Preloading:', url);
     //</if>
 
     img = new Image();
@@ -103,7 +99,7 @@ Ext.define('NX.controller.Icon', {
     me.stylesheet = Ext.util.CSS.createStyleSheet(styles.join(' '), 'nx-icons');
 
     //<if debug>
-    me.logDebug('Stylesheet installed with ' + me.stylesheet.cssRules.length + ' rules');
+    me.logDebug('Stylesheet installed with', me.stylesheet.cssRules.length, 'rules');
     //</if>
   },
 
@@ -113,8 +109,7 @@ Ext.define('NX.controller.Icon', {
    * @private
    */
   buildIconStyle: function (icon) {
-    var me = this,
-        style;
+    var style;
 
     style = '.' + icon.cls + ' {';
     style += 'background: url(' + icon.url + ') no-repeat center center !important;';
@@ -176,10 +171,10 @@ Ext.define('NX.controller.Icon', {
 
     // complain if height/width are missing as this could cause the image not to display
     if (!icon.height) {
-      me.logWarn('Icon missing height: ' + icon.css);
+      me.logWarn('Icon missing height:', icon.css);
     }
     if (!icon.width) {
-      me.logWarn('Icon missing width: ' + icon.css);
+      me.logWarn('Icon missing width:', icon.css);
     }
 
     // TODO: complain if we are overwriting an icon
@@ -193,8 +188,7 @@ Ext.define('NX.controller.Icon', {
    * @private
    */
   configureIcon: function (icon) {
-    var me = this,
-        variant = icon.variant;
+    var variant = icon.variant;
 
     // automatically apply 'x<size>'
     if (Ext.isString(variant)) {
@@ -217,8 +211,7 @@ Ext.define('NX.controller.Icon', {
    * @public
    */
   findIcon: function (name, variant) {
-    var me = this,
-        store = me.getStore('Icon'),
+    var store = this.getStore('Icon'),
         recordId;
 
     recordId = store.findBy(function (record, id) {

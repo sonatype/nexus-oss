@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -58,7 +58,7 @@ class NugetDefaultRepositoriesContributor
                 [
                     proxy: [
                         remoteUrl     : 'https://www.nuget.org/api/v2/',
-                        artifactMaxAge: 5
+                        contentMaxAge: 5
                     ],
                     storage: [
                         blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME

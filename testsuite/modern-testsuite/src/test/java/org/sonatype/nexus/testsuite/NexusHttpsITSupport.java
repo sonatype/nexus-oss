@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -61,7 +61,8 @@ public abstract class NexusHttpsITSupport
    */
   @Configuration
   public static Option[] configureNexus() {
-    return options(nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"), withHttps());
+    return options(NexusCoreITSupport.configureNexus(),
+        withHttps(resolveBaseFile("target/it-resources/ssl/nexus.jks")));
   }
 
   /**
@@ -126,7 +127,7 @@ public abstract class NexusHttpsITSupport
    */
   protected KeyStore trustStore() throws Exception {
     KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-    try (FileInputStream instream = new FileInputStream(resolveBaseFile("src/test/it-resources/ssl/client.jks"))) {
+    try (FileInputStream instream = new FileInputStream(resolveBaseFile("target/it-resources/ssl/client.jks"))) {
       trustStore.load(instream, "password".toCharArray());
     }
     return trustStore;

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,10 +19,13 @@
  */
 Ext.define('NX.coreui.view.search.SearchResultList', {
   extend: 'NX.view.drilldown.Master',
-  alias: ['widget.nx-coreui-search-result-list', 'widget.nx-coreui-healthcheck-result-list'],
+  alias: 'widget.nx-coreui-search-result-list',
   requires: [
     'NX.I18n'
   ],
+
+  // Mark grid as health check columns target
+  healthCheckColumnsTarget: true,
 
   config: {
     stateful: true,
@@ -30,6 +33,9 @@ Ext.define('NX.coreui.view.search.SearchResultList', {
   },
 
   store: 'SearchResult',
+
+  // Prevent the store from automatically loading
+  loadStore: Ext.emptyFn,
 
   style: {
     'background-color': '#F4F4F4'

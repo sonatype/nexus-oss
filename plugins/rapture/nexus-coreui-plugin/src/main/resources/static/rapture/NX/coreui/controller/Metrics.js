@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,7 +19,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.Metrics', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.Ajax',
     'NX.Messages',
@@ -28,9 +28,6 @@ Ext.define('NX.coreui.controller.Metrics', {
     'NX.util.DownloadHelper',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'support.Metrics'

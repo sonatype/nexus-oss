@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,6 +18,7 @@ import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTxHook;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.collect.Sets;
 
@@ -85,11 +86,17 @@ public class SearchHook
 
   @Override
   public void postCommit() {
-    for (EntityId entityId : deindexable) {
-      searchFacet.delete(entityId);
+    UnitOfWork.begin(searchFacet.txSupplier());
+    try {
+      for (EntityId entityId : deindexable) {
+        searchFacet.delete(entityId);
+      }
+      for (EntityId entityId : indexable) {
+        searchFacet.put(entityId);
+      }
     }
-    for (EntityId entityId : indexable) {
-      searchFacet.put(entityId);
+    finally {
+      UnitOfWork.end();
     }
   }
 }

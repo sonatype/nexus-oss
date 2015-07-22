@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -36,6 +36,10 @@ public class RawHostedIT
 {
   public static final String HOSTED_REPO = "raw-test-hosted";
 
+  public static final String TEST_PATH = "alphabet.txt";
+
+  public static final String TEST_CONTENT = "alphabet.txt";
+
   private RawClient rawClient;
 
   @Before
@@ -47,16 +51,14 @@ public class RawHostedIT
 
   @Test
   public void uploadAndDownload() throws Exception {
-    final String path = "alphabet.txt";
-
-    final File testFile = resolveTestFile(path);
-    final int response = rawClient.put(path, ContentType.TEXT_PLAIN, testFile);
+    final File testFile = resolveTestFile(TEST_CONTENT);
+    final int response = rawClient.put(TEST_PATH, ContentType.TEXT_PLAIN, testFile);
     assertThat(response, is(HttpStatus.CREATED));
 
-    assertThat(bytes(rawClient.get(path)), is(Files.toByteArray(testFile)));
+    assertThat(bytes(rawClient.get(TEST_PATH)), is(Files.toByteArray(testFile)));
 
-    assertThat(status(rawClient.delete(path)), is(HttpStatus.NO_CONTENT));
+    assertThat(status(rawClient.delete(TEST_PATH)), is(HttpStatus.NO_CONTENT));
 
-    assertThat("content should be deleted", status(rawClient.get(path)), is(HttpStatus.NOT_FOUND));
+    assertThat("content should be deleted", status(rawClient.get(TEST_PATH)), is(HttpStatus.NOT_FOUND));
   }
 }

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.view.support.FileCreated', {
-  extend: 'Ext.window.Window',
+  extend: 'NX.view.ModalDialog',
   alias: 'widget.nx-coreui-support-filecreated',
   requires: [
     'NX.I18n'
@@ -35,19 +35,13 @@ Ext.define('NX.coreui.view.support.FileCreated', {
    */
   fileType: undefined,
 
-  layout: 'fit',
-  autoShow: true,
-  constrain: true,
-  resizable: false,
-  width: 630,
-  border: false,
-  modal: true,
-
   /**
    * @override
    */
   initComponent: function () {
     var me = this;
+
+    me.setWidth(me.LARGE_MODAL);
 
     Ext.apply(me, {
       title: me.title || me.fileType + ' Created',

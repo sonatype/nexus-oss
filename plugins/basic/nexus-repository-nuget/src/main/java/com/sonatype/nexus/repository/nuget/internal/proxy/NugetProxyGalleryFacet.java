@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +37,7 @@ import com.sonatype.nexus.repository.nuget.odata.ODataUtils;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
+import org.sonatype.nexus.transaction.Transactional;
 import org.sonatype.sisu.goodies.common.Time;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -130,7 +132,7 @@ public class NugetProxyGalleryFacet
         getProxyRepositories(),
         new CountFetcher(fetcher));
 
-    final int hostedCount = super.count(operation, parameters, getHostedRepositories());
+    final int hostedCount = count(operation, parameters, getHostedRepositories());
 
     return sum(remoteCounts) + hostedCount;
   }
@@ -184,6 +186,7 @@ public class NugetProxyGalleryFacet
   }
 
   @Override
+  @Transactional
   public String entry(final String base, final String id, final String version) {
     String entryXml = super.entry(base, id, version);
 
@@ -309,6 +312,7 @@ public class NugetProxyGalleryFacet
       {
         @Override
         public Integer call() throws Exception {
+          // The count cache shouldn't contain nulls, so return 0 if we fail to get a result from the feed
           return firstNonNull(fetcher.cachePackageFeed(remote, nugetQuery, false, new ODataConsumer()
           {
             @Override

@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -230,6 +230,23 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
+
+    <!--
+    HACK: expose orientdb distribution to extract studio.zip plugin
+    -->
+    <dependency>
+      <groupId>com.orientechnologies</groupId>
+      <artifactId>orientdb-community</artifactId>
+      <classifier>distribution</classifier>
+      <type>zip</type>
+      <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <build>
@@ -302,9 +319,9 @@
 
                 <!-- trim out various enterprise/deployment features we don't need at the moment -->
                 <replace file="${project.build.directory}/assembly/etc/org.apache.karaf.features.cfg">
-                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.3/xml/features"/>
-                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.1.4/xml/features"/>
-                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.3/xml/features"/>
+                  <replacefilter token=",mvn:org.apache.karaf.features/enterprise/3.0.4/xml/features"/>
+                  <replacefilter token=",mvn:org.ops4j.pax.web/pax-web-features/3.2.3/xml/features"/>
+                  <replacefilter token=",mvn:org.apache.karaf.features/spring/3.0.4/xml/features"/>
                   <replacefilter token=",kar,ssh,management"/>
                   <replacefilter token=",region"/>
                 </replace>
@@ -314,6 +331,17 @@
                   <replacefilter token="${mvn:pax-logging-service}"
                                  value="${mvn:metrics-core} = 8${line.separator}${mvn:metrics-logback} = 8${line.separator}${mvn:pax-logging-metrics} = 8${line.separator}${mvn:pax-logging-access} = 8${line.separator}${mvn:pax-logging-logback}"/>
                 </replace>
+
+                <!--
+                HACK: Include orientdb-studio plugin.
+                -->
+                <unzip src="${com.orientechnologies:orientdb-community:zip:distribution}"
+                       dest="${project.build.directory}/assembly/data/orient/plugins">
+                  <mergemapper to="studio.zip"/>
+                  <patternset>
+                    <include name="*/plugins/studio-*.zip"/>
+                  </patternset>
+                </unzip>
               </target>
             </configuration>
           </execution>

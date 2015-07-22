@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -32,21 +32,32 @@ Ext.define('NX.coreui.app.PluginStrings', {
 
   keys: {
     // Browse -> Browse
-    Browse_Title_Feature: 'Browse',
-    Browse_Description_Feature: 'Browse components and assets',
+    Browse_Assets_Title_Feature: 'Assets',
+    Browse_Assets_Description_Feature: 'Browse assets',
+    Browse_Components_Title_Feature: 'Components',
+    Browse_Components_Description_Feature: 'Browse components and assets',
     Browse_BrowseRepositoryList_Name_Column: 'Name',
     Browse_BrowseRepositoryList_Type_Column: 'Type',
     Browse_BrowseRepositoryList_Format_Column: 'Format',
-    Browse_BrowseRepositoryList_EmptyText_View: 'No repositories defined',
+    Browse_BrowseRepositoryList_EmptyText_View: 'No browseable repositories defined',
     Browse_BrowseRepositoryList_EmptyText_Filter: 'No repositories matched "$filter"',
-    Browse_BrowseResultList_Name_Column: 'Name',
-    Browse_BrowseResultList_Name_Column_Unattached: '-- Unattached assets --',
-    Browse_BrowseResultList_Group_Column: 'Group',
-    Browse_BrowseResultList_Version_Column: 'Version',
-    Browse_BrowseResultList_EmptyText_View: 'No components found in repository',
-    Browse_BrowseResultList_EmptyText_Filter: 'No components matched "$filter"',
-    Assets_Info_Name: 'Name',
+    Browse_BrowseComponentList_Name_Column: 'Name',
+    Browse_BrowseComponentList_Group_Column: 'Group',
+    Browse_BrowseComponentList_Version_Column: 'Version',
+    Browse_BrowseComponentList_EmptyText_View: 'No components found in repository',
+    Browse_BrowseComponentList_EmptyText_Filter: 'No components matched "$filter"',
+    Browse_BrowseAssetList_Name_Column: 'Name',
+    Browse_BrowseAssetList_EmptyText_View: 'No assets found in repository',
+    Browse_BrowseAssetList_EmptyText_Filter: 'No assets matched "$filter"',
+    Assets_Info_Path: 'Path',
     Assets_Info_ContentType: 'Content Type',
+    Assets_Info_FileSize: 'File size',
+    Assets_Info_Last_Updated: 'Last updated',
+    Assets_Info_Locally_Cached: 'Locally cached',
+    Assets_Info_BlobRef: 'Blob Reference',
+    AssetInfo_Delete_Button: 'Delete asset',
+    AssetInfo_Delete_Title: 'Confirm deletion?',
+    AssetInfo_Delete_Success: 'Asset deleted: {0}',
 
     // Browse -> Search
     Search_Text: 'Search',
@@ -95,9 +106,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     HealthCheckSearch_Security_Header: 'Security',
     HealthCheckSearch_License_Header: 'License',
     HealthCheckSearch_Disabled_Tooltip: 'The age and popularity data is only available once Repository Health Check (RHC) has been enabled.',
-    HealthCheckSearch_Error_Tooltip: 'Error retrieving data from Sonatype CLM',
+    HealthCheckSearch_Error_Tooltip: 'Error retrieving component data',
     HealthCheckSearch_Quota_Tooltip: 'The query limit for age and popularity data has been reached. Contact Sonatype support to extend current quota limits.',
-    HealthCheckSearch_Unavailable_Tooltip: 'CLM data is not available for this component.<br/>Internal components are not covered in Sonatype CLM.',
+    HealthCheckSearch_Unavailable_Tooltip: 'No data available for this component',
     Component_AssetInfo_Info_Title: 'Info',
 
     // Browse -> Search -> Raw
@@ -126,6 +137,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Feed_FeedFeature_List_Title: 'Events',
     Feed_FeedEntryList_Title_Header: 'Title',
     Feed_FeedEntryList_Date_Header: 'Date',
+
+    // Browse -> Browse
+    FeatureGroups_Browse_Text: 'Browse',
+    FeatureGroups_Browse_Description: 'Browse assets and components',
 
     // Browse -> Upload
     FeatureGroups_Upload_Text: 'Upload',
@@ -168,7 +183,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_Facet_ProxyFacet_Blocked_FieldLabel: 'Blocked',
     Repository_Facet_ProxyFacet_Blocked_HelpText: 'Block outbound connections on the repository',
     Repository_RepositorySettingsForm_Name_FieldLabel: 'Name',
+    Repository_RepositorySettingsForm_Name_HelpText: 'An identifier used during the construction of the repository URL',
     Repository_RepositorySettingsForm_URL_FieldLabel: 'URL',
+    Repository_RepositorySettingsForm_URL_HelpText: 'The URL used to access this repository',
     Repository_Facet_GroupFacet_Members_FieldLabel: 'Member repositories',
     Repository_Facet_GroupFacet_Members_HelpText: 'Select and order the repositories that are part of this group',
     Repository_Facet_GroupFacet_Members_FromTitle: 'Available',
@@ -191,7 +208,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Maven2Facet_VersionPolicy_ReleaseItem: 'Release',
     Maven2Facet_VersionPolicy_SnapshotItem: 'Snapshot',
     Repository_RepositorySettingsForm_Format_FieldLabel: 'Format',
+    Repository_RepositorySettingsForm_Format_HelpText: 'The format chosen as the recipe for this repository',
     Repository_RepositorySettingsForm_Type_FieldLabel: 'Type',
+    Repository_RepositorySettingsForm_Type_HelpText: 'The type of repository (i.e. group, hosted, or proxy)',
     Repository_RepositorySettingsForm_Online_FieldLabel: 'Online',
     Repository_RepositorySettingsForm_Online_HelpText: 'If checked, the repository accepts incoming requests',
     Repository_Facet_ProxyFacet_ArtifactAge_FieldLabel: 'Maximum artifact age',
@@ -201,7 +220,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_Facet_HttpClientFacet_ConnectionTimeout_FieldLabel: 'Connection timeout',
     Repository_Facet_HttpClientFacet_ConnectionTimeout_HelpText: 'Seconds to wait for activity before stopping and retrying the connection. Leave blank to use the globally defined HTTP timeout.',
     Repository_Facet_StorageFacet_BlobStore_FieldLabel: 'Blobstore',
-    Repository_Facet_StorageFacet_BlobStore_HelpText: 'Blobstore to be used to store asset contents.',
+    Repository_Facet_StorageFacet_BlobStore_HelpText: 'Blobstore used to store asset contents',
     Repository_Facet_StorageFacet_BlobStore_EmptyText: 'Select a blobstore',
     Repository_Facet_StorageFacet_ContentTypeValidation_FieldLabel: 'Strict Content Type Validation',
     Repository_Facet_NegativeCacheFacet_Enabled_FieldLabel: 'Not found cache enabled',
@@ -692,7 +711,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Capability_CapabilitySummary_Title: 'Summary',
     Capability_CapabilitySettings_Title: 'Settings',
     Capability_CapabilitySettingsForm_Enabled_FieldLabel: 'Enable this capability',
-    Capability_CapabilitySummary_Summary_Title: 'Summary',
     Capability_CapabilitySummary_Status_Title: 'Status',
     Capability_CapabilitySummary_About_Title: 'About',
     Capability_CapabilitySummary_Notes_Title: 'Notes',
@@ -737,7 +755,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     System_HttpSettings_ProxyPort_FieldLabel: 'HTTP proxy port',
     System_HttpSettings_Authentication_Title: 'Authentication',
     System_HttpSettings_ExcludeHosts_FieldLabel: 'Hosts to exclude from HTTP/HTTPS proxy',
-    System_HttpSettings_ExcludeHosts_HelpText: 'Java http.nonProxyHosts glob-like expressions are supported (do not use \'|\' delimiter)',
+    System_HttpSettings_ExcludeHosts_HelpText: 'Accepts Java "http.nonProxyHosts" wildcard patterns (one per line, no \'|\' hostname delimiters)',
     System_HttpSettings_HttpsProxy_Title: 'HTTPS proxy',
     System_HttpSettings_HttpsProxyHost_FieldLabel: 'HTTPS proxy host',
     System_HttpSettings_HttpsProxyHost_HelpText: 'No https:// required (e.g. "proxy-host" or "192.168.1.101")',
@@ -891,9 +909,8 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Nuget_NuGetApiKey_Access_Button: 'Access API Key',
     Nuget_NuGetApiKey_Access_HelpText: 'Accessing NuGet API Key requires validation of your credentials.',
     Nuget_NuGetApiKey_Reset_Button: 'Reset API Key',
-    Nuget_NuGetApiKey_Reset_HelpText: 'Resetting NuGet API Key requires validation of your credentials.',
+    Nuget_NuGetApiKey_Reset_HelpText: 'Resetting NuGet API Key requires validation of your credentials.'
   }
 }, function(obj) {
   NX.I18n.register(obj.keys);
 });
-

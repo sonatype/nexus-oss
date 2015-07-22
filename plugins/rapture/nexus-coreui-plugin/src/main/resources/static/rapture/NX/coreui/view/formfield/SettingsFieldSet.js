@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -138,8 +138,7 @@ Ext.define('NX.coreui.view.formfield.SettingsFieldSet', {
    * an object hash of `{id: msg, id2: msg2}`, or a {@link Ext.data.Errors} object.
    */
   markInvalid: function (errors) {
-    var me = this,
-        form = me.up('form').getForm(),
+    var form = this.up('form').getForm(),
         remainingMessages = [],
         key, marked, field;
 

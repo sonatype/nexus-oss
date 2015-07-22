@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -90,6 +90,11 @@ public class NexusRedirectStrategy
       final URI targetUri = createLocationURI(locationHeader.getValue());
       final String targetScheme = schemeOf(targetUri);
       final String targetHost = hostOf(targetUri);
+
+      // FIXME: sourceUri might be relative while targetUri is always absolute, which can lead to
+      // false-positive logging because the source scheme (null) differs from the target ("http")
+      // One way to fix this is to resolve the relative sourceUri against the original proxy URL,
+      // but this relies on access to the original configuration.
 
       // nag about redirection peculiarities, in any case
       if (!Objects.equals(sourceScheme, targetScheme)) {

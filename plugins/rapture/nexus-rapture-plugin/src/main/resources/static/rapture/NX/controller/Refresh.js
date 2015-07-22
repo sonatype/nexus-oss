@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,14 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Refresh', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Messages',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'header.Refresh'
@@ -47,22 +44,25 @@ Ext.define('NX.controller.Refresh', {
 
     me.addEvents(
       /**
+       * Fires before the refresh is performed.
+       *
        * @event beforerefresh
-       * Fires before the refresh is performed
        */
       'beforerefresh',
 
       /**
-       * @event refresh
        * Fires when refresh should be performed.
+       *
+       * @event refresh
        */
       'refresh'
     );
   },
 
   /**
-   * @public
    * Fire refresh event.
+   *
+   * @public
    */
   refresh: function () {
     var me = this;

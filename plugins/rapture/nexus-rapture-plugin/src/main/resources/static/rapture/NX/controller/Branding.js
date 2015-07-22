@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Branding', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.State'
   ],
@@ -57,24 +57,23 @@ Ext.define('NX.controller.Branding', {
   },
 
   /**
-   * @private
    * Render header/footer branding when branding configuration changes.
+   *
+   * @private
    */
   onBrandingChanged: function() {
-    var me = this;
-
-    me.renderHeaderBranding();
-    me.renderFooterBranding();
+    this.renderHeaderBranding();
+    this.renderFooterBranding();
   },
 
   /**
-   * @private
    * Render header branding.
+   *
+   * @private
    */
   renderHeaderBranding: function() {
-    var me = this,
-        branding = NX.State.getValue('branding'),
-        headerBranding = me.getHeaderBranding();
+    var branding = NX.State.getValue('branding'),
+        headerBranding = this.getHeaderBranding();
 
     if (headerBranding) {
       if (branding && branding['headerEnabled']) {
@@ -88,13 +87,13 @@ Ext.define('NX.controller.Branding', {
   },
 
   /**
-   * @private
    * Render footer branding.
+   *
+   * @private
    */
   renderFooterBranding: function() {
-    var me = this,
-        branding = NX.State.getValue('branding'),
-        footerBranding = me.getFooterBranding();
+    var branding = NX.State.getValue('branding'),
+        footerBranding = this.getFooterBranding();
 
     if (footerBranding) {
       if (branding && branding['footerEnabled']) {

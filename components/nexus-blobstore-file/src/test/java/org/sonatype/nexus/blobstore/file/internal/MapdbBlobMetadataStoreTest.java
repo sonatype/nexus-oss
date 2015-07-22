@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.List;
 
 import org.sonatype.nexus.blobstore.api.BlobId;
+import org.sonatype.nexus.blobstore.api.BlobMetrics;
 import org.sonatype.nexus.blobstore.file.BlobMetadata;
 import org.sonatype.nexus.blobstore.file.BlobMetadataStore;
 import org.sonatype.nexus.blobstore.file.BlobState;
@@ -25,10 +26,12 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.emptyIterable;
@@ -110,12 +113,18 @@ public class MapdbBlobMetadataStoreTest
   @Test
   public void basic() throws Exception {
     BlobMetadata md = new BlobMetadata(BlobState.CREATING, ImmutableMap.of("foo", "bar"));
+    BlobMetrics test = new BlobMetrics(new DateTime(), "test", 1l);
+    md.setMetrics(test);
     log(md);
 
     // add a record
     log("add");
     BlobId id = underTest.add(md);
     log(id);
+
+    assertThat(underTest.getBlobSize(), is(1l));
+    assertThat("Total should be size of metadata + size of blobs",
+        underTest.getTotalSize() - underTest.getMetadataSize(), is(1l));
 
     dumpStates();
 

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,13 +18,11 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Content', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
-    'NX.Icons'
+    'NX.Icons',
+    'NX.State'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'feature.Content'
@@ -48,13 +46,27 @@ Ext.define('NX.controller.Content', {
         '#Menu': {
           featureselected: me.onFeatureSelected
         }
+      },
+      component: {
+        'nx-feature-content': {
+          resize: function (obj) {
+            var drilldown;
+            if (obj) {
+              drilldown = obj.down('nx-drilldown');
+              if (drilldown) {
+                drilldown.fireEvent('syncsize');
+              }
+            }
+          }
+        }
       }
     });
   },
 
   /**
-   * @private
    * Update content to selected feature view.
+   *
+   * @private
    * @param {NX.model.Feature} feature selected feature
    */
   onFeatureSelected: function (feature) {
@@ -75,15 +87,12 @@ Ext.define('NX.controller.Content', {
     }
     me.mon(cmp, 'destroy', function () {
       //<if debug>
-      me.logDebug('Destroyed: ' + cmp.self.getName());
+      me.logTrace('Destroyed:', cmp.self.getName());
       //</if>
     });
 
     // remove the current contents
     content.removeAll();
-
-    // Hide the breadcrumb
-    content.showRoot();
 
     // update title and icon
     content.setTitle(text);
@@ -101,6 +110,9 @@ Ext.define('NX.controller.Content', {
     }
     content.setDescription(description);
 
+    // Update the breadcrumb
+    content.showRoot();
+
     // install new feature view
     content.add(cmp);
 
@@ -108,7 +120,7 @@ Ext.define('NX.controller.Content', {
     cmp.fireEvent('activate', cmp);
 
     //<if debug>
-    me.logDebug('Content changed to: ' + text + ' (' + cmp.self.getName() + ')');
+    me.logInfo('Content changed to:', text, 'class:', cmp.self.getName());
     //</if>
   }
 

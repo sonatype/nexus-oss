@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -13,7 +13,6 @@
 package com.sonatype.nexus.repository.nuget.internal.proxy;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
@@ -24,13 +23,11 @@ import com.sonatype.nexus.repository.nuget.internal.NugetGalleryFacet;
 import com.sonatype.nexus.repository.nuget.odata.ODataConsumer;
 
 import org.sonatype.nexus.repository.InvalidContentException;
+import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
-import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
-
-import org.joda.time.DateTime;
 
 /**
  * Serves NuGet packages, and also exposes proxy configuration and content-fetching.
@@ -50,12 +47,7 @@ public class NugetProxyFacet
   @Override
   protected Content getCachedPayload(final Context context) throws IOException {
     String[] coords = coords(context);
-    Payload payload = gallery().get(coords[0], coords[1]);
-    if (payload != null) {
-      // TODO: get last-modified and etag
-      return new Content(payload);
-    }
-    return null;
+    return gallery().get(coords[0], coords[1]);
   }
 
   @Override
@@ -90,24 +82,16 @@ public class NugetProxyFacet
   }
 
   @Override
-  protected void store(final Context context, final Content payload) throws IOException, InvalidContentException {
+  protected Content store(final Context context, final Content payload) throws IOException, InvalidContentException {
     // The metadata will have been cached by this time, so we just need to set the content
     String[] coords = coords(context);
-    try (InputStream in = payload.openInputStream()) {
-      gallery().putContent(coords[0], coords[1], in);
-    }
+   return gallery().putContent(coords[0], coords[1], payload);
   }
 
   @Override
-  protected DateTime getCachedPayloadLastVerified(final Context context) throws IOException {
+  protected void indicateVerified(final Context context, final CacheInfo cacheInfo) throws IOException {
     String[] coords = coords(context);
-    return gallery().getLastVerified(coords[0], coords[1]);
-  }
-
-  @Override
-  protected void indicateVerified(final Context context) throws IOException {
-    String[] coords = coords(context);
-    gallery().setLastVerified(coords[0], coords[1], new DateTime());
+    gallery().setCacheInfo(coords[0], coords[1], cacheInfo);
   }
 
   @Override

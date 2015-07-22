@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,27 +24,28 @@ import java.util.zip.ZipInputStream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.collect.AttributesMap;
-import org.sonatype.nexus.orient.DatabaseInstance;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.maven.MavenFacet;
 import org.sonatype.nexus.repository.maven.MavenPath;
 import org.sonatype.nexus.repository.maven.MavenPath.HashType;
 import org.sonatype.nexus.repository.maven.MavenPathParser;
 import org.sonatype.nexus.repository.maven.internal.DigestExtractor;
+import org.sonatype.nexus.repository.maven.internal.MavenAttributes;
 import org.sonatype.nexus.repository.maven.internal.maven2.Constants;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.BucketEntityAdapter;
 import org.sonatype.nexus.repository.storage.Component;
-import org.sonatype.nexus.repository.storage.ComponentDatabase;
 import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
+import org.sonatype.nexus.transaction.Operation;
+import org.sonatype.nexus.transaction.Operations;
+import org.sonatype.nexus.transaction.Transactional;
+import org.sonatype.nexus.transaction.UnitOfWork;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Charsets;
@@ -53,8 +54,8 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.orientechnologies.common.concur.ONeedRetryException;
 import com.orientechnologies.orient.core.command.OCommandResultListener;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -76,15 +77,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MetadataRebuilder
     extends ComponentSupport
 {
-  private final Provider<DatabaseInstance> databaseInstanceProvider;
-
   private final BucketEntityAdapter bucketEntityAdapter;
 
   @Inject
-  public MetadataRebuilder(@Named(ComponentDatabase.NAME) final Provider<DatabaseInstance> databaseInstanceProvider,
-                           final BucketEntityAdapter bucketEntityAdapter)
+  public MetadataRebuilder(final BucketEntityAdapter bucketEntityAdapter)
   {
-    this.databaseInstanceProvider = checkNotNull(databaseInstanceProvider);
     this.bucketEntityAdapter = checkNotNull(bucketEntityAdapter);
   }
 
@@ -109,13 +106,18 @@ public class MetadataRebuilder
     final Map<String, Object> sqlParams = Maps.newHashMap();
     buildSql(sql, sqlParams, groupId, artifactId, baseVersion);
 
-    try (ODatabaseDocumentTx db = databaseInstanceProvider.get().acquire()) {
-      try (StorageTx tx = repository.facet(StorageFacet.class).openTx(db)) {
-        final ORID bucketOrid = bucketEntityAdapter.recordIdentity(tx.getBucket());
-        sqlParams.put("bucket", bucketOrid);
-      }
-      final Worker worker = new Worker(db, repository, update, sql.toString(), sqlParams);
+    final StorageTx tx = repository.facet(StorageFacet.class).txSupplier().get();
+
+    UnitOfWork.beginBatch(tx);
+    try {
+      final ORID bucketOrid = bucketEntityAdapter.recordIdentity(tx.getBucket());
+      sqlParams.put("bucket", bucketOrid);
+
+      final Worker worker = new Worker(repository, update, sql.toString(), sqlParams);
       worker.rebuildMetadata();
+    }
+    finally {
+      UnitOfWork.end();
     }
   }
 
@@ -132,7 +134,7 @@ public class MetadataRebuilder
         "SELECT " +
             "group as groupId, " +
             "name as artifactId, " +
-            "set(attributes.maven2.baseVersion) as baseVersions " +
+            "set(attributes.maven2." + MavenAttributes.P_BASE_VERSION + ") as baseVersions " +
             "FROM component WHERE bucket=:bucket"
     );
     if (!Strings.isNullOrEmpty(groupId)) {
@@ -142,7 +144,7 @@ public class MetadataRebuilder
         sql.append(" and name=:artifactId");
         sqlParams.put("artifactId", artifactId);
         if (!Strings.isNullOrEmpty(baseVersion)) {
-          sql.append(" and attributes.maven2.baseVersion=:baseVersion");
+          sql.append(" and attributes.maven2." + MavenAttributes.P_BASE_VERSION + "=:baseVersion");
           sqlParams.put("baseVersion", baseVersion);
         }
       }
@@ -156,15 +158,11 @@ public class MetadataRebuilder
   private static class Worker
       extends ComponentSupport
   {
-    private final ODatabaseDocumentTx db;
-
     private final String sql;
 
     private final Map<String, Object> sqlParams;
 
     private final Repository repository;
-
-    private final StorageFacet storageFacet;
 
     private final MavenFacet mavenFacet;
 
@@ -174,17 +172,14 @@ public class MetadataRebuilder
 
     private final MetadataUpdater metadataUpdater;
 
-    public Worker(final ODatabaseDocumentTx db,
-                  final Repository repository,
+    public Worker(final Repository repository,
                   final boolean update,
                   final String sql,
                   final Map<String, Object> sqlParams)
     {
-      this.db = db;
       this.sql = sql;
       this.sqlParams = sqlParams;
       this.repository = repository;
-      this.storageFacet = repository.facet(StorageFacet.class);
       this.mavenFacet = repository.facet(MavenFacet.class);
       this.mavenPathParser = mavenFacet.getMavenPathParser();
       this.metadataBuilder = new MetadataBuilder();
@@ -197,7 +192,8 @@ public class MetadataRebuilder
      */
     public void rebuildMetadata()
     {
-      db.command(
+      final StorageTx tx = UnitOfWork.currentTransaction();
+      tx.getDb().command(
           new OSQLAsynchQuery<ODocument>(
               sql,
               new OCommandResultListener()
@@ -238,23 +234,11 @@ public class MetadataRebuilder
      * Process exits from group level, executed in isolation.
      */
     private void rebuildMetadataExitGroup(final String currentGroupId) {
-      storageFacet.perform(db, new Operation<Void>()
-      {
-        @Override
-        public Void execute(final StorageTx tx) {
-          metadataUpdater.processMetadata(
-              tx,
-              metadataMavenPath(currentGroupId, null, null),
-              metadataBuilder.onExitGroupId()
-          );
-          return null;
-        }
 
-        @Override
-        public String toString() {
-          return String.format("processMetadata(%s)", currentGroupId);
-        }
-      });
+      metadataUpdater.processMetadata(
+          metadataMavenPath(currentGroupId, null, null),
+          metadataBuilder.onExitGroupId()
+      );
     }
 
     /**
@@ -266,15 +250,20 @@ public class MetadataRebuilder
                                       final String artifactId,
                                       final Set<String> baseVersions)
     {
+      final StorageTx tx = UnitOfWork.currentTransaction();
+
       metadataBuilder.onEnterArtifactId(artifactId);
       for (final String baseVersion : baseVersions) {
         metadataBuilder.onEnterBaseVersion(baseVersion);
-        storageFacet.perform(db, new Operation<Void>()
+
+        Operations.transactional(new Operation<Void, RuntimeException>()
         {
-          @Override
-          public Void execute(final StorageTx tx) {
+          @Transactional(retryOn = ONeedRetryException.class)
+          public Void call() {
+
             final Iterable<Component> components = tx.findComponents(
-                "group = :groupId and name = :artifactId and attributes.maven2.baseVersion = :baseVersion",
+                "group = :groupId and name = :artifactId and attributes.maven2." + MavenAttributes.P_BASE_VERSION +
+                    " = :baseVersion",
                 ImmutableMap.<String, Object>of(
                     "groupId", groupId,
                     "artifactId", artifactId,
@@ -283,6 +272,7 @@ public class MetadataRebuilder
                 ImmutableList.of(repository),
                 null // order by
             );
+
             for (Component component : components) {
               for (Asset asset : tx.browseAssets(component)) {
                 final MavenPath mavenPath = mavenPathParser.parsePath(
@@ -292,58 +282,42 @@ public class MetadataRebuilder
                   continue;
                 }
                 metadataBuilder.addArtifactVersion(mavenPath);
-                mayUpdateChecksum(tx, asset, mavenPath, HashType.SHA1);
-                mayUpdateChecksum(tx, asset, mavenPath, HashType.MD5);
+                mayUpdateChecksum(asset, mavenPath, HashType.SHA1);
+                mayUpdateChecksum(asset, mavenPath, HashType.MD5);
                 if (mavenPath.isPom()) {
-                  final Xpp3Dom pom = getModel(tx, mavenPath);
+                  final Xpp3Dom pom = getModel(mavenPath);
                   if (pom != null) {
                     final String packaging = getChildValue(pom, "packaging", "jar");
                     log.debug("POM packaging: {}", packaging);
                     if ("maven-plugin".equals(packaging)) {
-                      metadataBuilder.addPlugin(getPluginPrefix(tx, mavenPath.locateMainArtifact("jar")), artifactId,
+                      metadataBuilder.addPlugin(getPluginPrefix(mavenPath.locateMainArtifact("jar")), artifactId,
                           getChildValue(pom, "name", null));
                     }
                   }
                 }
               }
             }
+
             metadataUpdater.processMetadata(
-                tx,
                 metadataMavenPath(groupId, artifactId, baseVersion),
                 metadataBuilder.onExitBaseVersion()
             );
-            return null;
-          }
 
-          @Override
-          public String toString() {
-            return String.format("rebuildMetadataInner(%s, %s, %s)", groupId, artifactId, baseVersion);
+            return null;
           }
         });
       }
-      storageFacet.perform(db, new Operation<Void>()
-      {
-        @Override
-        public Void execute(final StorageTx tx) {
-          metadataUpdater.processMetadata(
-              tx,
-              metadataMavenPath(groupId, artifactId, null),
-              metadataBuilder.onExitArtifactId()
-          );
-          return null;
-        }
 
-        @Override
-        public String toString() {
-          return String.format("processMetadata(%s, %s)", groupId,  artifactId);
-        }
-      });
+      metadataUpdater.processMetadata(
+          metadataMavenPath(groupId, artifactId, null),
+          metadataBuilder.onExitArtifactId()
+      );
     }
 
     /**
      * Verifies and may fix/create the broken/non-existent Maven hashes (.sha1/.md5 files).
      */
-    private void mayUpdateChecksum(final StorageTx tx, final Asset asset, final MavenPath mavenPath,
+    private void mayUpdateChecksum(final Asset asset, final MavenPath mavenPath,
                                    final HashType hashType)
     {
       final AttributesMap checksums = asset.attributes().child(StorageFacet.P_CHECKSUM);
@@ -355,7 +329,7 @@ public class MetadataRebuilder
       }
       final MavenPath checksumPath = mavenPath.hash(hashType);
       try {
-        final Content content = mavenFacet.get(tx, checksumPath);
+        final Content content = mavenFacet.get(checksumPath);
         if (content != null) {
           try (InputStream is = content.openInputStream()) {
             final String mavenChecksum = DigestExtractor.extract(is);
@@ -371,7 +345,7 @@ public class MetadataRebuilder
       // we need to generate/write it
       try {
         final StringPayload mavenChecksum = new StringPayload(assetChecksum, Constants.CHECKSUM_CONTENT_TYPE);
-        mavenFacet.put(tx, checksumPath, mavenChecksum);
+        mavenFacet.put(checksumPath, mavenChecksum);
       }
       catch (IOException e) {
         log.warn("Error writing {}", checksumPath, e);
@@ -402,11 +376,11 @@ public class MetadataRebuilder
      * Reads and parses Maven POM.
      */
     @Nullable
-    private Xpp3Dom getModel(final StorageTx tx, final MavenPath mavenPath) {
+    private Xpp3Dom getModel(final MavenPath mavenPath) {
       // sanity checks: is artifact and extension is "pom", only possibility for maven POM currently
       checkArgument(mavenPath.isPom(), "Not a pom path: %s", mavenPath);
       try {
-        final Content pomContent = mavenFacet.get(tx, mavenPath);
+        final Content pomContent = mavenFacet.get(mavenPath);
         if (pomContent != null) {
           return parse(mavenPath, pomContent.openInputStream());
         }
@@ -439,13 +413,13 @@ public class MetadataRebuilder
      * Descriptor. If fails, falls back to mangle artifactId (ie. extract XXX from XXX-maven-plugin or
      * maven-XXX-plugin).
      */
-    private String getPluginPrefix(final StorageTx tx, final MavenPath mavenPath) {
+    private String getPluginPrefix(final MavenPath mavenPath) {
       // sanity checks: is artifact and extension is "jar", only possibility for maven plugins currently
       checkArgument(mavenPath.getCoordinates() != null);
       checkArgument(Objects.equals(mavenPath.getCoordinates().getExtension(), "jar"));
       String prefix = null;
       try {
-        final Content jarFile = mavenFacet.get(tx, mavenPath);
+        final Content jarFile = mavenFacet.get(mavenPath);
         if (jarFile != null) {
           try (ZipInputStream zip = new ZipInputStream(jarFile.openInputStream())) {
             ZipEntry entry;

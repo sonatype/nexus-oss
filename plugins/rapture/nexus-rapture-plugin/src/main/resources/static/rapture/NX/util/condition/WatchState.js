@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,18 +19,29 @@
  */
 Ext.define('NX.util.condition.WatchState', {
   extend: 'NX.util.condition.Condition',
+  requires: [
+    'NX.State'
+  ],
 
   /**
-   * @cfg {String} state value key.
+   * @cfg {String}
+   *
+   * State value key.
    */
   key: undefined,
 
   /**
-   * @cfg {Function} An optional function to be called when a state value changes. If not specified, a boolean check
+   * An optional function to be called when a state value changes. If not specified, a boolean check
    * against value will be performed.
+   *
+   * @cfg {Function}
    */
   fn: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.WatchState}
+   */
   bind: function () {
     var me = this,
         controller, listeners;
@@ -52,6 +63,9 @@ Ext.define('NX.util.condition.WatchState', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function (value, oldValue) {
     var me = this;
 
@@ -60,9 +74,12 @@ Ext.define('NX.util.condition.WatchState', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ key=' + me.key + ' }';
+    return this.self.getName() + '{ key=' + this.key + ' }';
   }
 
 });

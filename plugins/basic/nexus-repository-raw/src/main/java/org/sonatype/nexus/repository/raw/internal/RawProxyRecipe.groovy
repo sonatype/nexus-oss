@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -30,9 +30,12 @@ import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler;
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.ExceptionHandler
+import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
+import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
@@ -93,7 +96,16 @@ class RawProxyRecipe
   PartialFetchHandler partialFetchHandler
 
   @Inject
+  UnitOfWorkHandler unitOfWorkHandler
+
+  @Inject
   ProxyHandler proxyHandler
+
+  @Inject
+  ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
+  ContentHeadersHandler contentHeadersHandler
 
   @Inject
   public RawProxyRecipe(final @Named(ProxyType.NAME) Type type,
@@ -127,6 +139,9 @@ class RawProxyRecipe
         .handler(exceptionHandler)
         .handler(negativeCacheHandler)
         .handler(partialFetchHandler)
+        .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
         .handler(proxyHandler)
         .handler(notFound())
         .create())

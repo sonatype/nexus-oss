@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -31,7 +31,7 @@
       <pattern>%d{"yyyy-MM-dd HH:mm:ss,SSSZ"} %-5p [%thread] %X{userId} %c - %m%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${nexus-work}/log/nexus.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+      <fileNamePattern>${nexus-work}/log/nexus-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
       <maxHistory>90</maxHistory>
     </rollingPolicy>
   </appender>
@@ -42,7 +42,7 @@
   <logger name="org.apache.felix" level="WARN"/>
   <logger name="org.apache.karaf" level="WARN"/>
 
-  <root level="${root.level}">
+  <root level="${root.level:-INFO}">
     <appender-ref ref="osgi"/>
     <appender-ref ref="console"/>
     <appender-ref ref="logfile"/>

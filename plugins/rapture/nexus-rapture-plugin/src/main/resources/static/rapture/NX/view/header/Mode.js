@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,16 +24,15 @@ Ext.define('NX.view.header.Mode', {
   layout: 'absolute',
 
   /**
-   * @private
-   * Add a caret to the mode button
+   * Add a caret to the mode button.
+   *
+   * @override
    */
   initComponent: function() {
-    var me = this;
-
-    me.callParent(arguments);
+    this.callParent(arguments);
 
     // Add caret
-    me.add({
+    this.add({
       xtype: 'container',
       cls: 'nx-caret',
       width: 0,

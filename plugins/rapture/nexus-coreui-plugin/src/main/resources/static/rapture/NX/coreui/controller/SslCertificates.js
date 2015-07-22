@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -88,6 +88,11 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     me.callParent();
 
     me.listen({
+      controller: {
+        '#Refresh': {
+          refresh: me.loadStores
+        }
+      },
       store: {
         '#SslCertificate': {
           load: me.reselect
@@ -133,10 +138,8 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    * @override
    */
   onSelection: function (list, model) {
-    var me = this;
-
     if (Ext.isDefined(model)) {
-      me.getDetails().loadRecord(model);
+      this.getDetails().loadRecord(model);
     }
   },
 
@@ -144,11 +147,10 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    * @private
    */
   showAddWindowFromServer: function () {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('SslCertificates_Load_Title'));
+    me.setItemName(1, NX.I18n.get('SslCertificates_Load_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-sslcertificate-add-from-server'));
   },
 
@@ -156,11 +158,10 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    * @private
    */
   showAddWindowFromPem: function () {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('SslCertificates_Paste_Title'));
+    me.setItemName(1, NX.I18n.get('SslCertificates_Paste_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-sslcertificate-add-from-pem'));
   },
 
@@ -170,7 +171,6 @@ Ext.define('NX.coreui.controller.SslCertificates', {
    */
   showCertificateDetailsPanel: function(certificate) {
     var me = this,
-        feature = me.getFeature(),
         panel = Ext.widget('nx-coreui-sslcertificate-details-panel'),
         form = panel.down('form'),
         model = me.getSslCertificateModel().create(certificate);
@@ -181,7 +181,7 @@ Ext.define('NX.coreui.controller.SslCertificates', {
     form.loadRecord(model);
 
     // Show the second panel in the create wiard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.get('Ssl_SslCertificateDetailsWindow_Title'));
+    me.setItemName(2, NX.I18n.get('Ssl_SslCertificateDetailsWindow_Title'));
     me.loadCreateWizard(2, true, panel);
   },
 

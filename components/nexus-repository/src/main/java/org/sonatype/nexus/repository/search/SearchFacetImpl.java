@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -33,6 +33,8 @@ import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.storage.StorageTxHook;
+import org.sonatype.nexus.transaction.Transactional;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
@@ -86,8 +88,10 @@ public class SearchFacetImpl
     try {
       searchService.deleteIndex(getRepository());
       searchService.createIndex(getRepository());
-      // TODO: is this going to scale? Currently it returns a List...
-      try (StorageTx tx = facet(StorageFacet.class).openTx()) {
+
+      UnitOfWork.begin(facet(StorageFacet.class).txSupplier());
+      try {
+        final StorageTx tx = UnitOfWork.currentTransaction();
         for (Component component : tx.browseComponents(tx.getBucket())) {
           try {
             put(component, tx.browseAssets(component));
@@ -96,6 +100,9 @@ public class SearchFacetImpl
             log.warn("Could not reindex component: {}", component, e);
           }
         }
+      }
+      finally {
+        UnitOfWork.end();
       }
     }
     finally {
@@ -113,6 +120,7 @@ public class SearchFacetImpl
    * Indexes a component with given id.
    */
   @Guarded(by = STARTED)
+  @Transactional
   protected void put(final EntityId componentId) {
     checkNotNull(componentId);
     if (!rebuildIndexLock.readLock().tryLock()) {
@@ -120,15 +128,12 @@ public class SearchFacetImpl
     }
     try {
       Component component;
-      List<Asset> assets;
-      try (StorageTx tx = facet(StorageFacet.class).openTx()) {
-        component = tx.findComponent(componentId, tx.getBucket());
-        if (component == null) {
-          return;
-        }
-        assets = Lists.newArrayList(tx.browseAssets(component));
+      final StorageTx tx = UnitOfWork.currentTransaction();
+      component = tx.findComponent(componentId, tx.getBucket());
+      if (component == null) {
+        return;
       }
-      put(component, assets);
+      put(component, tx.browseAssets(component));
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
@@ -164,6 +169,10 @@ public class SearchFacetImpl
   protected void doDelete() {
     facet(StorageFacet.class).unregisterHookSupplier(searchHook);
     searchService.deleteIndex(getRepository());
+  }
+
+  Supplier<StorageTx> txSupplier() {
+    return getRepository().facet(StorageFacet.class).txSupplier();
   }
 
   /**

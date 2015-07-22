@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -22,9 +22,14 @@ Ext.define('NX.util.condition.IsPermitted', {
 
   /**
    * @private
+   * @property {String}
    */
   permission: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.IsPermitted}
+   */
   bind: function () {
     var me = this,
         controller;
@@ -42,6 +47,9 @@ Ext.define('NX.util.condition.IsPermitted', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function () {
     var me = this;
 
@@ -50,23 +58,23 @@ Ext.define('NX.util.condition.IsPermitted', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ permission=' + me.permission + ' }';
+    return this.self.getName() + '{ permission=' + this.permission + ' }';
   },
 
   /**
-   * @public
-   *
    * Sets permission and re-evaluate.
    *
-   * @param {String} permission permission
+   * @public
+   * @param {String} permission
    */
   setPermission: function(permission) {
-    var me = this;
-
-    me.permission = permission;
-    me.evaluate();
+    this.permission = permission;
+    this.evaluate();
   }
 
 });

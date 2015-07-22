@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -26,17 +26,12 @@ Ext.define('NX.app.PluginStrings', {
     'NX.I18n'
   ],
 
-  /*
-   * Note: Symbols follow the following naming convention:
-   * <Class>_<Name>_<Component or Attribute>
-   */
+  //
+  // Note: Symbols follow the following naming convention:
+  // <Class>_<Name>_<Component or Attribute>
+  //
 
   keys: {
-
-    /*
-     * Global strings
-     */
-
     // Header
     Header_Panel_Logo_Text: 'Sonatype Nexus',
     Header_BrowseMode_Title: 'Browse',
@@ -70,7 +65,7 @@ Ext.define('NX.app.PluginStrings', {
     Header_Help_Support_Tooltip: 'Sonatype Nexus product support',
 
     // Footer
-    Footer_Panel_HTML: 'Copyright &copy; 2008-2015, Sonatype Inc. All rights reserved.',
+    Footer_Panel_HTML: 'Copyright &copy; 2008-present, Sonatype Inc. All rights reserved.',
 
     // Sign in
     SignIn_Title: 'Sign In',
@@ -92,10 +87,6 @@ Ext.define('NX.app.PluginStrings', {
     Add_Cancel_Button: 'Cancel',
     ChangeOrderWindow_Submit_Button: 'Save',
     ChangeOrderWindow_Cancel_Button: 'Cancel',
-
-    // Messages
-    Header_Messages_Tooltip: 'Toggle messages display',
-    Message_Panel_Empty: 'No messages',
 
     // Server
     User_ConnectFailure_Message: 'Operation failed as server could not be contacted',

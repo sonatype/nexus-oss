@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Dashboard', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.I18n'
   ],
@@ -27,10 +27,11 @@ Ext.define('NX.controller.Dashboard', {
     'dashboard.Welcome'
   ],
 
+  /**
+   * @override
+   */
   init: function () {
-    var me = this;
-
-    me.getApplication().getFeaturesController().registerFeature({
+    this.getApplication().getFeaturesController().registerFeature({
       path: '/Welcome',
       mode: 'browse',
       view: 'NX.view.dashboard.Welcome',

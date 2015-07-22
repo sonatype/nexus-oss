@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -22,6 +22,7 @@ Ext.define('NX.coreui.view.support.SysInfo', {
   alias: 'widget.nx-coreui-support-sysinfo',
   requires: [
     'Ext.XTemplate',
+    'NX.Assert',
     'NX.I18n'
   ],
   layout: 'fit',
@@ -172,7 +173,13 @@ Ext.define('NX.coreui.view.support.SysInfo', {
    * @public
    */
   setInfo: function(info) {
-    this.mainTpl.overwrite(this.body, info);
+    var me = this;
+    //<if assert>
+    NX.Assert.assert(me.rendered, "Expected me.rendered to be true");
+    //</if>
+    if (me.rendered) {
+      me.mainTpl.overwrite(me.body, info);
+    }
   }
 
 });

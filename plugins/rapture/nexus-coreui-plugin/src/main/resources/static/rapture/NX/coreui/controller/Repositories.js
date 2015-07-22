@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -101,7 +101,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRelatedStores
+          refresh: me.loadStores
         },
         '#State': {
           receivingchanged: me.onStateReceivingChanged
@@ -114,7 +114,7 @@ Ext.define('NX.coreui.controller.Repositories', {
       },
       component: {
         'nx-coreui-repository-list': {
-          beforerender: me.loadRelatedStores,
+          beforerender: me.loadStores,
           afterrender: me.startStatusPolling,
           beforedestroy: me.stopStatusPolling
         },
@@ -126,7 +126,7 @@ Ext.define('NX.coreui.controller.Repositories', {
           afterrender: me.bindRebuildIndexButton
         },
         'nx-coreui-repository-settings-form': {
-          submitted: me.onSettingsSubmitted
+          submitted: me.loadStores
         },
         'nx-coreui-repository-selectrecipe': {
           cellclick: me.showAddRepositoryPanel
@@ -150,14 +150,13 @@ Ext.define('NX.coreui.controller.Repositories', {
         settingsPanel = me.getSettings(),
         formCls = Ext.ClassManager.getByAlias('widget.nx-coreui-repository-' + model.get('recipe'));
 
+    Ext.suspendLayouts();
+
     if (!formCls) {
       me.logWarn('Could not find settings form for: ' + model.getId());
     }
     else {
       if (Ext.isDefined(model)) {
-        // Show the correct icon in the breadcrumb
-        me.getFeature().setItemClass(1, NX.Icons.cls('repository-' + model.get('type'), 'x16'));
-
         // Load the form
         settingsPanel.removeAllSettingsForms();
         settingsPanel.addSettingsForm({ xtype: formCls.xtype, recipe: model });
@@ -170,18 +169,18 @@ Ext.define('NX.coreui.controller.Repositories', {
         });
       }
     }
+    Ext.resumeLayouts();
   },
 
   /**
    * @private
    */
   showSelectRecipePanel: function() {
-    var me = this,
-        feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Repositories_SelectRecipe_Title'));
-    feature.setItemClass(1, NX.Icons.cls('repository-hosted', 'x16'));
+    me.setItemName(1, NX.I18n.get('Repositories_SelectRecipe_Title'));
+    me.setItemClass(1, NX.Icons.cls('repository-hosted', 'x16'));
 
     // Show the panel
     me.loadCreateWizard(1, true, Ext.widget({
@@ -206,7 +205,6 @@ Ext.define('NX.coreui.controller.Repositories', {
    */
   showAddRepositoryPanel: function(list, td, cellIndex, model) {
     var me = this,
-        feature = me.getFeature(),
         formCls = Ext.ClassManager.getByAlias('widget.nx-coreui-repository-' + model.getId());
 
     if (!formCls) {
@@ -214,33 +212,10 @@ Ext.define('NX.coreui.controller.Repositories', {
     }
     else {
       // Show the second panel in the create wizard, and set the breadcrumb
-      feature.setItemName(2, NX.I18n.format('Repositories_Create_Title', model.get('name')));
-      feature.setItemClass(2, NX.Icons.cls('repository-hosted', 'x16'));
+      me.setItemName(2, NX.I18n.format('Repositories_Create_Title', model.get('name')));
+      me.setItemClass(2, NX.Icons.cls('repository-hosted', 'x16'));
       me.loadCreateWizard(2, true, { xtype: 'nx-coreui-repository-add', recipe: model });
     }
-  },
-
-  /**
-   * @private
-   */
-  loadRelatedStores: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('Blobstore').load();
-      me.getStore('RepositoryRecipe').load();
-    }
-  },
-
-  /**
-   * @private
-   */
-  onSettingsSubmitted: function(form, action) {
-    var me = this,
-      win = form.up('nx-coreui-repository-add');
-
-    me.getStore('Repository').load();
   },
 
   /**

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -22,10 +22,16 @@ Ext.define('NX.util.condition.Conjunction', {
   extend: 'NX.util.condition.Condition',
 
   /**
-   * @cfg {NX.util.condition.Condition[]} Array of conditions to be AND-ed
+   * Array of conditions to be AND-ed.
+   *
+   * @cfg {NX.util.condition.Condition[]}
    */
   conditions: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.Conjunction}
+   */
   bind: function () {
     var me = this;
 
@@ -44,6 +50,9 @@ Ext.define('NX.util.condition.Conjunction', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function () {
     var me = this,
         satisfied = true;
@@ -57,9 +66,12 @@ Ext.define('NX.util.condition.Conjunction', {
     }
   },
 
+  /**
+   * @overrdie
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.conditions.join(' AND ');
+    return this.conditions.join(' AND ');
   }
 
 });

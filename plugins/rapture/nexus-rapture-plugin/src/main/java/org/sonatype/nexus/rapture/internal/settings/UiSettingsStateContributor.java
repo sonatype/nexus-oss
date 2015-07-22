@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -50,12 +50,6 @@ public class UiSettingsStateContributor
   @Override
   public Map<String, Object> getState() {
     return ImmutableMap.of(STATE_ID, calculateSettings());
-  }
-
-  @Nullable
-  @Override
-  public Map<String, Object> getCommands() {
-    return null;
   }
 
   private Object calculateSettings() {

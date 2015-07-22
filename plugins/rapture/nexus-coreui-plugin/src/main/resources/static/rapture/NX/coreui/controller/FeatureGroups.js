@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.FeatureGroups', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.I18n'
   ],
@@ -27,9 +27,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
    * @override
    */
   init: function () {
-    var me = this;
-
-    me.getApplication().getFeaturesController().registerFeature([
+    this.getApplication().getFeaturesController().registerFeature([
       {
         mode: 'admin',
         path: '/Repository',
@@ -74,6 +72,17 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
         weight: 1000,
         iconConfig: {
           file: 'cog.png',
+          variants: ['x16', 'x32']
+        }
+      },
+      {
+        mode: 'browse',
+        path: '/Browse',
+        text: NX.I18n.get('FeatureGroups_Browse_Text'),
+        description: NX.I18n.get('FeatureGroups_Browse_Description'),
+        group: true,
+        iconConfig: {
+          file: 'box_front.png',
           variants: ['x16', 'x32']
         }
       },

@@ -1,7 +1,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -14,9 +14,9 @@
 -->
 # Configure Repositories
 
-    orient:connect plocal:../sonatype-work/nexus/db/config admin admin
+    orient:connect plocal:data/db/config admin admin
     orient:insert 'into repository_configuration SET repository_name="nugethosted1", recipe_name="nuget-hosted"'
-    orient:insert 'into repository_configuration SET repository_name="nugetproxy", recipe_name="nuget-proxy", attributes={"proxy": { "remoteUrl": "http://www.nuget.org/api/v2/", "artifactMaxAge" : 5 }, "httpclient":{"connection":{"timeout":20000, "retries":2}}}'
+    orient:insert 'into repository_configuration SET repository_name="nugetproxy", recipe_name="nuget-proxy", attributes={"proxy": { "remoteUrl": "http://www.nuget.org/api/v2/", "contentMaxAge" : 5 }, "httpclient":{"connection":{"timeout":20000, "retries":2}}}'
     orient:insert 'into repository_configuration SET repository_name="nugetgroup", recipe_name="nuget-group", attributes={"group": { "memberNames": ["nugethosted1", "nugetproxy"] }}'
     system:shutdown --force --reboot
 
@@ -32,7 +32,7 @@ Note: curl commands have been escaped for bash
 
 ### Viewing Components in OrientDB
 
-    orient:connect plocal:../sonatype-work/nexus/db/component admin admin
+    orient:connect plocal:data/db/component admin admin
     orient:select * from component
     orient:exportrecord json
 

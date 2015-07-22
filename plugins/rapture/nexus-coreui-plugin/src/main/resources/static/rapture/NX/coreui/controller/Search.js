@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,11 +28,11 @@ Ext.define('NX.coreui.controller.Search', {
     'NX.I18n'
   ],
   masters: [
-    'nx-coreui-search-result-list',
-    'nx-coreui-component-asset-list'
+    'nx-coreui-searchfeature nx-coreui-search-result-list',
+    'nx-coreui-searchfeature nx-coreui-component-asset-list'
   ],
   stores: [
-    'Asset',
+    'ComponentAsset',
     'SearchFilter',
     'SearchCriteria',
     'SearchResult'
@@ -50,9 +50,9 @@ Ext.define('NX.coreui.controller.Search', {
 
   refs: [
     { ref: 'feature', selector: 'nx-coreui-searchfeature' },
-    { ref: 'searchResult', selector: 'nx-coreui-search-result-list' },
+    { ref: 'searchResult', selector: 'nx-coreui-searchfeature nx-coreui-search-result-list' },
     { ref: 'componentDetails', selector: 'nx-coreui-searchfeature nx-coreui-component-details' },
-    { ref: 'assets', selector: 'nx-coreui-searchfeature nx-coreui-component-asset-list' },
+    { ref: 'assetList', selector: 'nx-coreui-searchfeature nx-coreui-component-asset-list' },
     { ref: 'quickSearch', selector: 'nx-header-panel #quicksearch' }
   ],
 
@@ -125,7 +125,7 @@ Ext.define('NX.coreui.controller.Search', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.onRefresh
+          refresh: me.loadStores
         }
       },
       component: {
@@ -150,9 +150,6 @@ Ext.define('NX.coreui.controller.Search', {
           afterrender: me.bindQuickSearch,
           search: me.onQuickSearch,
           searchcleared: me.onQuickSearch
-        },
-        'nx-coreui-searchfeature nx-coreui-component-assetcontainer': {
-          updated: me.setAssetIcon
         }
       }
     });
@@ -274,7 +271,7 @@ Ext.define('NX.coreui.controller.Search', {
     // Extract the filter object from the URI
     if (bookmarkSegments && bookmarkSegments.length) {
       queryIndex = bookmarkSegments[0].indexOf('=');
-      if (queryIndex != -1) {
+      if (queryIndex !== -1) {
         filterSegments = decodeURIComponent(bookmarkSegments[0].slice(queryIndex + 1)).split(' AND ');
         for (var i = 0; i < filterSegments.length; ++i) {
           pair = filterSegments[i].split('=');
@@ -337,7 +334,7 @@ Ext.define('NX.coreui.controller.Search', {
         criteria: criteria,
         criteriaId: criteria.getId(),
         action: 'add',
-        hidden: Ext.isDefined(criterias[criteria.getId()])
+        disabled: Ext.isDefined(criterias[criteria.getId()])
       });
     });
     Ext.Object.each(criteriasPerGroup, function(key, value) {
@@ -372,15 +369,14 @@ Ext.define('NX.coreui.controller.Search', {
    * @param menuitem selected criteria menu item
    */
   addCriteria: function(menuitem) {
-    var me = this,
-        searchPanel = me.getFeature(),
+    var searchPanel = this.getFeature(),
         searchCriteriaPanel = searchPanel.down('#criteria'),
         addButton = searchCriteriaPanel.down('#addButton'),
         criteria = menuitem.criteria,
         cmpClass = Ext.ClassManager.getByAlias('widget.nx-coreui-searchcriteria-' + criteria.getId()),
         cmp;
 
-    menuitem.hide();
+    menuitem.disable();
     if (!cmpClass) {
       cmpClass = Ext.ClassManager.getByAlias('widget.nx-coreui-searchcriteria-text');
     }
@@ -399,13 +395,11 @@ Ext.define('NX.coreui.controller.Search', {
    * @param searchCriteria removed search criteria
    */
   removeCriteria: function(searchCriteria) {
-    var me = this,
-        searchPanel = me.getFeature(),
-        searchCriteriaPanel = searchPanel.down('#criteria');
+    var searchCriteriaPanel = this.getFeature().down('#criteria');
 
     searchCriteriaPanel.remove(searchCriteria);
-    searchCriteriaPanel.down('menuitem[criteriaId=' + searchCriteria.criteriaId + ']').show();
-    me.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
+    searchCriteriaPanel.down('menuitem[criteriaId=' + searchCriteria.criteriaId + ']').enable();
+    this.applyFilter({ criteriaId: searchCriteria.criteriaId }, true);
   },
 
   /**
@@ -414,19 +408,21 @@ Ext.define('NX.coreui.controller.Search', {
    * @param searchCriteria changed criteria
    */
   onSearchCriteriaChange: function(searchCriteria) {
-    var me = this;
-    me.applyFilter(searchCriteria, true);
+    this.applyFilter(searchCriteria, true);
   },
 
   /**
-   * @private
+   * @override
    * Search on refresh.
    */
-  onRefresh: function() {
-    var me = this;
-
-    if (me.getFeature()) {
-      me.getStore('SearchResult').filter();
+  loadStores: function() {
+    if (this.getFeature()) {
+      if (this.currentIndex === 0) {
+        this.getSearchResult().getStore().load();
+      }
+      if (this.currentIndex === 1) {
+        this.getAssetList().getStore().load();
+      }
     }
   },
 
@@ -440,6 +436,8 @@ Ext.define('NX.coreui.controller.Search', {
     var me = this,
         store = me.getStore('SearchResult'),
         filter = searchCriteria.filter;
+
+    me.getSearchResult().getSelectionModel().deselectAll();
 
     if (filter && Ext.isFunction(filter) && !(filter instanceof Ext.util.Filter)) {
       filter = searchCriteria.filter();
@@ -473,14 +471,13 @@ Ext.define('NX.coreui.controller.Search', {
    * When a list managed by this controller is clicked, route the event to the proper handler
    */
   onSelection: function(list, model) {
-    var me = this,
-        modelType;
+    var modelType;
 
     // Figure out what kind of list we’re dealing with
     modelType = model.id.replace(/^.*?model\./, '').replace(/\-.*$/, '');
 
     if (modelType == "Component") {
-      me.onSearchResultSelection(model);
+      this.onSearchResultSelection(model);
     }
   },
 
@@ -493,23 +490,7 @@ Ext.define('NX.coreui.controller.Search', {
     var me = this;
 
     me.getComponentDetails().setComponentModel(model);
-    me.getAssets().setComponentModel(model);
-  },
-
-  /**
-   * @private
-   * Set the appropriate breadcrumb icon.
-   * @param {NX.coreui.model.Component} componentModel selected asset
-   * @param {NX.coreui.model.Asset} assetModel selected asset
-   */
-  setAssetIcon: function(container, componentModel, assetModel) {
-    var me = this,
-        feature = me.getFeature();
-
-    if (assetModel) {
-      // Set the appropriate breadcrumb icon
-      feature.setItemClass(2, container.iconCls);
-    }
+    me.getAssetList().setComponentModel(model);
   },
 
   /**
@@ -568,14 +549,13 @@ Ext.define('NX.coreui.controller.Search', {
    * Bookmark search values.
    */
   bookmarkFilters: function() {
-    var me = this,
-        filterArray = [],
+    var filterArray = [],
         firstSegment, segments;
 
     // Remove any pre-existing query string
     firstSegment = NX.Bookmarks.getBookmark().getSegment(0);
-    if (firstSegment.indexOf('=') != -1) {
-      firstSegment = firstSegment.slice(0, firstSegment.indexOf('='))
+    if (firstSegment.indexOf('=') !== -1) {
+      firstSegment = firstSegment.slice(0, firstSegment.indexOf('='));
     }
 
     // Add each criteria to the filter object
@@ -587,7 +567,7 @@ Ext.define('NX.coreui.controller.Search', {
 
     // Stringify and url encode the filter object, then bookmark it
     segments = [firstSegment + "=" + encodeURIComponent(filterArray.join(' AND '))];
-    NX.Bookmarks.bookmark(NX.Bookmarks.fromSegments(segments), me);
+    NX.Bookmarks.bookmark(NX.Bookmarks.fromSegments(segments), this);
   },
 
   /**
@@ -608,6 +588,7 @@ Ext.define('NX.coreui.controller.Search', {
       }
     }
     else {
+      me.showChild(0, true);
       searchFeature.down('#criteria component[criteriaId=keyword]').setValue(searchValue);
     }
   }

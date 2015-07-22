@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -112,7 +112,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.onRefresh
+          refresh: me.loadStores
         }
       },
       store: {
@@ -122,7 +122,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
       },
       component: {
         'nx-coreui-capability-list': {
-          beforerender: me.onRefresh
+          beforerender: me.loadStores
         },
         'nx-coreui-capability-list button[action=new]': {
           click: me.showSelectTypePanel
@@ -172,8 +172,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
         capabilityTypeModel;
 
     if (Ext.isDefined(model)) {
-      me.getFeature().setItemClass(1, NX.Icons.cls('capability-' + model.get('state'), 'x16'));
-
       capabilityTypeModel = me.getStore('CapabilityType').getById(model.get('typeId'));
 
       me.eventuallyShowWarning(model);
@@ -190,13 +188,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {NX.coreui.model.Capability} model capability model
    */
   eventuallyShowWarning: function(model) {
-    var drilldown = this.getList().up('nx-drilldown');
+    var me = this;
 
     if (model.get('enabled') && !model.get('active')) {
-      drilldown.showWarning(model.get('stateDescription'));
+      me.showWarning(model.get('stateDescription'));
     }
     else {
-      drilldown.clearWarning();
+      me.clearWarning();
     }
   },
 
@@ -252,11 +250,10 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @private
    */
   showSelectTypePanel: function() {
-    var me = this,
-        feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Capabilities_Select_Title'));
+    me.setItemName(1, NX.I18n.get('Capabilities_Select_Title'));
     me.loadCreateWizard(1, true, Ext.widget({
       xtype: 'panel',
       layout: {
@@ -279,31 +276,13 @@ Ext.define('NX.coreui.controller.Capabilities', {
    */
   showAddPanel: function(list, td, cellIndex, model) {
     var me = this,
-        feature = me.getFeature(),
         panel;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(2, NX.I18n.format('Capabilities_Create_Title', model.get('name')));
+    me.setItemName(2, NX.I18n.format('Capabilities_Create_Title', model.get('name')));
     me.loadCreateWizard(2, true, panel = Ext.create('widget.nx-coreui-capability-add'));
     var m = me.getCapabilityModel().create({ typeId: model.getId(), enabled: true });
     panel.down('nx-settingsform').loadRecord(m);
-  },
-
-  /**
-   * @private
-   * (Re)load capability type store && reset all cached combo stores.
-   */
-  onRefresh: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('CapabilityType').load(
-          function() {
-            me.reselect();
-          }
-      );
-    }
   },
 
   /**
@@ -312,10 +291,9 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * Enable 'New' button when user has 'create' permission and there is at least one capability type.
    */
   bindNewButton: function(button) {
-    var me = this;
     button.mon(
         NX.Conditions.and(
-            NX.Conditions.isPermitted(me.permission + ':create'),
+            NX.Conditions.isPermitted(this.permission + ':create'),
             NX.Conditions.storeHasRecords('CapabilityType')
         ),
         {
@@ -383,9 +361,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
                 me.getDescription(me.getCapabilityModel().create(response.data))),
             type: 'success'
           });
-          me.getStore('Capability').load(function() {
-            me.reselect();
-          });
+          me.getStore('Capability').load();
         }
         else if (Ext.isDefined(response.errors)) {
           form.markInvalid(response.errors);
@@ -432,9 +408,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
         description = me.getDescription(model);
 
     NX.direct.capability_Capability.remove(model.getId(), function(response) {
-      me.getStore('Capability').load(function() {
-        me.reselect();
-      });
+      me.getStore('Capability').load();
       if (Ext.isObject(response) && response.success) {
         NX.Messages.add({
           text: NX.I18n.format('Capabilities_Delete_Success', description),
@@ -554,8 +528,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @return {String[]} Sorted list of dynamic capability tag names.
    */
   discoverDynamicTags: function(store) {
-    var me = this,
-        tags = [];
+    var tags = [];
 
     store.each(function(model) {
       Ext.Object.each(model.get('tags'), function(key) {
@@ -567,7 +540,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     Ext.Array.sort(tags);
 
     //<if debug>
-    me.logDebug('Discovered dynamic tags: ', tags);
+    this.logDebug('Discovered dynamic tags: ', tags);
     //</if>
 
     return tags;
@@ -605,8 +578,6 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {String[]} tags
    */
   addDynamicTagDataToStoreRecords: function(store, tags) {
-    var me = this;
-
     store.each(function(model) {
       // apply dynamic tag data to 'tag$' fields if the record has any tag data
       var data = model.get('tags');
@@ -619,7 +590,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     store.commitChanges();
 
     //<if debug>
-    me.logDebug('Dynamic tag data applied Capability store records');
+    this.logDebug('Dynamic tag data applied Capability store records');
     //</if>
   },
 
@@ -631,8 +602,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
    * @param {String[]} tags
    */
   addDynamicTagsToGrid: function(panel, tags) {
-    var me = this,
-        columns = Ext.Array.clone(panel.originalColumns),
+    var columns = Ext.Array.clone(panel.originalColumns),
         tagColumns = [];
 
     // create new colums for each dynamic tag
@@ -650,7 +620,7 @@ Ext.define('NX.coreui.controller.Capabilities', {
     panel.reconfigure(null, columns);
 
     //<if debug>
-    me.logDebug('Dynamic tag columns added to grid');
+    this.logDebug('Dynamic tag columns added to grid');
     //</if>
   }
 

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -25,11 +25,13 @@ Ext.define('NX.I18n', {
 
   /**
    * @private
+   * @property {Object}
    */
   keys: {},
 
   /**
    * @public
+   * @param {Object} keys
    */
   register: function(keys) {
     Ext.apply(this.keys, keys);
@@ -37,11 +39,12 @@ Ext.define('NX.I18n', {
 
   /**
    * @public
+   * @param {String} key
    */
   get: function(key) {
     var text = this.keys[key];
     if (text === null || text === undefined) {
-      this.logWarn('Missing I18n key: ' + key);
+      this.logWarn('Missing I18n key:', key);
       return 'MISSING_I18N:' + key;
     }
     return text;
@@ -49,8 +52,8 @@ Ext.define('NX.I18n', {
 
   /**
    * @public
-   * @param key
-   * @param values
+   * @param {String} key
+   * @param {Object...} values
    * @returns {String}
    */
   format: function(key) {

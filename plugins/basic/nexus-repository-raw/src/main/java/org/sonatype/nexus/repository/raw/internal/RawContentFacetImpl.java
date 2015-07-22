@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -14,29 +14,35 @@ package org.sonatype.nexus.repository.raw.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import org.sonatype.nexus.blobstore.api.Blob;
+import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.raw.RawContent;
+import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.storage.StorageFacet.Operation;
 import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.view.Content;
+import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.view.payloads.BlobPayload;
+import org.sonatype.nexus.transaction.Transactional;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
-import com.google.common.base.Throwables;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
-import org.joda.time.DateTime;
+import com.orientechnologies.common.concur.ONeedRetryException;
+import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
@@ -55,8 +61,6 @@ public class RawContentFacetImpl
 {
   private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(MD5, SHA1);
 
-  private static final String P_LAST_VERIFIED_DATE = "last_verified";
-
   // TODO: raw does not have config, this method is here only to have this bundle do Import-Package org.sonatype.nexus.repository.config
   // TODO: as FacetSupport subclass depends on it. Actually, this facet does not need any kind of configuration
   // TODO: it's here only to circumvent this OSGi/maven-bundle-plugin issue.
@@ -67,72 +71,65 @@ public class RawContentFacetImpl
 
   @Nullable
   @Override
-  public RawContent get(final String path) {
-    try (StorageTx tx = getStorage().openTx()) {
-      final Component component = getComponent(tx, path, tx.getBucket());
-      if (component == null) {
-        return null;
-      }
+  @Transactional(retryOn = IllegalStateException.class)
+  public Content get(final String path) {
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      final Asset asset = tx.firstAsset(component);
-      final Blob blob = tx.requireBlob(asset.requireBlobRef());
-
-      return marshall(asset, blob);
+    final Component component = getComponent(tx, path, tx.getBucket());
+    if (component == null) {
+      return null;
     }
+
+    final Asset asset = tx.firstAsset(component);
+    final Blob blob = tx.requireBlob(asset.requireBlobRef());
+
+    return toContent(asset, blob);
   }
 
   @Override
-  public void put(final String path, final RawContent content) throws IOException, InvalidContentException {
+  public Content put(final String path, final Payload content) throws IOException, InvalidContentException {
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      getStorage().perform(new Operation<Void>()
-      {
-        @Override
-        public Void execute(final StorageTx tx) {
-          try {
-            final Bucket bucket = tx.getBucket();
-            Component component = getComponent(tx, path, bucket);
-            Asset asset;
-            if (component == null) {
-              // CREATE
-              component = tx.createComponent(bucket, getRepository().getFormat())
-                  .group(getGroup(path))
-                  .name(getName(path));
-
-              // Set attributes map to contain "raw" format-specific metadata (in this case, path)
-              component.formatAttributes().set(P_PATH, path);
-              tx.saveComponent(component);
-
-              asset = tx.createAsset(bucket, component);
-              asset.name(component.name());
-            }
-            else {
-              // UPDATE
-              asset = tx.firstAsset(component);
-            }
-
-            asset.formatAttributes().set(P_LAST_VERIFIED_DATE, new Date());
-            tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, content.getContentType());
-            tx.saveAsset(asset);
-
-            return null;
-          }
-          catch (IOException e) {
-            throw Throwables.propagate(e);
-          }
-        }
-
-        @Override
-        public String toString() {
-          return String.format("put(%s)", path);
-        }
-      });
+      return doPutContent(path, streamSupplier, content);
     }
-    catch (RuntimeException e) {
-      if (e.getCause() instanceof IOException) {
-        throw (IOException) e.getCause();
-      }
-      throw e;
+  }
+
+  @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
+  protected Content doPutContent(final String path, final Supplier<InputStream> streamSupplier, final Payload payload)
+      throws IOException
+  {
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    final Bucket bucket = tx.getBucket();
+    Component component = getComponent(tx, path, bucket);
+    Asset asset;
+    if (component == null) {
+      // CREATE
+      component = tx.createComponent(bucket, getRepository().getFormat())
+          .group(getGroup(path))
+          .name(getName(path));
+
+      // Set attributes map to contain "raw" format-specific metadata (in this case, path)
+      component.formatAttributes().set(P_PATH, path);
+      tx.saveComponent(component);
+
+      asset = tx.createAsset(bucket, component);
+      asset.name(component.name());
     }
+    else {
+      // UPDATE
+      asset = tx.firstAsset(component);
+    }
+
+    AttributesMap contentAttributes = null;
+    if (payload instanceof Content) {
+      contentAttributes = ((Content) payload).getAttributes();
+    }
+    Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
+    final AssetBlob assetBlob = tx
+        .setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
+    tx.saveAsset(asset);
+
+    return toContent(asset, assetBlob.getBlob());
   }
 
   private String getGroup(String path) {
@@ -158,50 +155,35 @@ public class RawContentFacetImpl
   }
 
   @Override
+  @Transactional
   public boolean delete(final String path) throws IOException {
-    try (StorageTx tx = getStorage().openTx()) {
-      final Component component = getComponent(tx, path, tx.getBucket());
-      if (component == null) {
-        return false;
-      }
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-      tx.deleteComponent(component);
-      tx.commit();
-      return true;
+    final Component component = getComponent(tx, path, tx.getBucket());
+    if (component == null) {
+      return false;
     }
+
+    tx.deleteComponent(component);
+    return true;
   }
 
   @Override
-  public void updateLastVerified(final String path, final DateTime lastUpdated) throws IOException {
-    getStorage().perform(new Operation<Date>()
-    {
-      @Override
-      public Date execute(final StorageTx tx) {
-        Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
+  @Transactional(retryOn = ONeedRetryException.class)
+  public void setCacheInfo(final String path, final CacheInfo cacheInfo) throws IOException {
+    StorageTx tx = UnitOfWork.currentTransaction();
 
-        if (component == null) {
-          log.debug("Attempting to set last verified date for non-existent raw component {}", path);
-          return null;
-        }
+    Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
 
-        final Asset asset = tx.firstAsset(component);
+    if (component == null) {
+      log.debug("Attempting to set last verified date for non-existent raw component {}", path);
+    }
 
-        final Date priorDate = asset.formatAttributes().get(P_LAST_VERIFIED_DATE, Date.class);
-        asset.formatAttributes().set(P_LAST_VERIFIED_DATE, lastUpdated.toDate());
-        tx.saveAsset(tx.firstAsset(component));
+    final Asset asset = tx.firstAsset(component);
 
-        return priorDate;
-      }
-
-      @Override
-      public String toString() {
-        return String.format("updateLastVerified(%s, %s)", path, lastUpdated);
-      }
-    });
-  }
-
-  private StorageFacet getStorage() {
-    return getRepository().facet(StorageFacet.class);
+    log.debug("Updating cacheInfo of {} to {}", path, cacheInfo);
+    CacheInfo.applyToAsset(asset, cacheInfo);
+    tx.saveAsset(tx.firstAsset(component));
   }
 
   // TODO: Consider a top-level indexed property (e.g. "locator") to make these common lookups fast
@@ -210,31 +192,9 @@ public class RawContentFacetImpl
     return tx.findComponentWithProperty(property, path, bucket);
   }
 
-  private RawContent marshall(final Asset asset, final Blob blob) {
-    final String contentType = asset.requireContentType();
-    final DateTime lastVerified = new DateTime(asset.formatAttributes().require(P_LAST_VERIFIED_DATE, Date.class));
-
-    return new RawContent()
-    {
-      @Override
-      public String getContentType() {
-        return contentType;
-      }
-
-      @Override
-      public long getSize() {
-        return blob.getMetrics().getContentSize();
-      }
-
-      @Override
-      public InputStream openInputStream() {
-        return blob.getInputStream();
-      }
-
-      @Override
-      public DateTime getLastVerified() {
-        return lastVerified;
-      }
-    };
+  private Content toContent(final Asset asset, final Blob blob) {
+    final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
+    Content.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
+    return content;
   }
 }

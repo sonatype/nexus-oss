@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,9 +28,12 @@ import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
+import org.sonatype.nexus.repository.storage.UnitOfWorkHandler;
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.ExceptionHandler
+import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
+import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
@@ -85,7 +88,17 @@ class RawHostedRecipe
   PartialFetchHandler partialFetchHandler
 
   @Inject
+  UnitOfWorkHandler unitOfWorkHandler
+
+  @Inject
   RawContentHandler rawContentHandler
+
+  @Inject
+  ConditionalRequestHandler conditionalRequestHandler
+
+  @Inject
+  ContentHeadersHandler contentHeadersHandler
+
 
   @Inject
   RawHostedRecipe(@Named(HostedType.NAME) final Type type,
@@ -123,6 +136,9 @@ class RawHostedRecipe
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(partialFetchHandler)
+        .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
         .handler(rawContentHandler)
         .create())
 

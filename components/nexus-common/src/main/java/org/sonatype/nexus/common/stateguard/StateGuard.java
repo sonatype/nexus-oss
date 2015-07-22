@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -116,7 +116,14 @@ public class StateGuard
    * Create a transition to given state.
    */
   public Transition transition(final String to) {
-    return new TransitionImpl(to);
+    return new TransitionImpl(to, false, new Class[0]);
+  }
+
+  /**
+   * Create a transition to given state with custom exception-handling behaviour.
+   */
+  public Transition transition(final String to, final boolean silent, final Class<? extends Exception>[] ignore) {
+    return new TransitionImpl(to, silent, ignore);
   }
 
   /**
@@ -138,11 +145,17 @@ public class StateGuard
   {
     private final String to;
 
+    private final boolean silent;
+
+    private final Class<? extends Exception>[] ignore;
+
     @Nullable
     private String[] allowed;
 
-    private TransitionImpl(final String to) {
+    private TransitionImpl(final String to, final boolean silent, final Class<? extends Exception>[] ignore)    {
       this.to = checkNotNull(to);
+      this.silent = silent;
+      this.ignore = checkNotNull(ignore);
     }
 
     @Override
@@ -180,11 +193,23 @@ public class StateGuard
           return result;
         }
         catch (Throwable t) {
-          log.error("Failed transition: {} -> {}", current, to, t);
+          if (ignore(t)) {
+            current = to;
 
-          // maybe set failure state
-          if (failure != null) {
-            current = failure;
+            log.trace("Transitioned: {} ignoring: {}", to, t.toString());
+          }
+          else {
+            if (silent) {
+              log.debug("Failed transition: {} -> {}", current, to, t);
+            }
+            else {
+              log.error("Failed transition: {} -> {}", current, to, t);
+            }
+  
+            // maybe set failure state
+            if (failure != null) {
+              current = failure;
+            }
           }
 
           Throwables.propagateIfPossible(t, Exception.class, Error.class);
@@ -194,6 +219,15 @@ public class StateGuard
       finally {
         lock.unlock();
       }
+    }
+
+    private boolean ignore(final Throwable t) {
+      for (final Class<? extends Exception> type : ignore) {
+        if (type.isInstance(t)) {
+          return true;
+        }
+      }
+      return false;
     }
   }
 

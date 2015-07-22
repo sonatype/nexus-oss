@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -22,6 +22,7 @@ import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -77,4 +78,9 @@ public class Maven2Client
     return execute(put);
   }
 
+  public HttpResponse delete(String path) throws IOException {
+    final URI uri = resolve(path);
+    final HttpDelete delete = new HttpDelete(uri);
+    return execute(delete);
+  }
 }

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -16,9 +16,11 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.nexus.common.stateguard.StateGuardModule;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.security.WebSecurityModule;
+import org.sonatype.nexus.transaction.TransactionModule;
 import org.sonatype.sisu.goodies.lifecycle.Lifecycle;
 
 import com.google.inject.AbstractModule;
@@ -68,12 +70,14 @@ public class NexusContextModule
     // key components we expect to be able to find after booting nexus
     requireBinding(Key.get(Lifecycle.class, Names.named("NxApplication")));
     requireBinding(GuiceFilter.class);
+    requireBinding(LocalNodeAccess.class);
     requireBinding(LogManager.class);
 
     bind(ServletContext.class).toInstance(servletContext);
     bind(ParameterKeys.PROPERTIES).toInstance(nexusProperties);
 
     install(new StateGuardModule());
+    install(new TransactionModule());
     install(new WebSecurityModule(servletContext));
 
     // enable OSGi service lookup of Karaf components

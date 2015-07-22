@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -87,7 +87,7 @@ Ext.define('NX.coreui.controller.Roles', {
     me.listen({
       controller: {
         '#Refresh': {
-          refresh: me.loadRelatedStores
+          refresh: me.loadStores
         }
       },
       store: {
@@ -100,7 +100,7 @@ Ext.define('NX.coreui.controller.Roles', {
       },
       component: {
         'nx-coreui-role-list': {
-          beforerender: me.loadRelatedStores
+          beforerender: me.loadStores
         },
         'nx-coreui-role-list menuitem[action=newrole]': {
           click: me.showAddWindowRole
@@ -123,10 +123,8 @@ Ext.define('NX.coreui.controller.Roles', {
   },
 
   onSelection: function(list, model) {
-    var me = this;
-
     if (Ext.isDefined(model)) {
-      me.getSettings().loadRecord(model);
+      this.getSettings().loadRecord(model);
     }
   },
 
@@ -134,11 +132,10 @@ Ext.define('NX.coreui.controller.Roles', {
    * @private
    */
   showAddWindowRole: function() {
-    var me = this,
-      feature = me.getFeature();
+    var me = this;
 
     // Show the first panel in the create wizard, and set the breadcrumb
-    feature.setItemName(1, NX.I18n.get('Roles_Create_Title'));
+    me.setItemName(1, NX.I18n.get('Roles_Create_Title'));
     me.loadCreateWizard(1, true, Ext.create('widget.nx-coreui-role-add'));
   },
 
@@ -162,26 +159,10 @@ Ext.define('NX.coreui.controller.Roles', {
 
   /**
    * @private
-   * (Re)load related stores.
-   */
-  loadRelatedStores: function() {
-    var me = this,
-        list = me.getList();
-
-    if (list) {
-      me.getStore('RoleSource').load();
-      me.getStore('Privilege').load();
-      me.getSettings().down('#roles').getStore().load();
-    }
-  },
-
-  /**
-   * @private
    * (Re)create external role mapping entries.
    */
   onRoleSourceLoad: function(store) {
-    var me = this,
-        list = me.getList(),
+    var list = this.getList(),
         newButton, menuItems = [];
 
     if (list) {
@@ -230,10 +211,7 @@ Ext.define('NX.coreui.controller.Roles', {
    * @private
    */
   onSettingsSubmitted: function(form, action) {
-    var me = this,
-        win = form.up('nx-coreui-role-add');
-
-    me.getStore('Role').load();
+    this.getStore('Role').load();
   },
 
   /**

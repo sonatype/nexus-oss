@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.HealthCheckColumns', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'Ext.grid.column.Column',
     'NX.Conditions',
@@ -31,11 +31,11 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
     'Component'
   ],
   stores: [
-    'Asset',
-    'SearchResult'
+    'SearchResult',
+    'ComponentAsset'
   ],
   refs: [
-    { ref: 'healthcheckResult', selector: 'nx-coreui-healthcheck-result-list' },
+    { ref: 'healthcheckResult', selector: 'grid[healthCheckColumnsTarget=true]' },
     { ref: 'componentDetails', selector: 'nx-coreui-component-details' }
   ],
 
@@ -55,7 +55,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
         }
       },
       component: {
-        'nx-coreui-healthcheck-result-list': {
+        'grid[healthCheckColumnsTarget=true]': {
           afterrender: me.bindHealthCheckColumns,
           selection: me.showHealthCheckInfo
         }
@@ -84,9 +84,8 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
    * Loads/set Health Check fields on loaded records.
    */
   loadHealthCheckFields: function(store, records) {
-    var me = this,
-        components = [],
-        resultList = me.getHealthcheckResult();
+    var components = [],
+        resultList = this.getHealthcheckResult();
 
     if (!resultList || !resultList['healthCheckColumns']) {
       return;
@@ -115,7 +114,9 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
       });
       if (success) {
         Ext.Array.each(response.data, function(entry) {
-          var model = store.getById(entry.id);
+          var model = Ext.Array.findBy(records, function(record) {
+            return record.getId() === entry.id;
+          });
           if (model) {
             model.beginEdit();
             Ext.Object.each(entry['healthCheck'], function(key, value) {
@@ -125,7 +126,7 @@ Ext.define('NX.coreui.controller.HealthCheckColumns', {
           }
         });
       }
-    });
+    }, undefined, {enableBuffer: false});
   },
 
   /**

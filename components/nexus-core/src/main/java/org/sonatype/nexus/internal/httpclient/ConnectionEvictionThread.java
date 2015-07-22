@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -38,33 +38,34 @@ class ConnectionEvictionThread
 
   private final long idleTimeMillis;
 
-  private final long delay;
+  private final long evictingDelayMillis;
 
   @VisibleForTesting
   ConnectionEvictionThread(final HttpClientConnectionManager connectionManager,
                            final long idleTimeMillis,
-                           final long delay)
+                           final long evictingDelayMillis)
   {
     super("nexus-httpclient-eviction-thread");
     checkArgument(idleTimeMillis > -1, "Keep alive period in milliseconds cannot be negative");
+    checkArgument(evictingDelayMillis > 0, "Evicting delay period in milliseconds must be greater than 0");
     this.connectionManager = checkNotNull(connectionManager);
     this.idleTimeMillis = idleTimeMillis;
-    this.delay = delay;
+    this.evictingDelayMillis = evictingDelayMillis;
     setDaemon(true);
     setPriority(MIN_PRIORITY);
   }
 
-  ConnectionEvictionThread(final HttpClientConnectionManager connectionManager, final Time idleTime) {
-    this(connectionManager, idleTime.toMillisI(), 5000);
+  ConnectionEvictionThread(final HttpClientConnectionManager connectionManager, final Time idleTime, final Time evictingDelayTime) {
+    this(connectionManager, idleTime.toMillis(), evictingDelayTime.toMillis());
   }
 
   @Override
   public void run() {
-    log.debug("Starting '{}' (delay {} millis)", getName(), delay);
+    log.debug("Starting '{}' (delay {} millis)", getName(), evictingDelayMillis);
     try {
       while (true) {
         synchronized (this) {
-          wait(delay);
+          wait(evictingDelayMillis);
 
           try {
             connectionManager.closeExpiredConnections();

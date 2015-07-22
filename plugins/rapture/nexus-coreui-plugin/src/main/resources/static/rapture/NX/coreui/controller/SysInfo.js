@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,7 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.coreui.controller.SysInfo', {
-  extend: 'Ext.app.Controller',
+  extend: 'NX.app.Controller',
   requires: [
     'NX.Permissions',
     'NX.util.Url',
@@ -26,9 +26,6 @@ Ext.define('NX.coreui.controller.SysInfo', {
     'NX.Messages',
     'NX.I18n'
   ],
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
 
   views: [
     'support.SysInfo'
@@ -107,8 +104,9 @@ Ext.define('NX.coreui.controller.SysInfo', {
   },
 
   /**
-   * @private
    * Download system information report.
+   *
+   * @private
    */
   download: function () {
     NX.util.DownloadHelper.downloadUrl(NX.util.Url.urlOf('service/siesta/atlas/system-information'));

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,6 +23,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -65,7 +66,7 @@ public class FormatClientSupport
 
   protected HttpResponse execute(final HttpUriRequest request) throws IOException {
     log.info("Requesting {}", request);
-    final HttpResponse response = httpClient.execute(request, httpClientContext);
+    final HttpResponse response = httpClient.execute(request, new BasicHttpContext(httpClientContext));
     log.info("Received {}", response);
     return response;
   }

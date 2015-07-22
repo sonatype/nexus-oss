@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -21,21 +21,21 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
   extend: 'NX.view.drilldown.Drilldown',
   alias: 'widget.nx-coreui-searchfeature',
 
-  // TODO: Needed?
-  itemId: 'searchfeature',
-
   iconName: 'search-default',
 
   masters: [
     {
       xtype: 'panel',
-      layout: 'border',
+      layout: {
+        type: 'vbox',
+        align: 'stretch',
+        pack: 'start'
+      },
       items: [
         {
           xtype: 'panel',
           itemId: 'criteria',
 
-          region: 'north',
           header: false,
 
           style: {
@@ -58,14 +58,13 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
         },
         {
           xtype: 'nx-coreui-search-result-list',
-          region: 'center',
+          flex: 1,
           header: false
         }
       ]
     },
     {
       xtype: 'panel',
-      region: 'center',
       layout: {
         type: 'vbox',
         align: 'stretch',
@@ -97,20 +96,11 @@ Ext.define('NX.coreui.view.search.SearchFeature', {
 
     items: [
       {
-        xtype: 'nx-actions'
-      },
-      {
         xtype: 'nx-coreui-component-assetcontainer',
         header: false,
         flex: 1
       }
     ]
-  },
-
-  initComponent: function() {
-    var me = this;
-    me.callParent(arguments);
-    // Set default icon for the component version list
-    me.down('nx-coreui-component-asset-list').up('nx-drilldown-item').setItemClass('nx-icon-search-component-detail-x16');
   }
+
 });

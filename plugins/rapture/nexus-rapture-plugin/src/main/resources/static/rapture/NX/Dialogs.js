@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -24,6 +24,8 @@ Ext.define('NX.Dialogs', {
   ],
 
   /**
+   * Show information dialog.
+   *
    * @public
    */
   showInfo: function (title, message, options) {
@@ -42,6 +44,8 @@ Ext.define('NX.Dialogs', {
   },
 
   /**
+   * Show error dialog.
+   *
    * @public
    */
   showError: function (title, message, options) {
@@ -60,6 +64,8 @@ Ext.define('NX.Dialogs', {
   },
 
   /**
+   * Show confirmation dialog.
+   *
    * @public
    */
   askConfirmation: function (title, message, onYesFn, options) {

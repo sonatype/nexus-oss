@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -41,6 +41,10 @@ public class SSLTrustStoreIT
   @Inject
   private TrustStore trustStore;
 
+  public SSLTrustStoreIT() {
+    testData.addDirectory(resolveBaseFile("target/it-resources/ssl"));
+  }
+
   /**
    * Verify that certificates can be created / removed.
    */
@@ -48,7 +52,7 @@ public class SSLTrustStoreIT
   public void createReadDelete() throws Exception {
     // create a certificate
     final Certificate created = trustStore.importTrustCertificate(
-        FileUtils.readFileToString(testData.resolveFile("pem.txt")), "test");
+        FileUtils.readFileToString(resolveTestFile("pem.txt")), "test");
 
     // check that we can get the created certificate
     final Certificate updated = trustStore.getTrustedCertificate("test");

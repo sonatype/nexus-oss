@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -124,6 +124,10 @@ public class NxApplication
   protected void doStop() throws Exception {
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPING);
 
+    // log uptime before triggering activity which may run into problems
+    long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+    log.info("Uptime: {}", PeriodFormat.getDefault().print(new Period(uptime)));
+
     // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
     eventBus.post(new NexusStoppingEvent(this));
 
@@ -141,8 +145,6 @@ public class NxApplication
 
     applicationStatusSource.getSystemStatus().setState(SystemState.STOPPED);
 
-    long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
-    log.info("Uptime: {}", PeriodFormat.getDefault().print(new Period(uptime)));
     log.info("Stopped {}", getNexusNameForLogs());
   }
 }

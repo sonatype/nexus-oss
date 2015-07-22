@@ -2,7 +2,7 @@
 <!--
 
     Sonatype Nexus (TM) Open Source Version
-    Copyright (c) 2008-2015 Sonatype, Inc.
+    Copyright (c) 2008-present Sonatype, Inc.
     All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
 
     This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -45,7 +45,7 @@
     </dependency>
 
     <!--
-    Distribution to be tested
+    Base template bundle to be tested
     -->
     <dependency>
       <groupId>${it.nexus.bundle.groupId}</groupId>
@@ -56,7 +56,7 @@
     </dependency>
 
     <!--
-    Additional dependencies needed to build/run the tests
+    Additional plugins on top of the base template
     -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
@@ -81,6 +81,7 @@
       <artifactId>nexus-repository-raw</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
@@ -96,12 +97,51 @@
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
-      <version>1.5</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <!--
+      Unpack shared test-data
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <outputDirectory>${project.build.directory}/it-resources</outputDirectory>
+          <excludes>META-INF/**</excludes>
+          <artifactItems>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-maven-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-nuget-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-raw-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-ssl-test-data</artifactId>
+            </item>
+          </artifactItems>
+        </configuration>
+        <executions>
+          <execution>
+            <id>unpack-test-data</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <!--
       Allow use of 'versionAsInProject' in Pax-Exam configuration
       -->

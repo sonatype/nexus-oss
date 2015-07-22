@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -28,8 +28,6 @@ Ext.define('NX.coreui.view.browse.BrowseRepositoryList', {
     stateful: true,
     stateId: 'nx-coreui-browse-repository-list'
   },
-
-  store: 'Repository',
 
   columns: [
     {
@@ -74,6 +72,20 @@ Ext.define('NX.coreui.view.browse.BrowseRepositoryList', {
       ptype: 'gridfilterbox',
       emptyText: NX.I18n.get('Browse_BrowseRepositoryList_EmptyText_Filter')
     }
-  ]
+  ],
+
+  /**
+   * @override
+   */
+  initComponent: function() {
+    var me = this;
+
+    me.store = Ext.create('NX.coreui.store.RepositoryReference', { remoteFilter: true });
+    me.store.addFilter([
+      { property: 'applyPermissions', value: true }
+    ], false);
+
+    me.callParent(arguments);
+  }
 
 });

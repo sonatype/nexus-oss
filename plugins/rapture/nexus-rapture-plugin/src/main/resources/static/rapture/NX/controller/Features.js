@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -18,10 +18,7 @@
  * @since 3.0
  */
 Ext.define('NX.controller.Features', {
-  extend: 'Ext.app.Controller',
-  mixins: {
-    logAware: 'NX.LogAware'
-  },
+  extend: 'NX.app.Controller',
 
   models: [
     'Feature'
@@ -32,10 +29,20 @@ Ext.define('NX.controller.Features', {
   ],
 
   statics: {
+    /**
+     * Always returns true.
+     *
+     * @returns {boolean}
+     */
     alwaysVisible: function () {
       return true;
     },
 
+    /**
+     * Always returns false.
+     *
+     * @returns {boolean}
+     */
     alwaysHidden: function () {
       return false;
     }
@@ -43,6 +50,7 @@ Ext.define('NX.controller.Features', {
 
   /**
    * Registers features.
+   *
    * @param {Array/Object} features to be registered
    * @param {Ext.util.Observable} [owner] to be watched to automatically unregister the features if owner is destroyed
    */
@@ -71,8 +79,7 @@ Ext.define('NX.controller.Features', {
 
         // complain if there is no view configuration
         if (!clonedFeature.view) {
-          me.logError('Missing view configuration for feature at path: ' + clonedFeature.path);
-          // TODO: Maybe raise an error instead?
+          me.logError('Missing view configuration for feature at path:', clonedFeature.path);
         }
 
         path = clonedFeature.path;
@@ -92,7 +99,7 @@ Ext.define('NX.controller.Features', {
 
         // generate default context-help keyword
         if (!clonedFeature.helpKeyword) {
-          clonedFeature.helpKeyword = path.replace(/\//g, '_').toLowerCase();
+          clonedFeature.helpKeyword = path.replace(/\//g, ' ').toLowerCase();
         }
 
         if (Ext.isDefined(clonedFeature.visible)) {
@@ -116,6 +123,7 @@ Ext.define('NX.controller.Features', {
 
   /**
    * Un-registers features.
+   *
    * @param {Object[]/Object} features to be unregistered
    */
   unregisterFeature: function (features) {
@@ -149,8 +157,7 @@ Ext.define('NX.controller.Features', {
    * @param feature
    */
   configureIcon: function (path, feature) {
-    var me = this,
-        defaultIconName = 'feature-' + feature.mode + '-' + path.toLowerCase().replace(/\//g, '-').replace(/\s/g, '');
+    var defaultIconName = 'feature-' + feature.mode + '-' + path.toLowerCase().replace(/\//g, '-').replace(/\s/g, '');
 
     // inline icon registration for feature
     if (feature.iconConfig) {
@@ -162,7 +169,7 @@ Ext.define('NX.controller.Features', {
       else {
         icon.name = defaultIconName;
       }
-      me.getApplication().getIconController().addIcon(icon);
+      this.getApplication().getIconController().addIcon(icon);
     }
 
     // default icon name if not set

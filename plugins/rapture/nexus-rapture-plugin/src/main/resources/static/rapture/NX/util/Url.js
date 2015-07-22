@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -19,14 +19,19 @@
  */
 Ext.define('NX.util.Url', {
   singleton: true,
+  requires: [
+    'Ext.String'
+  ],
 
   /**
    * Returns the base URL of the Nexus server.  URL never ends with '/'.
    *
    * @public
+   * @property {String}
+   * @readonly
    */
   baseUrl: NX.app.baseUrl,
-
+  
   /**
    * @public
    */
@@ -46,8 +51,9 @@ Ext.define('NX.util.Url', {
   },
 
   /**
-   * @public
    * Creates a link.
+   *
+   * @public
    * @param {String} url to link to
    * @param {String} [text] link text. If omitted, defaults to url value.
    * @param {String} [target] link target. If omitted, defaults to '_blank'

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -14,6 +14,8 @@ package org.sonatype.nexus.httpclient.internal;
 
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
 
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -50,11 +52,11 @@ public class NexusHttpRoutePlanner
    * @since 2.5
    */
   public NexusHttpRoutePlanner(final Map<String, HttpHost> proxies,
-                               final Pattern nonProxyHostsPattern)
+                               @Nullable final Pattern nonProxyHostsPattern)
   {
     super(DefaultSchemePortResolver.INSTANCE);
     this.proxies = checkNotNull(proxies);
-    this.nonProxyHostPattern = checkNotNull(nonProxyHostsPattern);
+    this.nonProxyHostPattern = nonProxyHostsPattern;
   }
 
   @Override
@@ -77,6 +79,6 @@ public class NexusHttpRoutePlanner
    * @return true if no proxy should be configured.
    */
   private boolean noProxyFor(final String hostName) {
-    return nonProxyHostPattern.matcher(hostName).matches();
+    return nonProxyHostPattern != null && nonProxyHostPattern.matcher(hostName).matches();
   }
 }

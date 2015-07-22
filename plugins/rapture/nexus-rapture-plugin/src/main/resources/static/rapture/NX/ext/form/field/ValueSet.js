@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -85,9 +85,10 @@ Ext.define('NX.ext.form.field.ValueSet', {
   input: undefined,
 
   /**
-   * @cfg {String} emptyText
    * The default text to place into an empty field.
-   * @see Ext.form.field.Text#emptyText
+   * See {@link Ext.form.field.Text#emptyText}
+   *
+   * @cfg {String} emptyText
    */
   emptyText: undefined,
 
@@ -102,7 +103,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
   glyphAddButton: 'xf055@FontAwesome' /* fa-plus-circle */,
 
   /**
-   * @cfg {String} [glyphAddButton="xf056@FontAwesome"]
+   * @cfg {String} [glyphDeleteButton="xf056@FontAwesome"]
    */
   glyphDeleteButton: 'xf056@FontAwesome' /* fa-minus-circle */,
 
@@ -288,9 +289,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
   },
 
   getSubmitValue: function () {
-    var me = this;
-
-    return me.getValue();
+    return this.getValue();
   },
 
   isValid: function () {
@@ -317,8 +316,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
   },
 
   markInvalid: function (errors) {
-    var me = this;
-    me.items.items[0].items.items[0].markInvalid(errors);
+    this.items.items[0].items.items[0].markInvalid(errors);
   },
 
   getErrors: function () {
@@ -344,8 +342,7 @@ Ext.define('NX.ext.form.field.ValueSet', {
    */
   clearInvalid: function () {
     // Clear the message and fire the 'valid' event
-    var me = this;
-    me.items.items[0].items.items[0].clearInvalid();
+    this.items.items[0].items.items[0].clearInvalid();
   },
 
   /**
@@ -363,10 +360,9 @@ Ext.define('NX.ext.form.field.ValueSet', {
    * @returns {Array} store values as an array
    */
   getValues: function () {
-    var me = this,
-        values = [];
+    var values = [];
 
-    me.store.each(function (model) {
+    this.store.each(function (model) {
       values.push(model.get('value'));
     });
 

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -23,16 +23,23 @@ Ext.define('NX.util.condition.FormHasRecord', {
   extend: 'NX.util.condition.Condition',
 
   /**
-   * @cfg {String} A form selector as specified by (@link Ext.ComponentQuery#query}
+   * A form selector as specified by (@link Ext.ComponentQuery#query}.
+   *
+   * @cfg {String}
    */
   form: undefined,
 
   /**
-   * @cfg {Function} An optional function to be called when form has a record to perform additional checks on the
-   * passed in model
+   * An optional function to be called when form has a record to perform additional checks on the passed in model.
+   *
+   * @cfg {Function}
    */
   fn: undefined,
 
+  /**
+   * @override
+   * @returns {NX.util.condition.FormHasRecord}
+   */
   bind: function () {
     var me = this,
         components = {}, queryResult;
@@ -54,6 +61,9 @@ Ext.define('NX.util.condition.FormHasRecord', {
     return me;
   },
 
+  /**
+   * @private
+   */
   evaluate: function (form) {
     var me = this,
         satisfied = false,
@@ -73,9 +83,12 @@ Ext.define('NX.util.condition.FormHasRecord', {
     }
   },
 
+  /**
+   * @override
+   * @returns {String}
+   */
   toString: function () {
-    var me = this;
-    return me.self.getName() + '{ form=' + me.form + ' }';
+    return this.self.getName() + '{ form=' + this.form + ' }';
   }
 
 });

@@ -1,6 +1,6 @@
 /*
  * Sonatype Nexus (TM) Open Source Version
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008-present Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
  *
  * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
@@ -64,7 +64,7 @@ public abstract class NugetProxyITSupport
 
     final NestedAttributesMap proxy = config.attributes("proxy");
     proxy.set("remoteUrl", remoteUrl);
-    proxy.set("artifactMaxAge", 5);
+    proxy.set("contentMaxAge", 5);
 
     NestedAttributesMap storage = config.attributes("storage");
     storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);
