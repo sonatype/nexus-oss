@@ -60,7 +60,7 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
     description: NX.I18n.get('Browse_Components_Description_Feature'),
     view: 'NX.coreui.view.browse.BrowseComponentFeature',
     iconConfig: {
-      file: 'plugin.png',
+      file: 'box_front.png',
       variants: ['x16', 'x32']
     },
     visible: function() {
