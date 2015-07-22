@@ -56,9 +56,12 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode<?>>
 
   private final BucketEntityAdapter bucketEntityAdapter;
 
+  private final OrientAsyncHelper orientAsyncHelper;
+
   public MetadataNodeEntityAdapter(final String typeName, final BucketEntityAdapter bucketEntityAdapter) {
     super(typeName);
     this.bucketEntityAdapter = bucketEntityAdapter;
+    this.orientAsyncHelper = new OrientAsyncHelper();
   }
 
   @Override
@@ -102,7 +105,7 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode<?>>
         "bucket", bucketEntityAdapter.recordIdentity(bucket)
     );
     String query = String.format("select from %s where bucket = :bucket", getTypeName());
-    Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);
+    Iterable<ODocument> docs = orientAsyncHelper.asyncIterable(db, query, parameters);
     return readEntities(docs);
   }
 
@@ -199,6 +202,7 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode<?>>
         {
           @Override
           public T apply(final ODocument doc) {
+            System.out.println(doc.toJSON());
             return readEntity(doc);
           }
         });
