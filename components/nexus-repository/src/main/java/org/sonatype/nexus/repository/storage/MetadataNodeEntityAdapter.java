@@ -202,7 +202,6 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode<?>>
         {
           @Override
           public T apply(final ODocument doc) {
-            System.out.println(doc.toJSON());
             return readEntity(doc);
           }
         });
