@@ -71,6 +71,7 @@ public class NodeProvider
         this.node = node;
       }
       catch (Exception e) {
+        // TODO: Should this be propagating exception?  ES is non-functional at this point if we get an exception
         log.warn("Failed to create node", e);
       }
     }
