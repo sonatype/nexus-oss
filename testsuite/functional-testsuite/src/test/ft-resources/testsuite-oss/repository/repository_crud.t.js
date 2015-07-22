@@ -120,12 +120,6 @@ StartTest(function(t) {
             t.is(form.down('#strictContentTypeValidation').getValue(), true);
             t.is(form.down('#writePolicy').readOnly, false);
             t.is(form.down('#writePolicy').getValue(), 'ALLOW');
-
-            next(forms);
-          },
-          // confirm that the save button is disabled
-          function(next, forms) {
-            var form = forms[0];
             t.is(form.down('button[action=save]').isDisabled(), true);
 
             next();
