@@ -41,6 +41,8 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.ComponentQuery;
+import org.sonatype.nexus.repository.storage.ComponentQuery.Builder;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.types.HostedType;
@@ -57,6 +59,7 @@ import com.orientechnologies.common.concur.ONeedRetryException;
 import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Arrays.asList;
 
 /**
  * A {@link MavenFacet} that persists Maven artifacts and metadata to a {@link StorageFacet}.
@@ -161,6 +164,10 @@ public class MavenFacetImpl
       return null;
     }
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
+    return toContent(asset, blob);
+  }
+
+  private Content toContent(final Asset asset, final Blob blob) {
     final String contentType = asset.contentType();
     final Content content = new Content(new BlobPayload(blob, contentType));
     Content.extractFromAsset(asset, HashType.ALGORITHMS, content.getAttributes());
@@ -168,20 +175,20 @@ public class MavenFacetImpl
   }
 
   @Override
-  public void put(final MavenPath path, final Payload payload)
+  public Content put(final MavenPath path, final Payload payload)
       throws IOException
   {
     log.debug("PUT {} : {}", getRepository().getName(), path.getPath());
 
     try (TempStreamSupplier streamSupplier = new TempStreamSupplier(payload.openInputStream())) {
-      doPut(path, payload, streamSupplier);
+      return doPut(path, payload, streamSupplier);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPut(final MavenPath path,
-                       final Payload payload,
-                       final Supplier<InputStream> streamSupplier)
+  protected Content doPut(final MavenPath path,
+                          final Payload payload,
+                          final Supplier<InputStream> streamSupplier)
       throws IOException
   {
     final StorageTx tx = UnitOfWork.currentTransaction();
@@ -197,22 +204,23 @@ public class MavenFacetImpl
     if (payload instanceof Content) {
       contentAttributes = ((Content) payload).getAttributes();
     }
+
     if (path.getCoordinates() != null) {
-      putArtifact(tx, path, assetBlob, contentAttributes);
+      return toContent(putArtifact(tx, path, assetBlob, contentAttributes), assetBlob.getBlob());
     }
     else {
-      putFile(tx, path, assetBlob, contentAttributes);
+      return toContent(putFile(tx, path, assetBlob, contentAttributes), assetBlob.getBlob());
     }
   }
 
-  private void putArtifact(final StorageTx tx,
-                           final MavenPath path,
-                           final AssetBlob assetBlob,
-                           @Nullable final AttributesMap contentAttributes)
+  private Asset putArtifact(final StorageTx tx,
+                            final MavenPath path,
+                            final AssetBlob assetBlob,
+                            @Nullable final AttributesMap contentAttributes)
       throws IOException
   {
     final Coordinates coordinates = checkNotNull(path.getCoordinates());
-    Component component = findComponent(tx, tx.getBucket(), path);
+    Component component = findComponent(tx, path);
     if (component == null) {
       // Create and set top-level properties
       component = tx.createComponent(tx.getBucket(), getRepository().getFormat())
@@ -222,7 +230,6 @@ public class MavenFacetImpl
 
       // Set format specific attributes
       final NestedAttributesMap componentAttributes = component.formatAttributes();
-      componentAttributes.set(P_COMPONENT_KEY, getComponentKey(coordinates));
       componentAttributes.set(P_GROUP_ID, coordinates.getGroupId());
       componentAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
       componentAttributes.set(P_VERSION, coordinates.getVersion());
@@ -238,7 +245,6 @@ public class MavenFacetImpl
       asset.formatAttributes().set(StorageFacet.P_PATH, path.getPath());
 
       final NestedAttributesMap assetAttributes = asset.formatAttributes();
-      assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
       assetAttributes.set(P_GROUP_ID, coordinates.getGroupId());
       assetAttributes.set(P_ARTIFACT_ID, coordinates.getArtifactId());
       assetAttributes.set(P_VERSION, coordinates.getVersion());
@@ -249,12 +255,14 @@ public class MavenFacetImpl
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
+
+    return asset;
   }
 
-  private void putFile(final StorageTx tx,
-                       final MavenPath path,
-                       final AssetBlob assetBlob,
-                       @Nullable final AttributesMap contentAttributes)
+  private Asset putFile(final StorageTx tx,
+                        final MavenPath path,
+                        final AssetBlob assetBlob,
+                        @Nullable final AttributesMap contentAttributes)
       throws IOException
   {
     Asset asset = findAsset(tx, tx.getBucket(), path);
@@ -262,13 +270,12 @@ public class MavenFacetImpl
       asset = tx.createAsset(tx.getBucket(), getRepository().getFormat());
       asset.name(path.getPath());
       asset.formatAttributes().set(StorageFacet.P_PATH, path.getPath());
-
-      final NestedAttributesMap assetAttributes = asset.formatAttributes();
-      assetAttributes.set(P_ASSET_KEY, getAssetKey(path));
     }
 
     putAssetPayload(tx, asset, assetBlob, contentAttributes);
     tx.saveAsset(asset);
+
+    return asset;
   }
 
   private void putAssetPayload(final StorageTx tx,
@@ -300,7 +307,7 @@ public class MavenFacetImpl
   }
 
   private boolean deleteArtifact(final MavenPath path, final StorageTx tx) {
-    final Component component = findComponent(tx, tx.getBucket(), path);
+    final Component component = findComponent(tx, path);
     if (component == null) {
       return false;
     }
@@ -342,32 +349,26 @@ public class MavenFacetImpl
   }
 
   /**
-   * Returns component key based on passed in {@link Coordinates} G:A:V values.
-   */
-  private String getComponentKey(final Coordinates coordinates) {
-    return coordinates.getGroupId()
-        + ":" + coordinates.getArtifactId()
-        + ":" + coordinates.getVersion();
-  }
-
-  /**
-   * Returns asset key based on passed in {@link MavenPath} path value.
-   */
-  private String getAssetKey(final MavenPath mavenPath) {
-    return mavenPath.getPath();
-  }
-
-  /**
-   * Finds component by key.
+   * Finds component by maven path.
    */
   @Nullable
   private Component findComponent(final StorageTx tx,
-                                  final Bucket bucket,
                                   final MavenPath mavenPath)
   {
-    final String componentKeyName =
-        StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_COMPONENT_KEY;
-    return tx.findComponentWithProperty(componentKeyName, getComponentKey(mavenPath.getCoordinates()), bucket);
+    final Coordinates coordinates = mavenPath.getCoordinates();
+
+    final ComponentQuery query = new Builder()
+        .where("group = ").param(coordinates.getGroupId())
+        .where(" and name = ").param(coordinates.getArtifactId())
+        .where(" and version = ").param(coordinates.getVersion())
+        .build();
+
+    final Iterable<Component> components = tx
+        .findComponents(query.getWhere(), query.getParameters(), asList(getRepository()), null);
+    if (components.iterator().hasNext()) {
+      return components.iterator().next();
+    }
+    return null;
   }
 
   /**
@@ -378,10 +379,8 @@ public class MavenFacetImpl
                                      final Component component,
                                      final MavenPath mavenPath)
   {
-    final String assetKey = getAssetKey(mavenPath);
     for (Asset asset : tx.browseAssets(component)) {
-      final NestedAttributesMap attributesMap = asset.formatAttributes();
-      if (assetKey.equals(attributesMap.get(P_ASSET_KEY, String.class))) {
+      if (mavenPath.getPath().equals(asset.name())) {
         return asset;
       }
     }
@@ -396,8 +395,7 @@ public class MavenFacetImpl
                           final Bucket bucket,
                           final MavenPath mavenPath)
   {
-    final String assetKeyName =
-        StorageFacet.P_ATTRIBUTES + "." + getRepository().getFormat().getValue() + "." + P_ASSET_KEY;
-    return tx.findAssetWithProperty(assetKeyName, getAssetKey(mavenPath), bucket);
+    // The maven path is stored in the asset 'name' field, which is indexed (the maven format-specific key is not).
+    return tx.findAssetWithProperty(StorageFacet.P_NAME, mavenPath.getPath(), bucket);
   }
 }

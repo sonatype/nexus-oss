@@ -28,6 +28,7 @@ import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
@@ -82,18 +83,18 @@ public class RawContentFacetImpl
     final Asset asset = tx.firstAsset(component);
     final Blob blob = tx.requireBlob(asset.requireBlobRef());
 
-    return marshall(asset, blob);
+    return toContent(asset, blob);
   }
 
   @Override
-  public void put(final String path, final Payload content) throws IOException, InvalidContentException {
+  public Content put(final String path, final Payload content) throws IOException, InvalidContentException {
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutContent(path, streamSupplier, content);
+      return doPutContent(path, streamSupplier, content);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutContent(final String path, final Supplier<InputStream> streamSupplier, final Payload payload)
+  protected Content doPutContent(final String path, final Supplier<InputStream> streamSupplier, final Payload payload)
       throws IOException
   {
     StorageTx tx = UnitOfWork.currentTransaction();
@@ -124,8 +125,11 @@ public class RawContentFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
-    tx.setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
+    final AssetBlob assetBlob = tx
+        .setBlob(asset, path, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(asset);
+
+    return toContent(asset, assetBlob.getBlob());
   }
 
   private String getGroup(String path) {
@@ -188,7 +192,7 @@ public class RawContentFacetImpl
     return tx.findComponentWithProperty(property, path, bucket);
   }
 
-  private Content marshall(final Asset asset, final Blob blob) {
+  private Content toContent(final Asset asset, final Blob blob) {
     final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
     Content.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
     return content;
