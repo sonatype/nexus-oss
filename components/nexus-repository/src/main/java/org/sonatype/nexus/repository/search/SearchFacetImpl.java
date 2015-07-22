@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.search;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -38,7 +37,6 @@ import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
