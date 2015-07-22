@@ -51,6 +51,9 @@ Ext.define('NX.controller.SettingsForm', {
         'form[settingsForm=true][settingsFormSubmit=true] button[action=save]': {
           click: me.submitForm
         },
+        'form[settingsForm=true][settingsFormSubmit=true] button[action=discard]': {
+          click: me.discardChanges
+        },
         'form[settingsForm=true] field[bindGroup]': {
           validitychange: me.updateEnableState
         }
@@ -121,6 +124,24 @@ Ext.define('NX.controller.SettingsForm', {
           me.loadForm(form);
         }
       });
+    }
+  },
+
+  /**
+   * Discard any changes to this form
+   *
+   * @private
+   */
+  discardChanges: function (button) {
+    var form = button.up('form'),
+        record = form.getRecord();
+
+    if (form.api && form.api.load) {
+      form.fireEvent('load', form);
+    }
+    else {
+      form.getForm().reset();
+      form.isValid();
     }
   },
 

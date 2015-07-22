@@ -100,19 +100,7 @@ Ext.define('NX.view.SettingsForm', {
     },
     { 
       text: NX.I18n.get('SettingsForm_Discard_Button'), 
-      action: 'discard',
-      handler: function () {
-        var form = this.up('form'),
-            record = form.getRecord();
-
-        if (form.api && form.api.load) {
-          form.fireEvent('load', form);
-        }
-        else {
-          form.getForm().reset();
-          form.isValid();
-        }
-      }
+      action: 'discard'
     }
   ],
 
