@@ -1,5 +1,12 @@
 cluster.name: nexus
-path.data: ${nexus-work}/elasticsearch
+
+path:
+  data: ${nexus-work}/elasticsearch
+  logs: ${nexus-work}/log
+  work: ${nexus-work}/tmp/elasticsearch
+
+node.data: true
+node.master: true
 
 # Disable groovy script integration
 script.groovy.sandbox.enabled: false
