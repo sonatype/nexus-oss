@@ -48,8 +48,8 @@ Ext.define('NX.coreui.view.nuget.NuGetApiKey', {
 
         buttonAlign: 'left',
         buttons: [
-          { text: NX.I18n.get('Nuget_NuGetApiKey_Access_Button'), action: 'access', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true },
-          { text: NX.I18n.get('Nuget_NuGetApiKey_Reset_Button'), action: 'reset', ui: 'nx-danger', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true }
+          { text: NX.I18n.get('Nuget_NuGetApiKey_Access_Button'), action: 'access', ui: 'nx-primary', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true },
+          { text: NX.I18n.get('Nuget_NuGetApiKey_Reset_Button'), action: 'reset', glyph: 'xf023@FontAwesome' /* fa-lock */, disabled: true }
         ]
       }
     ];
