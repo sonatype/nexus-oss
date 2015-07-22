@@ -87,6 +87,7 @@ public class SearchFacetImpl
       searchService.deleteIndex(getRepository());
       searchService.createIndex(getRepository());
 
+      // TODO: sort out with Stuart, is this correct, or would intermingle if this method is called from TX enabled method
       try (final StorageTx tx = getRepository().facet(StorageFacet.class).txSupplier().get()) {
         tx.begin();
         for (Component component : tx.browseComponents(tx.getBucket())) {
