@@ -127,10 +127,6 @@ Ext.define('NX.coreui.view.support.SupportZip', {
           glyph: 'xf019@FontAwesome' /* fa-download */,
           action: 'add',
           ui: 'nx-primary'
-        },
-        {
-          text: NX.I18n.get('SettingsForm_Discard_Button'),
-          action: 'discard'
         }
       ]
     };

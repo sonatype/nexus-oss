@@ -133,8 +133,7 @@ Ext.define('NX.controller.SettingsForm', {
    * @private
    */
   discardChanges: function (button) {
-    var form = button.up('form'),
-        record = form.getRecord();
+    var form = button.up('form');
 
     if (form.api && form.api.load) {
       form.fireEvent('load', form);

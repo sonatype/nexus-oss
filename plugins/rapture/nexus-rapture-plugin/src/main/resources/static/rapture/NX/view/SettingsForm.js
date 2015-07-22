@@ -180,7 +180,7 @@ Ext.define('NX.view.SettingsForm', {
   },
 
   /**
-   * Update the state of the save button
+   * Update the state of the save and discard buttons
    *
    * @private
    */
