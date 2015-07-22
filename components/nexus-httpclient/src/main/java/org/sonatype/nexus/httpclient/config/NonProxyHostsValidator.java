@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.httpclient.config;
 
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.validation.ConstraintValidatorContext;
@@ -25,7 +26,7 @@ import org.sonatype.nexus.validation.ConstraintValidatorSupport;
  * @since 3.0
  */
 public class NonProxyHostsValidator
-    extends ConstraintValidatorSupport<NonProxyHosts, String[]>
+    extends ConstraintValidatorSupport<NonProxyHosts, Set<String>>
 {
   /**
    * Pattern checking for allowed characters, best we can do, as input may be:
@@ -44,10 +45,12 @@ public class NonProxyHostsValidator
       .compile("\\*?[\\p{IsAlphabetic}|\\d|\\-|\\_|\\.|\\:|\\[|\\]]+\\*?");
 
   @Override
-  public boolean isValid(final String[] values, final ConstraintValidatorContext context) {
-    for (String value : values) {
-      if (!isValid(value)) {
-        return false;
+  public boolean isValid(final Set<String> values, final ConstraintValidatorContext context) {
+    if (values != null) {
+      for (String value : values) {
+        if (!isValid(value)) {
+          return false;
+        }
       }
     }
     return true;
