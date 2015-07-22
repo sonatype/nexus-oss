@@ -168,7 +168,6 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_RepositoryList_Filter_EmptyText: 'No repositories matched "$filter"',
     Repository_RepositoryList_EmptyText: 'No repositories defined',
     Repository_RepositoryFeature_Delete_Button: 'Delete repository',
-    Repository_RepositoryFeature_RebuildIndex_Button: 'Rebuild repository index',
     Repository_RepositorySettings_Title: 'Settings',
     Repository_Facet_GroupFacet_Title: 'Group',
     Repository_Facet_HttpClientFacet_Title: 'HTTP',

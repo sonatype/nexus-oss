@@ -121,10 +121,6 @@ Ext.define('NX.coreui.controller.Repositories', {
         'nx-coreui-repository-list button[action=new]': {
           click: me.showSelectRecipePanel
         },
-        'nx-coreui-repository-feature button[action=rebuildIndex]': {
-          click: me.rebuildIndex,
-          afterrender: me.bindRebuildIndexButton
-        },
         'nx-coreui-repository-settings-form': {
           submitted: me.loadStores
         },
@@ -336,46 +332,6 @@ Ext.define('NX.coreui.controller.Repositories', {
     var permittedCondition;
     button.mon(
         NX.Conditions.and(
-            permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:delete'),
-            NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
-              permittedCondition.setPermission(
-                  'nexus:repository-admin:' + model.get('format') + ':' + model.get('name') + ':delete'
-              );
-              return true;
-            })
-        ),
-        {
-          satisfied: button.enable,
-          unsatisfied: button.disable,
-          scope: button
-        }
-    );
-  },
-
-  /**
-   * @private
-   * Rebuild Repository index for the selected Repository.
-   */
-  rebuildIndex: function() {
-    var me = this,
-        model = me.getList().getSelectionModel().getLastSelected();
-
-    NX.direct.coreui_Repository.rebuildIndex(model.getId(), function(response) {
-      me.getStore('Repository').load();
-      if (Ext.isObject(response) && response.success) {
-        NX.Messages.add({ text: 'Repository index rebuilt: ' + me.getDescription(model), type: 'success' });
-      }
-    });
-  },
-
-  /**
-   * @private
-   * Enable 'Rebuild Index' when user has 'delete' permission for selected repository.
-   */
-  bindRebuildIndexButton: function(button) {
-    var permittedCondition;
-    button.mon(
-        NX.Conditions.or(
             permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:delete'),
             NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
               permittedCondition.setPermission(
