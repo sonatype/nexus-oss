@@ -34,8 +34,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.ehcache</artifactId>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache</artifactId>
     </dependency>
 
     <dependency>
