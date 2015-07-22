@@ -24,6 +24,7 @@ import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
+import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.StorageFacetImpl
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
@@ -74,6 +75,9 @@ class DockerHostedRecipe
   Provider<StorageFacetImpl> storageFacet
 
   @Inject
+  Provider<SearchFacet> searchFacet
+
+  @Inject
   TimingHandler timingHandler
 
   @Inject
@@ -117,6 +121,7 @@ class DockerHostedRecipe
     repository.attach(repositoryReverseProxyFacet.get())
     repository.attach(dockerFacet.get())
     repository.attach(storageFacet.get())
+    repository.attach(searchFacet.get())
   }
 
   /**
