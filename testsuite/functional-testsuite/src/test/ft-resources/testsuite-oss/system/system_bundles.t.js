@@ -17,14 +17,8 @@ StartTest(function(t) {
   t.describe('System Bundles', function(t) {
     t.it('Bundles view is populated', function(t) {
       t.chain(
-        t.openPageAsAdmin('admin/system/bundles'),
-        { waitFor: 'CQVisible', args: 'nx-coreui-system-bundlelist' },
-        function(next) {
-          var store = t.cq1('nx-coreui-system-bundlelist').getStore();
-          t.waitFor(function() {
-            return store.count() > 0;
-          }, next)
-        }
+          t.openPageAsAdmin('admin/system/bundles'),
+          {waitForRowsVisible: 'nx-coreui-system-bundlelist'}
       );
     });
     t.it('Can filter bundles by name', function(t) {
