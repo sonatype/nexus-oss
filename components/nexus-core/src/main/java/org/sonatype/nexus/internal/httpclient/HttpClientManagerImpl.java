@@ -33,6 +33,7 @@ import org.sonatype.nexus.httpclient.HttpClientPlan;
 import org.sonatype.nexus.httpclient.HttpClientPlan.Customizer;
 import org.sonatype.nexus.httpclient.config.ConfigurationCustomizer;
 import org.sonatype.nexus.httpclient.config.HttpClientConfiguration;
+import org.sonatype.nexus.validation.Validate;
 import org.sonatype.sisu.goodies.common.Mutex;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
@@ -167,6 +168,7 @@ public class HttpClientManagerImpl
 
   @Override
   @Guarded(by = STARTED)
+  @Validate
   public void setConfiguration(final HttpClientConfiguration configuration) {
     checkNotNull(configuration);
 

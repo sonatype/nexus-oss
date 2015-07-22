@@ -45,9 +45,11 @@ public class NonProxyHostsValidator
 
   @Override
   public boolean isValid(final String[] values, final ConstraintValidatorContext context) {
-    for (String value : values) {
-      if (!isValid(value)) {
-        return false;
+    if (values != null) {
+      for (String value : values) {
+        if (!isValid(value)) {
+          return false;
+        }
       }
     }
     return true;
