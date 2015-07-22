@@ -99,8 +99,12 @@ public class NodeProvider
   public void shutdown() {
     if (node != null) {
       log.debug("Shutting down");
-      node.close();
-      node = null;
+      try {
+        node.close();
+      }
+      finally {
+        node = null;
+      }
     }
   }
 }
