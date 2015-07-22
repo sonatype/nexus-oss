@@ -128,12 +128,17 @@ public class NugetProxyGalleryFacet
 
   @Override
   public int count(final String operation, final Map<String, String> parameters) {
+    Iterable<Repository> proxyRepositories = getProxyRepositories();
     final List<Integer> remoteCounts = passQueryToRemoteRepos(nugetQuery(operation, parameters),
-        getProxyRepositories(),
+        proxyRepositories,
         new CountFetcher(fetcher));
-
-    final int hostedCount = count(operation, parameters, getHostedRepositories());
-
+    log.debug("Counts from proxyRepositories: {} are: {}", proxyRepositories, remoteCounts);
+    
+    Iterable<Repository> hostedRepositories = getHostedRepositories();
+    final int hostedCount = hostedRepositories.iterator().hasNext()
+        ? count(operation, parameters, hostedRepositories) : 0; 
+    log.debug("Counts from hostedRepositories: {} are: {}", hostedRepositories, hostedCount);
+      
     return sum(remoteCounts) + hostedCount;
   }
 
