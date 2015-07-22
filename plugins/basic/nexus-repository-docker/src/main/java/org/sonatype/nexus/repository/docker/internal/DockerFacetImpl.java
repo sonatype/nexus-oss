@@ -173,18 +173,14 @@ public class DockerFacetImpl
     String metadataAssetName = imageId + "/json";
 
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, imageId);
-    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
-    }
-    Asset metadataAsset = findAsset(tx, component, metadataAssetName);
-    if (metadataAsset == null) {
+    Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
+    if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
 
     Content content = marshall(metadataAsset, tx.requireBlob(metadataAsset.requireBlobRef()));
 
-    NestedAttributesMap componentAttributes = component.formatAttributes();
+    NestedAttributesMap componentAttributes = metadataAsset.formatAttributes();
     content.getAttributes().set(P_X_DOCKER_SIZE, componentAttributes.get(P_X_DOCKER_SIZE));
     content.getAttributes().set(P_X_DOCKER_CHECKSUM_PAYLOAD, componentAttributes.get(P_X_DOCKER_CHECKSUM_PAYLOAD));
 
@@ -221,42 +217,34 @@ public class DockerFacetImpl
 
     Bucket bucket = tx.getBucket();
 
-    Component parentComponent = null;
+    Asset parentAsset = null;
     List<String> ancestry = null;
-    if (parentId != null && (parentComponent = findComponent(tx, bucket, parentId)) == null) {
+    if (parentId != null && (parentAsset = findAsset(tx, bucket, parentId + "/json")) == null) {
       throw new V1ApiException("Image depends on a non existing parent");
     }
-    if (parentComponent != null) {
-      ancestry = parentComponent.formatAttributes().get(P_ANCESTRY, TypeTokens.LIST_STRING);
+    if (parentAsset != null) {
+      ancestry = parentAsset.formatAttributes().get(P_ANCESTRY, TypeTokens.LIST_STRING);
     }
     if (ancestry == null) {
       ancestry = Lists.newArrayList();
     }
     ancestry.add(0, imageId);
 
-    Component component = findComponent(tx, bucket, imageId);
-    Asset metadataAsset = null;
-    if (component == null) {
-      component = tx.createComponent(bucket, getRepository().getFormat()).name(imageId);
-
-      component.formatAttributes().set(P_IN_PROGRESS, true);
-    }
-    else {
-      if (!Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
-        throw new V1ApiException("Image already exists", HttpStatus.CONFLICT);
-      }
-      metadataAsset = findAsset(tx, component, metadataAssetName);
-
-      // cleanup checksums as we have potentially new metadata/layer
-      component.formatAttributes().remove(P_X_DOCKER_CHECKSUM_PAYLOAD);
-    }
-    component.formatAttributes().set(P_ANCESTRY, ancestry);
-    tx.saveComponent(component);
+    Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     if (metadataAsset == null) {
-      metadataAsset = tx.createAsset(bucket, component);
+      metadataAsset = tx.createAsset(bucket, getRepository().getFormat());
       metadataAsset.name(metadataAssetName);
       metadataAsset.formatAttributes().set(P_PATH, "/v1/images/" + metadataAssetName);
+      metadataAsset.formatAttributes().set(P_IN_PROGRESS, true);
     }
+    else {
+      if (!Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
+        throw new V1ApiException("Image already exists", HttpStatus.CONFLICT);
+      }
+      // cleanup checksums as we have potentially new metadata/layer
+      metadataAsset.formatAttributes().remove(P_X_DOCKER_CHECKSUM_PAYLOAD);
+    }
+    metadataAsset.formatAttributes().set(P_ANCESTRY, ancestry);
 
     // If we reach that point, it means that this is a new image or a retry on a failed push
     // TODO Put attributes in component/asset based on parsed metadata json file
@@ -276,14 +264,15 @@ public class DockerFacetImpl
     validateImageId(imageId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
+    String metadataAssetName = imageId + "/json";
     String layerAssetName = imageId + "/layer";
 
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, imageId);
-    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
+    Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
+    if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
-    Asset layerAsset = findAsset(tx, component, layerAssetName);
+    Asset layerAsset = findAsset(tx, bucket, layerAssetName);
     if (layerAsset == null) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
@@ -310,20 +299,16 @@ public class DockerFacetImpl
     String layerAssetName = imageId + "/layer";
 
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, imageId);
-    if (component == null) {
-      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
-    }
-    if (!Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1ApiException("Image already exists", HttpStatus.CONFLICT);
-    }
-    Asset metadataAsset = findAsset(tx, component, metadataAssetName);
+    Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     if (metadataAsset == null) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
-    Asset layerAsset = findAsset(tx, component, layerAssetName);
+    if (!Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
+      throw new V1ApiException("Image already exists", HttpStatus.CONFLICT);
+    }
+    Asset layerAsset = findAsset(tx, bucket, layerAssetName);
     if (layerAsset == null) {
-      layerAsset = tx.createAsset(bucket, component);
+      layerAsset = tx.createAsset(bucket, getRepository().getFormat());
       layerAsset.name(layerAssetName);
       layerAsset.formatAttributes().set(P_PATH, "/v1/images/" + layerAssetName);
     }
@@ -349,9 +334,9 @@ public class DockerFacetImpl
     }
 
     // set extra component attributes
-    component.formatAttributes().set(P_X_DOCKER_SIZE, layerAsset.size());
-    component.formatAttributes().set(P_X_DOCKER_CHECKSUM_PAYLOAD, SHA256.name() + ":" + hasher.hash());
-    tx.saveComponent(component);
+    metadataAsset.formatAttributes().set(P_X_DOCKER_SIZE, layerAsset.size());
+    metadataAsset.formatAttributes().set(P_X_DOCKER_CHECKSUM_PAYLOAD, SHA256.name() + ":" + hasher.hash());
+    tx.saveAsset(metadataAsset);
   }
 
   @Override
@@ -380,13 +365,15 @@ public class DockerFacetImpl
     validateImageId(imageId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
+    String metadataAssetName = imageId + "/json";
+
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, imageId);
-    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
+    Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
+    if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
 
-    String ancestry = mapper.writeValueAsString(component.formatAttributes().get(P_ANCESTRY));
+    String ancestry = mapper.writeValueAsString(metadataAsset.formatAttributes().get(P_ANCESTRY));
     return new StringPayload(ancestry, Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
   }
 
@@ -398,24 +385,20 @@ public class DockerFacetImpl
     String metadataAssetName = imageId + "/json";
 
     Bucket bucket = tx.getBucket();
-    Component component = findComponent(tx, bucket, imageId);
-    if (component == null) {
-      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
-    }
-    if (!Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1ApiException("Cannot set this image checksum", HttpStatus.CONFLICT);
-    }
-    Asset metadataAsset = findAsset(tx, component, metadataAssetName);
+    Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     if (metadataAsset == null) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
-    Object actualChecksum = component.formatAttributes().get(P_X_DOCKER_CHECKSUM_PAYLOAD);
+    if (!Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
+      throw new V1ApiException("Cannot set this image checksum", HttpStatus.CONFLICT);
+    }
+    Object actualChecksum = metadataAsset.formatAttributes().get(P_X_DOCKER_CHECKSUM_PAYLOAD);
     if (!checksum.equals(actualChecksum)) {
       log.error("Wrong checksum. Actual: {}; Expected: {}", actualChecksum, checksum);
       throw new V1ApiException("Checksum mismatch");
     }
-    component.formatAttributes().remove(P_IN_PROGRESS);
-    tx.saveComponent(component);
+    metadataAsset.formatAttributes().remove(P_IN_PROGRESS);
+    tx.saveAsset(metadataAsset);
   }
 
   @Override
@@ -485,12 +468,8 @@ public class DockerFacetImpl
     if (imageIndexAsset == null) {
       throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
     }
-    Component component = findComponent(tx, bucket, imageId);
-    if (component == null || Boolean.TRUE.equals(component.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
-    }
-    Asset metadataAsset = findAsset(tx, component, metadataAssetName);
-    if (metadataAsset == null) {
+    Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
+    if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
       throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
     }
 
