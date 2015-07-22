@@ -81,8 +81,8 @@ public class SearchFacetImpl
   @Override
   @Guarded(by = STARTED)
   public void rebuildIndex() {
-    rebuildIndexLock.writeLock().lock();
     log.info("Rebuilding index of repository {}", getRepository().getName());
+    rebuildIndexLock.writeLock().lock();
     try {
       searchService.deleteIndex(getRepository());
       searchService.createIndex(getRepository());
