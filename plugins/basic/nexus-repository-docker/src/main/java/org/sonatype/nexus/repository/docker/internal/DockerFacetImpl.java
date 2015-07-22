@@ -17,10 +17,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import javax.inject.Named;
@@ -139,17 +141,25 @@ public class DockerFacetImpl
       indexStream = streamSupplier.get();
     }
     else {
-      String existingIndex;
-      try (InputStream in = tx.requireBlob(imagesIndexAsset.requireBlobRef()).getInputStream()) {
-        existingIndex = new String(ByteStreams.toByteArray(in), Charsets.UTF_8);
+      // merge existing index with the new one
+      List<Map<String, Object>> existingIndex = readImagesIndex(blobStreamSupplier(tx, imagesIndexAsset));
+      List<Map<String, Object>> newIndex = readImagesIndex(streamSupplier);
+      List<Map<String, Object>> mergedIndex = new ArrayList<>(existingIndex);
+      for (Map<String, Object> newImage : newIndex) {
+        boolean found = false;
+        for (Map<String, Object> existingImage : existingIndex) {
+          if (Objects.equals(existingImage.get("id"), newImage.get("id")) &&
+              Objects.equals(existingImage.get("Tag"), newImage.get("Tag"))) {
+            existingImage.putAll(newImage);
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          mergedIndex.add(newImage);
+        }
       }
-      String newIndex;
-      try (InputStream in = streamSupplier.get()) {
-        newIndex = new String(ByteStreams.toByteArray(in), Charsets.UTF_8);
-      }
-      // TODO merge existing images index with the new one
-      String mergedIndex = existingIndex;
-      indexStream = new ByteArrayInputStream(mergedIndex.getBytes(Charsets.UTF_8));
+      indexStream = new ByteArrayInputStream(mapper.writeValueAsBytes(mergedIndex));
     }
 
     AttributesMap contentAttributes = null;
@@ -533,6 +543,18 @@ public class DockerFacetImpl
     }
   }
 
+  private List<Map<String, Object>> readImagesIndex(final Supplier<InputStream> streamSupplier) throws IOException {
+    try (InputStream in = streamSupplier.get()) {
+      TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {};
+      try {
+        return mapper.readValue(streamSupplier.get(), typeRef);
+      }
+      catch (Exception e) {
+        throw new V1ApiException("Invalid JSON");
+      }
+    }
+  }
+
   private String validateImageId(final String imageId) {
     if (!validImageId.matcher(imageId).matches()) {
       throw new V1ApiException("Invalid image ID", HttpStatus.NOT_FOUND);
@@ -559,6 +581,16 @@ public class DockerFacetImpl
     final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
     Content.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
     return content;
+  }
+
+  private Supplier<InputStream> blobStreamSupplier(final StorageTx tx, final Asset imagesIndexAsset) {
+    return new Supplier<InputStream>()
+    {
+      @Override
+      public InputStream get() {
+        return tx.requireBlob(imagesIndexAsset.requireBlobRef()).getInputStream();
+      }
+    };
   }
 
 }
