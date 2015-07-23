@@ -42,9 +42,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class NugetClient
     extends FormatClientSupport
 {
-  public static final String VS_SEARCH_COUNT_TEMPLATE = "Search()/$count?$filter=IsAbsoluteLatestVersion&searchTerm='%s'&targetFramework='net45'&includePrerelease=true";
+  public static final String VS_SEARCH_COUNT_TEMPLATE = "Search()/$count?$filter=IsAbsoluteLatestVersion&searchTerm='%s'&targetFramework='net45'&includePrerelease=%s";
 
   public static final String VS_SEARCH_FEED_TEMPLATE = "Search()?$filter=IsAbsoluteLatestVersion&$skip=0&$top=30&searchTerm='%s'&targetFramework='net45'&includePrerelease=true";
+
+  public static final String VS_PACKAGE_COUNT = "Packages()/$count";
+
+  public static final String VS_INITIAL_COUNT_QUERY = "Search()/$count?$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false";
+
+  public static final String VS_INITIAL_FEED_QUERY =
+      "Search()?$filter=IsLatestVersion&$orderby=DownloadCount%20desc,Id&$skip=0&$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false";
 
   private String apiKey;
 
@@ -101,20 +108,74 @@ public class NugetClient
     return get(String.format("Packages(Id='%s',Version='%s')", packageId, version));
   }
 
+  /**
+   * Get feed xml for given component
+   * @param packageId
+   * @param version
+   * @return feed entry for given component
+   */
   public String entryXml(final String packageId, final String version) throws IOException {
     return asString(entry(packageId, version));
   }
 
+  /**
+   * Download component binary
+   * @param packageId
+   * @param version
+   * @return the nupkg file
+   */
   public HttpResponse packageContent(final String packageId, final String version) throws IOException {
     return get(String.format("%s/%s", packageId, version));
   }
 
-  public String vsSearchFeedXml(final String searchTerm) throws IOException {
-    return feedXml(String.format(VS_SEARCH_FEED_TEMPLATE, searchTerm));
+  /**
+   * Exercise Search() with no searchTerm
+   * @return feed with matching records
+   */
+  public String vsSearchFeedXml() throws IOException {
+    return feedXml(String.format(VS_SEARCH_FEED_TEMPLATE, "", false));
   }
 
+  /**
+   * Exercise Search() with no searchTerm and including inlinecount
+   * @return feed with matching records and inlinecount
+   */
+  public String vsSearchFeedXmlInlineCount() throws IOException {
+    return feedXml(String.format(VS_SEARCH_FEED_TEMPLATE, "", false) + "&$inlinecount=allpages");
+  }
+
+  /**
+   * Exercise Search() for given searchTerm
+   * @param searchTerm
+   * @return feed with matching records
+   */
+  public String vsSearchFeedXml(final String searchTerm) throws IOException {
+    return feedXml(String.format(VS_SEARCH_FEED_TEMPLATE, searchTerm, true));
+  }
+
+  /**
+   * Exercise a Search/$count query with no search term
+   * @return the count of all records
+   */
+  public int vsCount() throws IOException {
+    return count(VS_INITIAL_COUNT_QUERY);
+  }
+
+  /**
+   * Exercise a Search/$count query with the given search term
+   * @param searchTerm
+   * @return the count of matching records
+   */
   public int vsSearchCount(final String searchTerm) throws IOException {
-    return count(String.format(VS_SEARCH_COUNT_TEMPLATE, searchTerm));
+    return count(String.format(VS_SEARCH_COUNT_TEMPLATE, searchTerm, true));
+  }
+
+  /**
+   * Exercise a Package/$count query for all packages
+   * @return the count of all packages
+   */
+  public int vsPackageCount() throws IOException {
+    return count(VS_PACKAGE_COUNT);
   }
 
   /**
