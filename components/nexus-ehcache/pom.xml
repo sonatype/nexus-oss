@@ -41,7 +41,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.bundles</groupId>
       <artifactId>org.sonatype.nexus.bundles.ehcache</artifactId>
-      <version>${nexus.version}</version>
     </dependency>
 
     <dependency>

@@ -27,10 +27,15 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>bundle</packaging>
 
+  <properties>
+    <ehcache.version>2.10.0</ehcache.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache</artifactId>
+      <version>${ehcache.version}</version>
     </dependency>
   </dependencies>
 
@@ -46,7 +51,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
               <artifactSet>
                 <includes>
                   <include>net.sf.ehcache:ehcache</include>
@@ -55,15 +60,15 @@
               <filters>
                 <filter>
                   <artifact>net.sf.ehcache:ehcache</artifact>
-                  <includes>
-                    <include>net/sf/ehcache/**</include>
-                    <include>org/terracotta/context/**</include>
-                    <include>org/terracotta/statistics/**</include>
-                    <include>ehcache-failsafe.xml</include>
-                    <include>META-INF/maven/net.sf.ehcache/**</include>
-                  </includes>
+                  <!--<includes>-->
+                    <!--<include>net/sf/ehcache/**</include>-->
+                    <!--<include>org/terracotta/context/**</include>-->
+                    <!--<include>org/terracotta/statistics/**</include>-->
+                    <!--<include>ehcache-failsafe.xml</include>-->
+                    <!--<include>META-INF/maven/net.sf.ehcache/**</include>-->
+                  <!--</includes>-->
                   <excludes>
-                    <exclude>net/sf/ehcache/hibernate/**</exclude>
+                    <exclude>rest-management-private-classpath/**</exclude>
                   </excludes>
                 </filter>
               </filters>
@@ -80,7 +85,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Description>${project.description}</Bundle-Description>
             <Export-Package>
-              net.sf.ehcache
+              net.sf.ehcache*;version=${ehcache.version};-split-package:=merge-first
             </Export-Package>
             <Import-Package>
               javax.management*,
