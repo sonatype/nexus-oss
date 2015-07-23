@@ -55,6 +55,12 @@ Ext.define('NX.view.dev.Logging', {
       action: 'clear',
       glyph: 'xf12d@FontAwesome' /* fa-eraser */
     },
+    {
+      xtype: 'button',
+      text: 'Export selection',
+      action: 'export',
+      glyph: 'xf019@FontAwesome' /* fa-download */
+    },
     '-',
     {
       xtype: 'label',
@@ -105,12 +111,6 @@ Ext.define('NX.view.dev.Logging', {
       xtype: 'checkbox',
       itemId: 'remote',
       boxLabel: 'Remote events'
-    },
-    {
-      xtype: 'button',
-      text: 'Dump rows to console',
-      action: 'dump',
-      glyph: 'xf121@FontAwesome' /* fa-code */
     }
   ],
 
