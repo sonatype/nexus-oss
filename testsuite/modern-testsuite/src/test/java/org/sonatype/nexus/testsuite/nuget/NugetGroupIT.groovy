@@ -159,8 +159,7 @@ class NugetGroupIT
     assertThat('count should be updated with published component', groupCount,
         is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT + 1))
     assertThat('count should be updated with published component', hostedCount, is(1))
-    // fails due to https://issues.sonatype.org/browse/NEXUS-8990
-//    assertThat('count should not be affected', proxyCount, is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT))
+    assertThat('count should not be affected', proxyCount, is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT))
   }
 
   @Test
@@ -185,8 +184,7 @@ class NugetGroupIT
     assertThat('count should be updated with published component', groupCount,
         is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT + 1))
     assertThat('count should be updated with published component', hostedCount, is(1))
-    // fails due to https://issues.sonatype.org/browse/NEXUS-8990
-//    assertThat('count should not be affected', proxyCount, is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT))
+    assertThat('count should not be affected', proxyCount, is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT))
   }
 
   @Test
@@ -197,8 +195,7 @@ class NugetGroupIT
     proxy.packageContent(SONATYPE_COMPONENT.id, SONATYPE_COMPONENT.version) // prime our fake proxy cache
 
     assertThat(hosted.vsSearchCount(SONATYPE_COMPONENT.id), is(1))
-    // fails due to https://issues.sonatype.org/browse/NEXUS-8990
-//    assertThat(proxy.vsSearchCount(SONATYPE_COMPONENT.id), is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT))
+    assertThat(proxy.vsSearchCount(SONATYPE_COMPONENT.id), is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT))
     assertThat(proxyFirstGroup.vsSearchCount(SONATYPE_COMPONENT.id), is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT + 1))
 
     List<Map<String, String>> hostedSearch = parseFeedXml(hosted.vsSearchFeedXml(SONATYPE_COMPONENT.id))
