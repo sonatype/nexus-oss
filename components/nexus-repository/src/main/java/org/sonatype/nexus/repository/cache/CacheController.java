@@ -59,13 +59,13 @@ public class CacheController
    * age of the info.
    */
   public boolean isStale(final CacheInfo cacheInfo) {
-    if (contentMaxAgeMinutes < 0) {
-      log.trace("Content max age checking disabled");
-      return false;
-    }
     if (cacheToken != null && !cacheToken.equals(cacheInfo.getCacheToken())) {
       log.debug("Content expired (cacheToken)");
       return true;
+    }
+    if (contentMaxAgeMinutes < 0) {
+      log.trace("Content max age checking disabled");
+      return false;
     }
     if (cacheInfo.getLastVerified().isBefore(new DateTime().minusMinutes(contentMaxAgeMinutes))) {
       log.debug("Content expired (age)");
