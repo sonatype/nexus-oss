@@ -62,6 +62,7 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.it.Verifier;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.TestName;
 import org.ops4j.pax.exam.Option;
 
@@ -75,8 +76,9 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 
 /**
- * Naveb IT support.
+ * Maven IT support.
  */
+@Category(MavenTestGroup.class)
 public abstract class MavenITSupport
     extends NexusCoreITSupport
 {

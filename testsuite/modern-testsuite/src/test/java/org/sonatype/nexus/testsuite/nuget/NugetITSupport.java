@@ -44,6 +44,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Before;
+import org.junit.experimental.categories.Category;
 import org.ops4j.pax.exam.Option;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
@@ -53,11 +54,12 @@ import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 /**
  * Support for Nuget ITs
  */
+@Category(NugetTestGroup.class)
 public abstract class NugetITSupport
     extends RepositoryTestSupport
 {
-  public static final String VISUAL_STUDIO_INITIAL_COUNT_QUERY =
-      "Search()/$count?$filter=IsLatestVersion&searchTerm=''&targetFramework='net45'&includePrerelease=false";
+
+  public static final int VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT = 32091;
 
   public static final String VISUAL_STUDIO_INITIAL_FEED_QUERY =
       "Search()?$filter=IsLatestVersion&$orderby=DownloadCount%20desc,Id&$skip=0&$top=30&searchTerm=''&targetFramework='net45'&includePrerelease=false";
@@ -126,8 +128,6 @@ public abstract class NugetITSupport
   public void enableNugetRealm() {
     log.info("Realm configuration {}", realmManager.getConfiguration());
 
-    //final String realmName = NugetApiKeyRealm.class.getName();
-    //final String nugetRealmName = NugetApiKeyRealm.ID;
     final String nugetRealmName = NugetApiKey.NAME;
 
     final RealmConfiguration config = realmManager.getConfiguration();
