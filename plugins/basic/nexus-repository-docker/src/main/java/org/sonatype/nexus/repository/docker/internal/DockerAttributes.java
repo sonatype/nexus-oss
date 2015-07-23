@@ -29,8 +29,6 @@ public interface DockerAttributes
 
   String P_IMAGE_ID = "layer";
 
-  String P_REPOSITORY = "repository";
-
   String P_PARENT = "parent";
 
   String P_ANCESTRY = "ancestry";
