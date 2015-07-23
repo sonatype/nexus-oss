@@ -97,13 +97,10 @@ public class SecurityFilter
     // FIXME: Really should find a better place to do this so its covered in all request, not just those with security-filter
     UserIdMdcHelper.unknown();
 
-    ClassLoader currentLoader = Thread.currentThread().getContextClassLoader();
     try {
-      Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
       super.doFilterInternal(request, response, chain);
     }
     finally {
-      Thread.currentThread().setContextClassLoader(currentLoader);
       UserIdMdcHelper.unset();
     }
   }
