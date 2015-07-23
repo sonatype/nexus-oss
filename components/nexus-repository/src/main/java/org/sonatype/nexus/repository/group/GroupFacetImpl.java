@@ -35,10 +35,10 @@ import org.sonatype.nexus.repository.view.Content;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterables;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 /**
@@ -96,12 +96,21 @@ public class GroupFacetImpl
   protected void doConfigure(final Configuration configuration) throws Exception {
     config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
 
-    // form cache token from hash of member names: this will change on member change and on member reordering too
-    final String cacheToken = SHA1.function().hashUnencodedChars(String.valueOf(config.memberNames)).toString();
-
-    cacheController = new CacheController(config.contentMaxAge, cacheToken);
+    cacheController = new CacheController(config.contentMaxAge, null);
 
     log.debug("Config: {}", config);
+  }
+
+  @Override
+  protected void doUpdate(final Configuration configuration) throws Exception {
+    // detect member changes
+    Set<String> previousMemberNames = config.memberNames;
+    super.doUpdate(configuration);
+
+    // check members including their order in the iteration
+    if (!Iterables.elementsEqual(config.memberNames, previousMemberNames)) {
+      cacheController.invalidateCache();
+    }
   }
 
   @Override
