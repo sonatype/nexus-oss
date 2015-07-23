@@ -82,7 +82,7 @@ Ext.define('NX.coreui.controller.FeatureGroups', {
         description: NX.I18n.get('FeatureGroups_Browse_Description'),
         group: true,
         iconConfig: {
-          file: 'box_front.png',
+          file: 'database_share.png',
           variants: ['x16', 'x32']
         }
       },
