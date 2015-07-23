@@ -94,6 +94,7 @@ public class RawITSupport
 
     NestedAttributesMap group = config.attributes("group");
     group.set("memberNames", asList(memberNames));
+    group.set("contentMaxAge", 5);
 
     NestedAttributesMap storage = config.attributes("storage");
     storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);

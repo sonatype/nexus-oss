@@ -69,7 +69,8 @@ class NugetDefaultRepositoriesContributor
             attributes:
                 [
                     group: [
-                        memberNames: [DEFAULT_HOSTED_NAME, DEFAULT_PROXIED_NAME]
+                        memberNames: [DEFAULT_HOSTED_NAME, DEFAULT_PROXIED_NAME],
+                        contentMaxAge: 5
                     ],
                     storage: [
                         blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME

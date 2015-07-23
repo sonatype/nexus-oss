@@ -89,7 +89,8 @@ public class Maven2GroupFacet
    */
   @Nullable
   public Content getCachedMergedMetadata(final MavenPath mavenPath) throws IOException {
-    return mavenFacet.get(mavenPath);
+    final Content cached = mavenFacet.get(mavenPath);
+    return !isStale(cached) ? cached : null;
   }
 
   /**
@@ -170,7 +171,8 @@ public class Maven2GroupFacet
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
     content.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
-    return content;
+
+    return maintainCacheInfo(content);
   }
 
   /**
