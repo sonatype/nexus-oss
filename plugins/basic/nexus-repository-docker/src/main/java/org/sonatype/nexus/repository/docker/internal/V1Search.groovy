@@ -16,19 +16,17 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
-import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.http.HttpResponses
 import org.sonatype.nexus.repository.search.SearchService
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.view.ContentTypes
 import org.sonatype.nexus.repository.view.Context
-import org.sonatype.nexus.repository.view.Response
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 import org.sonatype.nexus.repository.view.payloads.StringPayload
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Charsets
+import com.google.common.net.HttpHeaders
 import org.elasticsearch.index.query.FilterBuilders
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.sort.SortBuilders
@@ -46,7 +44,6 @@ class V1Search
   private final static ObjectMapper mapper = new ObjectMapper()
 
   private final static sorting = [
-      SortBuilders.fieldSort(StorageFacet.P_GROUP).order(SortOrder.ASC),
       SortBuilders.fieldSort(StorageFacet.P_NAME).order(SortOrder.ASC),
       SortBuilders.fieldSort(StorageFacet.P_VERSION).order(SortOrder.ASC)
   ]
@@ -55,9 +52,8 @@ class V1Search
   SearchService searchService
 
   Closure search = { Context context ->
-    def repository = context.repository
     def query = context.request.parameters.get('q')
-    log.info '[search] repository: {} query: {}', repository.name, query
+    log.info '[search] query: {}', query
 
     def searchResults = new SearchResults(query: query, num_results: 0)
     if (query) {
@@ -68,10 +64,11 @@ class V1Search
       def searchResponse = searchService.search(queryBuilder, sorting, 0, 100)
       def hits = searchResponse.hits.hits
       if (hits) {
+        def host = context.request.headers.get(HttpHeaders.HOST)
         searchResults.num_results = hits.length
         searchResults.results = hits?.collect { hit ->
           new SearchResult(
-              name: hit.source[StorageFacet.P_ATTRIBUTES][DockerFormat.NAME][DockerAttributes.P_REPOSITORY]
+              name: "${host}/${hit.source[StorageFacet.P_NAME]}:${hit.source[StorageFacet.P_VERSION]}"
           )
         }
       }
