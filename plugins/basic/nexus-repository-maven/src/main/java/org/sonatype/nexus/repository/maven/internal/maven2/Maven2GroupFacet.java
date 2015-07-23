@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -52,9 +51,6 @@ import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -126,7 +122,7 @@ public class Maven2GroupFacet
     Config config = configurationFacet.readSection(configuration, CONFIG_KEY, Config.class);
 
     // HACK: no proper access to group config
-    final String memberNames = Joiner.on(",").join((Iterable<String>)(configuration.attributes("group").get("memberNames")));
+    final String memberNames = String.valueOf(configuration.attributes("group").get("memberNames"));
     cacheController = new CacheController(
         config.contentMaxAge,
         HashAlgorithm.SHA1.function().hashString(memberNames, Charsets.UTF_8).toString()

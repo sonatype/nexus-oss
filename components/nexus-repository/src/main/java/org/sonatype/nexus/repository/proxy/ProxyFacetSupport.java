@@ -35,7 +35,6 @@ import org.sonatype.nexus.repository.view.payloads.HttpEntityPayload;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.net.HttpHeaders;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
