@@ -144,9 +144,7 @@ class RepositoryComponent
   @Validate
   String rebuildIndex(final @NotEmpty String name) {
     Repository repository = repositoryManager.get(name)
-    // TODO: for now same permission as repo remove. Do we want separate permission for "rebuild index"?
-    securityHelper.ensurePermitted(adminPermission(repository, BreadActions.DELETE))
-
+    securityHelper.ensurePermitted(adminPermission(repository, BreadActions.EDIT))
     TaskConfiguration taskConfiguration = taskScheduler.createTaskConfigurationInstance(RebuildIndexTask.class)
     taskConfiguration.setString(RebuildIndexTask.REPOSITORY_NAME_FIELD_ID, repository.name)
     TaskInfo taskInfo = taskScheduler.submit(taskConfiguration)
