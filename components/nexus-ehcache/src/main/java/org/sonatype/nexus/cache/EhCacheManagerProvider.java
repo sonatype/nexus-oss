@@ -28,6 +28,7 @@ import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.ehcache.jcache.JCacheCachingProvider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -58,7 +59,8 @@ public class EhCacheManagerProvider
 
   @VisibleForTesting
   synchronized CacheManager create() {
-    CachingProvider provider = Caching.getCachingProvider("org.ehcache.jcache.JCacheCachingProvider");
+    CachingProvider provider = Caching.getCachingProvider(JCacheCachingProvider.class.getName(),
+        JCacheCachingProvider.class.getClassLoader());
     log.info("Creating cache-manager with configuration: {}", uri);
     CacheManager cacheManager = provider.getCacheManager(uri, getClass().getClassLoader());
     log.info("Created cache-manager: {}", cacheManager);
