@@ -36,6 +36,7 @@ import org.sonatype.nexus.repository.view.Content;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.annotations.VisibleForTesting;
 import org.hibernate.validator.constraints.NotEmpty;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
