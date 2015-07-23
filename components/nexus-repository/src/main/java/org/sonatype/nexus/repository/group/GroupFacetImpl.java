@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 
+import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
@@ -34,10 +35,13 @@ import org.sonatype.nexus.repository.view.Content;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 /**
@@ -103,13 +107,14 @@ public class GroupFacetImpl
   @Override
   protected void doUpdate(final Configuration configuration) throws Exception {
     // detect member changes
-    Set<String> previousMemberNames = config.memberNames;
     super.doUpdate(configuration);
 
-    // check members including their order in the iteration
-    if (!Iterables.elementsEqual(config.memberNames, previousMemberNames)) {
-      cacheController.invalidateCache();
-    }
+    // form hash out of member names: this will change on member change and on member reordering too
+    final String cacheToken = SHA1.function().hashString(
+        String.valueOf(config.memberNames),
+        Charsets.UTF_8
+    ).toString();
+    cacheController.mayInvalidateCache(cacheToken);
   }
 
   @Override
