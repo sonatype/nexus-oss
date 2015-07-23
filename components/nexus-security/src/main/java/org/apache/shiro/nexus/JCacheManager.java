@@ -13,6 +13,7 @@
 package org.apache.shiro.nexus;
 
 import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.EternalExpiryPolicy;
 
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.cache.Cache;
@@ -43,7 +44,7 @@ public class JCacheManager
   @Override
   public <K, V> Cache<K, V> getCache(final String name) throws CacheException {
     try {
-      return new JCache(maybeCreateCache(name));
+      return new JCache<>(this.<K,V>maybeCreateCache(name));
     }
     catch (Throwable t) {
       throw new CacheException(t);
@@ -80,9 +81,10 @@ public class JCacheManager
     if (cache == null) {
       log.debug("Creating a shiro jcache named: {}", name);
 
-      MutableConfiguration<K, V> cacheConfig = new MutableConfiguration<>();
-      cacheConfig.setManagementEnabled(true);
-      cacheConfig.setStatisticsEnabled(true);
+      MutableConfiguration<K, V> cacheConfig = new MutableConfiguration<K, V>()
+          .setExpiryPolicyFactory(EternalExpiryPolicy.factoryOf())
+          .setManagementEnabled(true)
+          .setStatisticsEnabled(true);
 
       cache = cacheManager.createCache(name, cacheConfig);
       log.debug("Created a shiro cache: {}", cache);
