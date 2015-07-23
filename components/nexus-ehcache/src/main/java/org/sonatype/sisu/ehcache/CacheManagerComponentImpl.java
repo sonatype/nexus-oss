@@ -24,8 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.management.MBeanServer;
 
-import org.sonatype.nexus.common.app.ApplicationDirectories;
-
 import com.google.common.annotations.VisibleForTesting;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.Configuration;
@@ -44,23 +42,35 @@ public class CacheManagerComponentImpl
 {
   private static final Logger logger = LoggerFactory.getLogger(CacheManagerComponentImpl.class);
 
-  private CacheManager cacheManager;
+  private final CacheManager cacheManager;
+
+  private final boolean isManaged;
 
   @Inject
-  public CacheManagerComponentImpl(final ApplicationDirectories directories) throws IOException {
-    this(new File(directories.getAppDirectory("etc"), "ehcache.xml"));
+  public CacheManagerComponentImpl(final javax.cache.CacheManager cacheManager) {
+    this(cacheManager.unwrap(CacheManager.class), false);
   }
 
   @VisibleForTesting
   public CacheManagerComponentImpl(final @Nullable File file) throws IOException {
-    this.cacheManager = createCacheManager(file);
+    this(createCacheManager(file), true);
+  }
 
-    try {
-      final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-      ManagementService.registerMBeans(cacheManager, mBeanServer, false, false, true, true);
+  private CacheManagerComponentImpl(CacheManager cacheManager, boolean isManaged) {
+    this.cacheManager = cacheManager;
+    this.isManaged = isManaged;
+
+    if (isManaged) {
+      try {
+        final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        ManagementService.registerMBeans(cacheManager, mBeanServer, false, false, true, true);
+      }
+      catch (Exception e) {
+        logger.warn("Failed to register mbean: {}", e.toString());
+      }
     }
-    catch (Exception e) {
-      logger.warn("Failed to register mbean: {}", e.toString());
+    else {
+      // JCacheManager does its own MBean registration
     }
   }
 
@@ -72,22 +82,21 @@ public class CacheManagerComponentImpl
   @Override
   @PreDestroy
   public synchronized void shutdown() {
-    if (cacheManager != null) {
+    if (isManaged && cacheManager != null) {
       logger.info("Shutting down");
       cacheManager.shutdown();
-      cacheManager = null;
     }
   }
 
-  private CacheManager createCacheManager(final @Nullable File file) throws IOException {
+  private static CacheManager createCacheManager(final @Nullable File file) throws IOException {
     URL url;
     if (file != null && file.exists()) {
       url = file.toURI().toURL();
     }
     else {
-      url = getClass().getResource("/ehcache.xml");
+      url = CacheManagerComponentImpl.class.getResource("/ehcache.xml");
       if (url == null) {
-        url = getClass().getResource("/ehcache-default.xml");
+        url = CacheManagerComponentImpl.class.getResource("/ehcache-default.xml");
       }
     }
 
