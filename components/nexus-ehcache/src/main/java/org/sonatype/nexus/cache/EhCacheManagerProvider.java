@@ -56,7 +56,8 @@ public class EhCacheManagerProvider
     this.uri = checkNotNull(uri);
   }
 
-  public synchronized CacheManager create() {
+  @VisibleForTesting
+  synchronized CacheManager create() {
     CachingProvider provider = Caching.getCachingProvider("org.ehcache.jcache.JCacheCachingProvider");
     log.info("Creating cache-manager with configuration: {}", uri);
     CacheManager cacheManager = provider.getCacheManager(uri, getClass().getClassLoader());
