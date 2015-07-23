@@ -27,6 +27,10 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>bundle</packaging>
 
+  <description>
+    OSGi bundle wrapping net.sf.ehcache:ehcache ${ehcache.version}
+  </description>
+
   <properties>
     <ehcache.version>2.10.0</ehcache.version>
   </properties>
@@ -60,16 +64,13 @@
               <filters>
                 <filter>
                   <artifact>net.sf.ehcache:ehcache</artifact>
-                  <!--<includes>-->
-                    <!--<include>net/sf/ehcache/**</include>-->
-                    <!--<include>org/terracotta/context/**</include>-->
-                    <!--<include>org/terracotta/statistics/**</include>-->
-                    <!--<include>ehcache-failsafe.xml</include>-->
-                    <!--<include>META-INF/maven/net.sf.ehcache/**</include>-->
-                  <!--</includes>-->
-                  <excludes>
-                    <exclude>rest-management-private-classpath/**</exclude>
-                  </excludes>
+                  <includes>
+                    <include>net/sf/ehcache/**</include>
+                    <include>org/terracotta/context/**</include>
+                    <include>org/terracotta/statistics/**</include>
+                    <include>ehcache-failsafe.xml</include>
+                    <include>META-INF/maven/net.sf.ehcache/**</include>
+                  </includes>
                 </filter>
               </filters>
             </configuration>
@@ -84,9 +85,9 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Description>${project.description}</Bundle-Description>
-            <Export-Package>
-              net.sf.ehcache*;version=${ehcache.version};-split-package:=merge-first
-            </Export-Package>
+            <Export-Package>net.sf.ehcache*;version=${ehcache.version};-split-package:=merge-first</Export-Package>
+            <Private-Package>org.terracotta.*</Private-Package>
+            <DynamicImport-Package>*</DynamicImport-Package>
             <Import-Package>
               javax.management*,
               javax.naming*,
@@ -98,11 +99,13 @@
               org.slf4j;resolution:=optional,
               javax.jms;resolution:=optional,
               sun.misc;resolution:=optional,
+              org.quartz*;resolution:=optional,
+              org.terracotta.quartz.*;resolution:=optional,
+              org.terracotta.toolkit.*;resolution:=optional,
+              com.terracotta*;resolution:=optional,
               *
             </Import-Package>
-            <DynamicImport-Package>
-              *
-            </DynamicImport-Package>
+            <Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
           </instructions>
         </configuration>
       </plugin>
