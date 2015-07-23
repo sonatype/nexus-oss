@@ -12,10 +12,14 @@
  */
 package org.sonatype.nexus.repository.negativecache;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.cache.Cache;
 import javax.cache.Cache.Entry;
 import javax.cache.CacheManager;
 import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.CreatedExpiryPolicy;
+import javax.cache.expiry.Duration;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -123,24 +127,19 @@ public class NegativeCacheFacetImpl
   private void maybeCreateCache() {
     if (cache == null) {
       log.debug("Creating negative-cache for: {}", getRepository());
-      MutableConfiguration<NegativeCacheKey, Status> config = new MutableConfiguration<>();
-      // TODO: How do we provide configuration (see commented bits below)?
-      cache = cacheManager.createCache(getRepository().getName() + "#negative-cache", config);
+
+      MutableConfiguration<NegativeCacheKey, Status> cacheConfig = new MutableConfiguration<>();
+      cacheConfig.setTypes(NegativeCacheKey.class, Status.class);
+      cacheConfig.setExpiryPolicyFactory(
+          CreatedExpiryPolicy.factoryOf(new Duration(TimeUnit.SECONDS, config.timeToLive))
+      );
+      cacheConfig.setManagementEnabled(true);
+      cacheConfig.setStatisticsEnabled(true);
+
+      cache = cacheManager.createCache(getRepository().getName() + "#negative-cache", cacheConfig);
       log.debug("Created negative-cache: {}", cache);
     }
   }
-
-  //@VisibleForTesting
-  //Ehcache newCache(final String name, final int timeToLiveSeconds) {
-  //  return new Cache(
-  //      name,
-  //      10000, // maxElementsInMemory
-  //      false, // overflowToDisk
-  //      false, // eternal
-  //      timeToLiveSeconds,
-  //      0 // timeToIdleSeconds
-  //  );
-  //}
 
   private void maybeDestroyCache() {
     if (cache != null) {
