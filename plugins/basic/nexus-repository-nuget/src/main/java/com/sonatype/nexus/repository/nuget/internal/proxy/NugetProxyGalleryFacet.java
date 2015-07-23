@@ -45,6 +45,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.UncheckedExecutionException;
@@ -133,12 +134,12 @@ public class NugetProxyGalleryFacet
         proxyRepositories,
         new CountFetcher(fetcher));
     log.debug("Counts from proxyRepositories: {} are: {}", proxyRepositories, remoteCounts);
-    
+
     Iterable<Repository> hostedRepositories = getHostedRepositories();
-    final int hostedCount = hostedRepositories.iterator().hasNext()
-        ? count(operation, parameters, hostedRepositories) : 0; 
+    final int hostedCount = !Iterables.isEmpty(hostedRepositories)
+        ? count(operation, parameters, hostedRepositories) : 0;
     log.debug("Counts from hostedRepositories: {} are: {}", hostedRepositories, hostedCount);
-      
+
     return sum(remoteCounts) + hostedCount;
   }
 
