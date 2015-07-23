@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.search.tasks.RebuildIndexTask
 import org.sonatype.nexus.repository.security.BreadActions
 import org.sonatype.nexus.repository.security.RepositoryAdminPermission
 import org.sonatype.nexus.repository.security.RepositoryViewPermission
