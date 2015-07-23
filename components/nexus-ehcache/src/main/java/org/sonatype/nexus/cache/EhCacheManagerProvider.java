@@ -67,7 +67,7 @@ public class EhCacheManagerProvider
     CachingProvider provider = Caching.getCachingProvider("org.ehcache.jcache.JCacheCachingProvider", ehcacheLoader);
     log.info("Creating cache-manager with configuration: {}", uri);
     CacheManager cacheManager = provider.getCacheManager(uri, ehcacheLoader);
-    log.info("Created cache-manager: {}", cacheManager);
+    log.debug("Created cache-manager: {}", cacheManager);
     return cacheManager;
   }
 
