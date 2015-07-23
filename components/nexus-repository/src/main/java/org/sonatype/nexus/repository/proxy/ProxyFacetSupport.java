@@ -97,14 +97,15 @@ public abstract class ProxyFacetSupport
 
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
-    config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    final ConfigurationFacet configurationFacet = facet(ConfigurationFacet.class);
+    config = configurationFacet.readSection(configuration, CONFIG_KEY, Config.class);
 
-    // current we do not persist cacheToken but we might in the future
-    cacheController = new CacheController(config.contentMaxAge, null);
     // normalize URL path to contain trailing slash
     if (!config.remoteUrl.getPath().endsWith("/")) {
       config.remoteUrl = config.remoteUrl.resolve(config.remoteUrl.getPath() + "/");
     }
+
+    cacheController = new CacheController(config.contentMaxAge, null);
 
     log.debug("Config: {}", config);
   }

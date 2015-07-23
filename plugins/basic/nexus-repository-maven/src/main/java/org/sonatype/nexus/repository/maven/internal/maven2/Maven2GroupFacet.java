@@ -23,12 +23,16 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.constraints.NotNull;
 
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.hash.Hashes;
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.cache.CacheController;
+import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.config.Configuration;
+import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.group.GroupFacetImpl;
 import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
@@ -45,6 +49,8 @@ import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -68,9 +74,28 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class Maven2GroupFacet
     extends GroupFacetImpl
 {
+  @VisibleForTesting
+  static final String CONFIG_KEY = "maven2group";
+
+  @VisibleForTesting
+  static class Config
+  {
+    @NotNull
+    public int contentMaxAge = 1440;
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "contentMaxAge=" + contentMaxAge +
+          '}';
+    }
+  }
+
   private final Maven2MetadataMerger metadataMerger;
 
   private MavenFacet mavenFacet;
+
+  private CacheController cacheController;
 
   @Inject
   public Maven2GroupFacet(final RepositoryManager repositoryManager) {
@@ -84,12 +109,39 @@ public class Maven2GroupFacet
     this.mavenFacet = facet(MavenFacet.class);
   }
 
+  @Override
+  protected void doValidate(final Configuration configuration) throws Exception {
+    super.doValidate(configuration);
+    facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+  }
+
+  @Override
+  protected void doConfigure(final Configuration configuration) throws Exception {
+    super.doConfigure(configuration);
+    final ConfigurationFacet configurationFacet = facet(ConfigurationFacet.class);
+    Config config = configurationFacet.readSection(configuration, CONFIG_KEY, Config.class);
+
+    // HACK: no proper access to group config
+    final String memberNames = String.valueOf(configuration.attributes("group").get("memberNames"));
+    cacheController = new CacheController(
+        config.contentMaxAge,
+        HashAlgorithm.SHA1.function().hashString(memberNames, Charsets.UTF_8).toString()
+    );
+  }
+
   /**
    * Fetches cached metadata if exists, or {@code null}.
    */
   @Nullable
   public Content getCachedMergedMetadata(final MavenPath mavenPath) throws IOException {
-    return mavenFacet.get(mavenPath);
+    final Content cached = mavenFacet.get(mavenPath);
+    if (cached != null) {
+      final CacheInfo cacheInfo = cached.getAttributes().require(CacheInfo.class);
+      if (!cacheController.isStale(cacheInfo)) {
+        return cached;
+      }
+    }
+    return null;
   }
 
   /**
@@ -167,9 +219,10 @@ public class Maven2GroupFacet
             byteArray,
             Maven2MimeRulesSource.METADATA_TYPE
         ));
+    content.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
     content.getAttributes().set(Content.CONTENT_LAST_MODIFIED, DateTime.now());
     content.getAttributes().set(Content.CONTENT_ETAG, "{SHA1{" + hashCodes.get(HashAlgorithm.SHA1).toString() + "}}");
-    content.getAttributes().set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
+    content.getAttributes().set(CacheInfo.class, cacheController.current());
     return content;
   }
 
