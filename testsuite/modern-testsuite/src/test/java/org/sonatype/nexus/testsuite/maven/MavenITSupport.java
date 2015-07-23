@@ -228,7 +228,6 @@ public abstract class MavenITSupport
 
     final NestedAttributesMap group = config.attributes("group");
     group.set("memberNames", Arrays.asList(members));
-    group.set("contentMaxAge", 5);
 
     NestedAttributesMap storage = config.attributes("storage");
     storage.set("blobStoreName", BlobStoreManager.DEFAULT_BLOBSTORE_NAME);

@@ -88,8 +88,7 @@ class MavenDefaultRepositoriesContributor
                     versionPolicy              : VersionPolicy.MIXED.toString()
                 ],
                 group  : [
-                    memberNames: [DEFAULT_RELEASE_REPO, DEFAULT_SNAPSHOT_REPO, DEFAULT_CENTRAL_REPO],
-                    contentMaxAge: 3600
+                    memberNames: [DEFAULT_RELEASE_REPO, DEFAULT_SNAPSHOT_REPO, DEFAULT_CENTRAL_REPO]
                 ],
                 storage: [
                     blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME,

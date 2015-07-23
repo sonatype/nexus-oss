@@ -20,7 +20,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.constraints.NotNull;
 
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
@@ -63,17 +62,10 @@ public class GroupFacetImpl
     @JsonDeserialize(as = LinkedHashSet.class) // retain order
     public Set<String> memberNames;
 
-    /**
-     * Artifact max-age minutes.
-     */
-    @NotNull
-    public int contentMaxAge;
-
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "memberNames=" + memberNames +
-          ", contentMaxAge=" + contentMaxAge +
           '}';
     }
   }
@@ -96,7 +88,7 @@ public class GroupFacetImpl
   protected void doConfigure(final Configuration configuration) throws Exception {
     config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
 
-    cacheController = new CacheController(config.contentMaxAge, null);
+    cacheController = new CacheController(-1, null);
 
     log.debug("Config: {}", config);
   }
