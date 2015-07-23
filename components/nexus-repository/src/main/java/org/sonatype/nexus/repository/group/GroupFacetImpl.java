@@ -34,6 +34,7 @@ import org.sonatype.nexus.repository.view.Content;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterables;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -105,7 +106,8 @@ public class GroupFacetImpl
     Set<String> previousMemberNames = config.memberNames;
     super.doUpdate(configuration);
 
-    if (!config.memberNames.equals(previousMemberNames)) {
+    // check members including their order in the iteration
+    if (!Iterables.elementsEqual(config.memberNames, previousMemberNames)) {
       cacheController.invalidateCache();
     }
   }
