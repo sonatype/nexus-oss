@@ -58,14 +58,14 @@
     <!-- Only way how session should be removed is via Shiro's own org.apache.shiro.session.mgt.AbstractValidatingSessionManager (called from dedicated thread started by Shiro)  -->
     <!-- See http://shiro.apache.org/session-management.html#SessionManagement-EHCacheSessionDAO -->
     <!-- Configuration bits copied from https://github.com/apache/shiro/blob/trunk/support/ehcache/src/main/resources/org/apache/shiro/cache/ehcache/ehcache.xml#L75 -->
-    <cache name="shiro-activeSessionCache"
+    <!--cache name="shiro-activeSessionCache"
            maxElementsInMemory="10000"
            overflowToDisk="true"
            eternal="true"
            timeToLiveSeconds="0"
            timeToIdleSeconds="0"
            diskPersistent="true"
-           diskExpiryThreadIntervalSeconds="600"/>
+           diskExpiryThreadIntervalSeconds="600"/-->
 
     <!--
     Specifies a CacheManagerEventListenerFactory, be used to create a CacheManagerPeerProvider,
