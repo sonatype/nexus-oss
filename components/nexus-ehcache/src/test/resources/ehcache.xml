@@ -97,7 +97,6 @@
       128 - the same continent
       255 - unrestricted
 
-
     Configuring Manual Discovery:
     Manual discovery is configured as per the following example:
     <cacheManagerPeerProviderFactory class=
@@ -193,7 +192,6 @@
             class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory"/>
     -->
 
-
     <!-- Cache configuration.
 
     The following attributes are required.
@@ -204,9 +202,9 @@
     maxElementsInMemory:
     Sets the maximum number of objects that will be created in memory
 
-	maxElementsOnDisk:
+    maxElementsOnDisk:
     Sets the maximum number of objects that will be maintained in the DiskStore
-	The default value is zero, meaning unlimited.
+    The default value is zero, meaning unlimited.
 
     eternal:
     Sets whether elements are eternal. If eternal,  timeouts are ignored and the
@@ -305,9 +303,7 @@
     * maximumChunkSizeBytes=<integer> - Caches can potentially be very large, larger than the
       memory limits of the VM. This property allows the bootstraper to fetched elements in
       chunks. The default chunk size is 5000000 (5MB).
-
     -->
-
 
     <!--
     Mandatory Default Cache configuration. These settings will be applied to caches
