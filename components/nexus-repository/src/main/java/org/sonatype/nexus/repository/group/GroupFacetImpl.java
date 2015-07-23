@@ -17,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
@@ -35,7 +36,6 @@ import org.sonatype.nexus.repository.view.Content;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.annotations.VisibleForTesting;
 import org.hibernate.validator.constraints.NotEmpty;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
@@ -157,7 +157,7 @@ public class GroupFacetImpl
   /**
    * Returns {@code true} if the content is considered stale; otherwise {@code false}.
    */
-  protected boolean isStale(final Content content) {
+  protected boolean isStale(@Nullable final Content content) {
     return content == null || cacheController.isStale(content.getAttributes().require(CacheInfo.class));
   }
 
