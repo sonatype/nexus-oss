@@ -42,22 +42,9 @@ public class CacheController
   /**
    * After invoking this method, all {@link #isStale(CacheInfo)} checks will return true that has {@link CacheInfo} not
    * carrying same token as created in this method.
-   *
-   * @return The new {@code cacheToken} in effect.
    */
-  public String invalidateCache() {
-    final String cacheToken = newCacheToken();
-    mayInvalidateCache(cacheToken);
-    return cacheToken;
-  }
-
-  /**
-   * After invoking this method, depending on value of {@code cacheToken}, all {@link #isStale(CacheInfo)}
-   * checks will return true that has {@link CacheInfo} not carrying same token as created in this method. If
-   * current {@code cacheToken} was used to invoke this method, nothing changes.
-   */
-  public void mayInvalidateCache(final String cacheToken) {
-    this.cacheToken = cacheToken;
+  public void invalidateCache() {
+    this.cacheToken = newCacheToken();
   }
 
   /**

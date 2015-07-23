@@ -34,7 +34,6 @@ import org.sonatype.nexus.repository.view.Content;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -96,22 +95,12 @@ public class GroupFacetImpl
   protected void doConfigure(final Configuration configuration) throws Exception {
     config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
 
-    cacheController = new CacheController(config.contentMaxAge, null);
+    // form cache token from hash of member names: this will change on member change and on member reordering too
+    final String cacheToken = SHA1.function().hashUnencodedChars(String.valueOf(config.memberNames)).toString();
+
+    cacheController = new CacheController(config.contentMaxAge, cacheToken);
 
     log.debug("Config: {}", config);
-  }
-
-  @Override
-  protected void doUpdate(final Configuration configuration) throws Exception {
-    // detect member changes
-    super.doUpdate(configuration);
-
-    // form hash out of member names: this will change on member change and on member reordering too
-    final String cacheToken = SHA1.function().hashString(
-        String.valueOf(config.memberNames),
-        Charsets.UTF_8
-    ).toString();
-    cacheController.mayInvalidateCache(cacheToken);
   }
 
   @Override
