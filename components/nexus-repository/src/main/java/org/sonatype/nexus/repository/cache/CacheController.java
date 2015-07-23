@@ -18,6 +18,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.joda.time.DateTime;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A support class which implements basic caching controller logic.
  *
@@ -42,12 +44,17 @@ public class CacheController
   /**
    * After invoking this method, all {@link #isStale(CacheInfo)} checks will return true that has {@link CacheInfo} not
    * carrying same token as created in this method.
-   *
-   * @return the new cache Token that is in-effect after this method returns.
    */
-  public String invalidateCache() {
-    this.cacheToken = newCacheToken();
-    return this.cacheToken;
+  public void invalidateCache() {
+    invalidateCache(newCacheToken());
+  }
+
+  /**
+   * After invoking this method, all {@link #isStale(CacheInfo)} checks will return true that has {@link CacheInfo} not
+   * carrying same token as created in this method.
+   */
+  public void invalidateCache(final String cacheToken) {
+    this.cacheToken = checkNotNull(cacheToken);;
   }
 
   /**

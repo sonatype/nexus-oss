@@ -74,18 +74,11 @@ public abstract class ProxyFacetSupport
     @NotNull
     public int contentMaxAge;
 
-    /**
-     * Cache token used by {@link CacheController}.
-     */
-    @NotNull
-    public String cacheToken = CacheController.newCacheToken();
-
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "remoteUrl=" + remoteUrl +
           ", contentMaxAge=" + contentMaxAge +
-          ", cacheToken=" + cacheToken +
           '}';
     }
   }
@@ -113,12 +106,7 @@ public abstract class ProxyFacetSupport
       config.remoteUrl = config.remoteUrl.resolve(config.remoteUrl.getPath() + "/");
     }
 
-    if (cacheController == null) {
-      // first config, persist the defaults too
-      configurationFacet.writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
-      configurationFacet.save();
-    }
-    cacheController = new CacheController(config.contentMaxAge, config.cacheToken);
+    cacheController = new CacheController(config.contentMaxAge, null);
 
     log.debug("Config: {}", config);
   }
@@ -185,15 +173,7 @@ public abstract class ProxyFacetSupport
   @Override
   public void invalidateProxyCaches() {
     log.info("Invalidating proxy caches of {}", getRepository().getName());
-    config.cacheToken = cacheController.invalidateCache();
-    final ConfigurationFacet configurationFacet = facet(ConfigurationFacet.class);
-    configurationFacet.writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
-    try {
-      configurationFacet.save();
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+    cacheController.invalidateCache();
   }
 
   /**

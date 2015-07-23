@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -50,6 +51,10 @@ import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -82,14 +87,10 @@ public class Maven2GroupFacet
     @NotNull
     public int contentMaxAge = 1440;
 
-    @NotNull
-    public String cacheToken = CacheController.newCacheToken();
-
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
           "contentMaxAge=" + contentMaxAge +
-          ", cacheToken=" + cacheToken +
           '}';
     }
   }
@@ -123,14 +124,13 @@ public class Maven2GroupFacet
     super.doConfigure(configuration);
     final ConfigurationFacet configurationFacet = facet(ConfigurationFacet.class);
     Config config = configurationFacet.readSection(configuration, CONFIG_KEY, Config.class);
-    if (cacheController == null) {
-      cacheController = new CacheController(config.contentMaxAge, config.cacheToken);
-    }
-    else {
-      config.cacheToken = cacheController.invalidateCache();
-    }
-    configurationFacet.writeSection(getRepository().getConfiguration(), CONFIG_KEY, config);
-    configurationFacet.save();
+
+    // HACK: no proper access to group config
+    final String memberNames = Joiner.on(",").join((Iterable<String>)(configuration.attributes("group").get("memberNames")));
+    cacheController = new CacheController(
+        config.contentMaxAge,
+        HashAlgorithm.SHA1.function().hashString(memberNames, Charsets.UTF_8).toString()
+    );
   }
 
   /**

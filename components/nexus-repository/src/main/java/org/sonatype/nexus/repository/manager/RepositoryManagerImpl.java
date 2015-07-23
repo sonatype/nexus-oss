@@ -251,15 +251,8 @@ public class RepositoryManagerImpl
 
     log.debug("Creating repository: {} -> {}", repositoryName, configuration);
 
-    Repository repository;
-    try {
-      store.create(configuration);
-      repository = newRepository(configuration);
-    }
-    catch (Exception e) {
-      store.delete(configuration);
-      throw e;
-    }
+    Repository repository = newRepository(configuration);
+    store.create(configuration);
     track(repository);
 
     repository.start();
