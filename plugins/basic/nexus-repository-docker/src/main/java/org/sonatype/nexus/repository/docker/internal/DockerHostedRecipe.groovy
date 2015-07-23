@@ -108,6 +108,9 @@ class DockerHostedRecipe
   V1Images v1Images
 
   @Inject
+  V1Search v1Search
+
+  @Inject
   DockerHostedRecipe(@Named(HostedType.NAME) final Type type,
                      @Named(DockerFormat.NAME) final Format format)
   {
@@ -164,7 +167,7 @@ class DockerHostedRecipe
             new LiteralMatcher('/v1/search')
         ))
         .handler(timingHandler)
-        .handler(handler(v1Index.search))
+        .handler(handler(v1Search.search))
         .create())
 
     builder.route(new Route.Builder().matcher(
