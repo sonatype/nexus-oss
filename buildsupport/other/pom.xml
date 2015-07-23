@@ -161,6 +161,24 @@
         <artifactId>plexus-utils</artifactId>
         <version>3.0.20</version>
       </dependency>
+
+      <dependency>
+        <groupId>javax.cache</groupId>
+        <artifactId>cache-api</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.ehcache</groupId>
+        <artifactId>jcache</artifactId>
+        <version>1.0.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>net.ef.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
