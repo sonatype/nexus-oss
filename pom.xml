@@ -637,6 +637,7 @@
               -->
               <id>javax.el</id>
               <id>validation-api</id>
+              <id>cache-api</id>
               <id>paranamer</id>
               <id>httpcore</id>
               <id>httpclient</id>
