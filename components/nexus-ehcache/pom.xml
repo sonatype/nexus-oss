@@ -33,9 +33,15 @@
       <artifactId>nexus-common</artifactId>
     </dependency>
 
+    <!--<dependency>-->
+      <!--<groupId>net.sf.ehcache</groupId>-->
+      <!--<artifactId>ehcache</artifactId>-->
+    <!--</dependency>-->
+
     <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
+      <groupId>org.sonatype.nexus.bundles</groupId>
+      <artifactId>org.sonatype.nexus.bundles.ehcache</artifactId>
+      <version>${nexus.version}</version>
     </dependency>
 
     <dependency>
