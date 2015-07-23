@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.storage;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -27,13 +28,12 @@ import com.google.common.base.Throwables;
 import com.orientechnologies.orient.core.command.OCommandResultListener;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLAsynchQuery;
 import com.orientechnologies.orient.core.sql.query.OSQLNonBlockingQuery;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Helper class to wrap Orient {@link OSQLAsynchQuery} into {@link Iterable}s.
+ * Helper class to wrap Orient SQL SELECT queries into {@link Iterable}s.
  *
  * @since 3.0
  */
@@ -107,18 +107,21 @@ public class OrientAsyncHelper
 
     @Override
     public boolean hasNext() {
+      if (Objects.equals(next, SENTINEL)) {
+        return false;
+      }
       try {
         next = queue.poll(TIMEOUT_SECONDS, TimeUnit.SECONDS);
       }
       catch (InterruptedException e) {
         throw Throwables.propagate(e);
       }
-      return next != SENTINEL;
+      return !Objects.equals(next, SENTINEL);
     }
 
     @Override
     public ODocument next() {
-      if (next == SENTINEL) {
+      if (next == null || Objects.equals(next, SENTINEL)) {
         throw new NoSuchElementException("Iterator depleted");
       }
       return next;
