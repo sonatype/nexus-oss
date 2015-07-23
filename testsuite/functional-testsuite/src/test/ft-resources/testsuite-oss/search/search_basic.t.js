@@ -26,8 +26,9 @@ StartTest(function(t) {
       t.chain(
           t.openPageAsAdmin('browse/search'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
-          {type: 'name:aopalliance', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
-          Ext.clone(waitForStoreToLoad),
+          Ext.apply(Ext.clone(waitForStoreToLoad),
+              {trigger: {type: 'name:aopalliance', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'}}
+          ),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -44,8 +45,9 @@ StartTest(function(t) {
       t.chain(
           t.navigateTo('browse/search/maven'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
-          {type: 'aopalliance', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.maven2.artifactId]'},
-          Ext.clone(waitForStoreToLoad),
+          Ext.apply(Ext.clone(waitForStoreToLoad),
+              {trigger: {type: 'aopalliance', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.maven2.artifactId]'}}
+          ),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -62,8 +64,9 @@ StartTest(function(t) {
       t.chain(
           t.navigateTo('browse/search'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
-          {type: 'name:SONATYPE.TEST', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
-          Ext.clone(waitForStoreToLoad),
+          Ext.apply(Ext.clone(waitForStoreToLoad), 
+              {trigger: {type: 'name:SONATYPE.TEST', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'}}
+          ),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -80,8 +83,9 @@ StartTest(function(t) {
       t.chain(
           t.navigateTo('browse/search/nuget'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
-          {type: 'SONATYPE.TEST', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.nuget.id]'},
-          Ext.clone(waitForStoreToLoad),
+          Ext.apply(Ext.clone(waitForStoreToLoad),
+              {trigger: {type: 'SONATYPE.TEST', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.nuget.id]'}}
+          ),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -98,8 +102,9 @@ StartTest(function(t) {
       t.chain(
           t.navigateTo('browse/search'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
-          {type: 'name:alphabet.txt', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
-          Ext.clone(waitForStoreToLoad),
+          Ext.apply(Ext.clone(waitForStoreToLoad),
+              {trigger: {type: 'name:alphabet.txt', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'}}
+          ),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -116,8 +121,9 @@ StartTest(function(t) {
       t.chain(
           t.navigateTo('browse/search/raw'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
-          {type: 'alphabet.txt', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.raw.path.tree]'},
-          Ext.clone(waitForStoreToLoad),
+          Ext.apply(Ext.clone(waitForStoreToLoad),
+              {trigger: {type: 'alphabet.txt', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.raw.path.tree]'}}
+          ),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
