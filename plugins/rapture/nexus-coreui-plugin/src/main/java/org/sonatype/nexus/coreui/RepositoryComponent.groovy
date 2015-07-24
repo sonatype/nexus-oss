@@ -156,7 +156,7 @@ class RepositoryComponent
   @DirectMethod
   @RequiresAuthentication
   @Validate
-  String invalidateProxyCache(final @NotEmpty String name) {
+  void invalidateProxyCache(final @NotEmpty String name) {
     Repository repository = repositoryManager.get(name)
     securityHelper.ensurePermitted(adminPermission(repository, BreadActions.EDIT))
     ProxyFacet proxyFacet = repository.facet(ProxyFacet)
@@ -166,7 +166,7 @@ class RepositoryComponent
   @DirectMethod
   @RequiresAuthentication
   @Validate
-  String invalidateNegativeCache(final @NotEmpty String name) {
+  void invalidateNegativeCache(final @NotEmpty String name) {
     Repository repository = repositoryManager.get(name)
     securityHelper.ensurePermitted(adminPermission(repository, BreadActions.EDIT))
     NegativeCacheFacet negativeCacheFacet = repository.facet(NegativeCacheFacet)
