@@ -176,6 +176,7 @@ Ext.define('NX.controller.Drilldown', {
   reselect: function () {
     var lists = Ext.ComponentQuery.query('nx-drilldown-master');
 
+    console.log("reselect()");
     if (lists.length) {
       this.navigateTo(NX.Bookmarks.getBookmark());
     }
@@ -189,14 +190,14 @@ Ext.define('NX.controller.Drilldown', {
     var index = Ext.ComponentQuery.query('nx-drilldown-master').indexOf(view.up('grid'));
 
     //if the cell target is a link, let it do it's thing
-    if(e.getTarget('a')) {
+    if(e && e.getTarget('a')) {
       return false;
     }
     this.loadView(index + 1, true, model);
   },
 
   /**
-   * @private
+   * @public
    * A model changed, focus on the new row and update the name of the related drilldown
    */
   onModelChanged: function (index, model) {
@@ -349,7 +350,7 @@ Ext.define('NX.controller.Drilldown', {
         model = store.getById(parseInt(modelId)); // check for integer model id
       }
       lists[index].fireEvent('selection', lists[index], model);
-      me.onModelChanged(index, model);
+      //me.onModelChanged(index, model);
       me.loadView(index + 1, false, model);
     }
   },

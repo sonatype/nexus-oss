@@ -23,13 +23,15 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     'NX.Bookmarks',
     'NX.Conditions',
     'NX.Permissions',
-    'NX.I18n'
+    'NX.I18n',
+    'NX.coreui.controller.Assets'
   ],
   masters: [
     'nx-coreui-browseassetfeature nx-coreui-browse-repository-list',
     'nx-coreui-browseassetfeature nx-coreui-browse-asset-list'
   ],
   stores: [
+    'Repository',
     'Asset'
   ],
   models: [
@@ -87,12 +89,10 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
           refresh: me.loadStores
         }
       },
-      store: {
-        '#Repository': {
-          load: me.reselect
-        }
-      },
       component: {
+        'nx-coreui-browse-repository-list': {
+          beforerender: me.loadStores
+        },
         'nx-coreui-browseassetfeature nx-coreui-component-assetcontainer': {
           updated: me.setAssetIcon
         },
@@ -125,6 +125,9 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     if (modelType === "RepositoryReference") {
       me.onRepositorySelection(model);
     }
+    else if (modelType === "Asset") {
+      me.onAssetSelection(model);
+    }
   },
 
   /**
@@ -152,16 +155,54 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
   },
 
   /**
+   * Load asset container for selected asset
+   *
+   * @private
+   * @param {NX.coreui.model.Asset} model selected asset
+   */
+  onAssetSelection: function(model) {
+    this.getController('NX.coreui.controller.Assets').updateAssetContainer(null, null, null, model);
+  },
+
+  /**
    * @override
    * Load all of the stores associated with this controller.
    */
   loadStores: function() {
-    if (this.getFeature()) {
-      if (this.currentIndex === 0) {
-        this.getRepositoryList().getStore().load();
+    var me = this;
+    if (me.getFeature()) {
+      // Initial load of the feature
+      if (this.currentIndex === undefined) {
+        this.getRepositoryList().getStore().load(function() {
+          var bookmark = NX.Bookmarks.getBookmark(),
+            list_ids = bookmark.getSegments().slice(1);
+
+          // Load the asset detail view
+          if (list_ids[1]) {
+            var repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
+            me.onModelChanged(0, repoModel);
+            me.onRepositorySelection(repoModel);
+            me.getAssetList().getStore().load(function() {
+              me.reselect();
+            });
+          }
+          // Load the asset list view
+          else if (list_ids[0]) {
+            me.reselect();
+          }
+        });
       }
-      if (this.currentIndex === 1) {
-        this.getAssetList().getStore().load();
+      // Refresh the list of repositories
+      else if (this.currentIndex === 0) {
+        this.getRepositoryList().getStore().load(function() {
+          me.reselect();
+        });
+      }
+      // Refresh the list of assets
+      else if (this.currentIndex === 1) {
+        this.getAssetList().getStore().load(function() {
+          me.reselect();
+        });
       }
     }
   },
