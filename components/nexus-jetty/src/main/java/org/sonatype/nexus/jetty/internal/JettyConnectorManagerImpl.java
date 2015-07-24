@@ -55,6 +55,7 @@ public class JettyConnectorManagerImpl
   @Inject
   public JettyConnectorManagerImpl()
   {
+    // TODO: this is same hack as Alin did. This should be exposed via some OSGi voodoo, see LauncherActivator
     final Holder holder = JettyHolder.getHolder();
     this.server = holder.getServer();
     this.properties = holder.getProperties();

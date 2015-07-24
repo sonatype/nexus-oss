@@ -67,41 +67,49 @@ public class JettyConnectorManagerIT
 
   @Test
   public void testHttpConnectorAdd() throws Exception {
+    final int newHttpPort = portRegistry.reservePort();
+
     HttpConfiguration config = jettyConnectorManager.defaultHttpConfiguration(HttpScheme.HTTP);
     config.addCustomizer(DUMMY_CUSTOMIZER);
-    final ServerConnector serverConnector = jettyConnectorManager.addConnector(HttpScheme.HTTP, 8082, config);
+    final ServerConnector serverConnector = jettyConnectorManager.addConnector(HttpScheme.HTTP, newHttpPort, config);
     serverConnector.start();
     try {
-      Maven2Client maven2Client = new Maven2Client(clientBuilder().build(), clientContext(),
-          URI.create("http://localhost:8082/"));
-
-      HttpResponse response = maven2Client.get("/whatever/path/it/will/be/rewritten/anyways");
+      HttpResponse response = new Maven2Client(
+          clientBuilder().build(),
+          clientContext(),
+          URI.create("http://localhost:" + newHttpPort + "/")
+      ).get("/whatever/path/it/will/be/rewritten/anyways");
       assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
       String entity = EntityUtils.toString(response.getEntity());
       assertThat(entity, containsString("Jetty :: Jetty JSPC Maven Plugin"));
     }
     finally {
       serverConnector.stop();
+      portRegistry.releasePort(newHttpPort);
     }
   }
 
   @Test
   public void testHttpsConnectorAdd() throws Exception {
+    final int newHttpsPort = portRegistry.reservePort();
+
     HttpConfiguration config = jettyConnectorManager.defaultHttpConfiguration(HttpScheme.HTTPS);
     config.addCustomizer(DUMMY_CUSTOMIZER);
-    final ServerConnector serverConnector = jettyConnectorManager.addConnector(HttpScheme.HTTPS, 8083, config);
+    final ServerConnector serverConnector = jettyConnectorManager.addConnector(HttpScheme.HTTPS, newHttpsPort, config);
     serverConnector.start();
     try {
-      Maven2Client maven2Client = new Maven2Client(clientBuilder().build(), clientContext(),
-          URI.create("https://localhost:8083/"));
-
-      HttpResponse response = maven2Client.get("/whatever/path/it/will/be/rewritten/anyways");
+      HttpResponse response = new Maven2Client(
+          clientBuilder().build(),
+          clientContext(),
+          URI.create("https://localhost:"+newHttpsPort+"/")
+      ).get("/whatever/path/it/will/be/rewritten/anyways");
       assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
       String entity = EntityUtils.toString(response.getEntity());
       assertThat(entity, containsString("Jetty :: Jetty JSPC Maven Plugin"));
     }
     finally {
       serverConnector.stop();
+      portRegistry.releasePort(newHttpsPort);
     }
   }
 }
