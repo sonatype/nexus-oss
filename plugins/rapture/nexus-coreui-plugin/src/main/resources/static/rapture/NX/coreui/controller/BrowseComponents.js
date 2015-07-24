@@ -207,18 +207,20 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
    * Load stores based on the bookmarked URL
    */
   onBeforeRender: function() {
-    var me = this;
-    me.getRepositoryList().getStore().load(function() {
-      var bookmark = NX.Bookmarks.getBookmark(),
-        list_ids = bookmark.getSegments().slice(1);
+    var me = this,
+        bookmark = NX.Bookmarks.getBookmark(),
+        list_ids = bookmark.getSegments().slice(1),
+        repoModel,
+        componentModel;
 
+    me.getRepositoryList().getStore().load(function() {
       // Load the asset detail view
       if (list_ids[2]) {
-        var repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
+        repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
         me.onModelChanged(0, repoModel);
         me.onRepositorySelection(repoModel);
         me.getComponentList().getStore().load(function() {
-          var componentModel = me.getComponentList().getStore().getById(decodeURIComponent(list_ids[1]));
+          componentModel = me.getComponentList().getStore().getById(decodeURIComponent(list_ids[1]));
           me.onModelChanged(1, componentModel);
           me.onComponentSelection(componentModel);
           me.getAssetList().getStore().load(function() {
@@ -228,7 +230,7 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
       }
       // Load the asset list view
       else if (list_ids[1]) {
-        var repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
+        repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
         me.onModelChanged(0, repoModel);
         me.onRepositorySelection(repoModel);
         me.getComponentList().getStore().load(function() {
