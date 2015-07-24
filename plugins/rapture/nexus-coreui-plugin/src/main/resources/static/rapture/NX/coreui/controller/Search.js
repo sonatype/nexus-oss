@@ -130,7 +130,7 @@ Ext.define('NX.coreui.controller.Search', {
       },
       component: {
         'nx-coreui-search-result-list': {
-          beforerender: me.loadStores
+          beforerender: me.onBeforeRender
         },
         'nx-coreui-searchfeature': {
           afterrender: me.initCriterias
@@ -419,38 +419,46 @@ Ext.define('NX.coreui.controller.Search', {
    * Search on refresh.
    */
   loadStores: function() {
-    var me = this;
-    if (me.getFeature()) {
-      // Initial load of the feature
-      if (me.currentIndex === undefined) {
-        me.getSearchResult().getStore().load(function() {
-          var bookmark = NX.Bookmarks.getBookmark(),
-            list_ids = bookmark.getSegments().slice(1);
-
-          // Load the asset detail view
-          if (list_ids[1]) {
-            var componentModel = me.getSearchResult().getStore().getById(decodeURIComponent(list_ids[0]));
-            me.onModelChanged(0, componentModel);
-            me.onSearchResultSelection(componentModel);
-            me.getAssetList().getStore().load(function () {
-              me.reselect();
-            });
-          }
-          // Load the asset list view
-          else if (list_ids[0]) {
-            me.reselect();
-          }
-        });
+    if (this.getFeature()) {
+      if (this.currentIndex === 0) {
+        this.getSearchResult().getStore().load();
       }
-      // Refresh the list of components
-      if (me.currentIndex === 0) {
-        me.getSearchResult().getStore().load();
-      }
-      // Refresh the list of assets
-      if (me.currentIndex === 1) {
-        me.getAssetList().getStore().load();
+      if (this.currentIndex === 1) {
+        this.getAssetList().getStore().load();
       }
     }
+  },
+
+  /**
+   * @private
+   * Load stores based on the bookmarked URL
+   */
+  onBeforeRender: function() {
+    var me = this;
+
+    // If no search filter has been specified, don't load any stores
+    if (!me.getStore('SearchResult').filters.length) {
+      return;
+    }
+
+    me.getSearchResult().getStore().load(function() {
+      var bookmark = NX.Bookmarks.getBookmark(),
+        list_ids = bookmark.getSegments().slice(1);
+
+      // Load the asset detail view
+      if (list_ids[1]) {
+        var componentModel = me.getSearchResult().getStore().getById(decodeURIComponent(list_ids[0]));
+        me.onModelChanged(0, componentModel);
+        me.onSearchResultSelection(componentModel);
+        me.getAssetList().getStore().load(function () {
+          me.reselect();
+        });
+      }
+      // Load the asset list view
+      else if (list_ids[0]) {
+        me.reselect();
+      }
+    });
   },
 
   /**

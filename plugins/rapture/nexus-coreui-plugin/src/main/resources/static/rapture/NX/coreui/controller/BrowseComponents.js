@@ -96,7 +96,7 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
       },
       component: {
         'nx-coreui-browse-repository-list': {
-          beforerender: me.loadStores
+          beforerender: me.onBeforeRender
         },
         'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list #filter': {
           search: me.onSearch,
@@ -189,56 +189,57 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
    * Load all of the stores associated with this controller.
    */
   loadStores: function() {
-    var me = this;
-    if (me.getFeature()) {
-      // Initial load of the feature
-      if (this.currentIndex === undefined) {
-        this.getRepositoryList().getStore().load(function() {
-          var bookmark = NX.Bookmarks.getBookmark(),
-            list_ids = bookmark.getSegments().slice(1);
-
-          // Load the asset detail view
-          if (list_ids[2]) {
-            var repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
-            me.onModelChanged(0, repoModel);
-            me.onRepositorySelection(repoModel);
-            me.getComponentList().getStore().load(function() {
-              var componentModel = me.getComponentList().getStore().getById(decodeURIComponent(list_ids[1]));
-              me.onModelChanged(1, componentModel);
-              me.onComponentSelection(componentModel);
-              me.getAssetList().getStore().load(function() {
-                me.reselect();
-              });
-            });
-          }
-          // Load the asset list view
-          else if (list_ids[1]) {
-            var repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
-            me.onModelChanged(0, repoModel);
-            me.onRepositorySelection(repoModel);
-            me.getComponentList().getStore().load(function() {
-              me.reselect();
-            });
-          }
-          // Load the component list view
-          else if (list_ids[0]) {
-            me.reselect();
-          }
-        });
+    if (this.getFeature()) {
+      if (this.currentIndex === 0) {
+        this.getRepositoryList().getStore().load();
       }
-      // Refresh the list of repositories
-      else if (this.currentIndex === 0) {
-        me.getRepositoryList().getStore().load();
+      if (this.currentIndex === 1) {
+        this.getComponentList().getStore().load();
       }
-      // Refresh the list of components
-      else if (this.currentIndex === 1) {
-        me.getComponentList().getStore().load();
-      }
-      // Refresh the list of assets
-      else if (this.currentIndex === 2) {
-        me.getAssetList().getStore().load();
+      if (this.currentIndex === 2) {
+        this.getAssetList().getStore().load();
       }
     }
+  },
+
+  /**
+   * @private
+   * Load stores based on the bookmarked URL
+   */
+  onBeforeRender: function() {
+    var me = this;
+    me.getRepositoryList().getStore().load(function() {
+      var bookmark = NX.Bookmarks.getBookmark(),
+        list_ids = bookmark.getSegments().slice(1);
+
+      // Load the asset detail view
+      if (list_ids[2]) {
+        var repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
+        me.onModelChanged(0, repoModel);
+        me.onRepositorySelection(repoModel);
+        me.getComponentList().getStore().load(function() {
+          var componentModel = me.getComponentList().getStore().getById(decodeURIComponent(list_ids[1]));
+          me.onModelChanged(1, componentModel);
+          me.onComponentSelection(componentModel);
+          me.getAssetList().getStore().load(function() {
+            me.reselect();
+          });
+        });
+      }
+      // Load the asset list view
+      else if (list_ids[1]) {
+        var repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
+        me.onModelChanged(0, repoModel);
+        me.onRepositorySelection(repoModel);
+        me.getComponentList().getStore().load(function() {
+          me.reselect();
+        });
+      }
+      // Load the component list view
+      else if (list_ids[0]) {
+        me.reselect();
+      }
+    });
   },
 
   /**
