@@ -153,7 +153,7 @@ class DockerHostedRecipe
                 // only allow docker versions >= 0.10
                 def dockerVersion = V1Tags.parseUserAgent(context)[DockerAttributes.P_DOCKER_VERSION]
                 try {
-                  return !dockerVersion || VERSION_0_10.compareTo(SCHEME.parseVersion(dockerVersion)) > 0
+                  return dockerVersion && VERSION_0_10.compareTo(SCHEME.parseVersion(dockerVersion)) > 0
                 }
                 catch (InvalidVersionSpecificationException e) {
                   return true
