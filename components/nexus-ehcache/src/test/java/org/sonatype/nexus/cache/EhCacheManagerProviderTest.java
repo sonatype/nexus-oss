@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.cache;
 
-import java.net.URI;
-
 import javax.cache.CacheManager;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
@@ -35,9 +33,7 @@ public class EhCacheManagerProviderTest
 
   @Before
   public void setUp() throws Exception {
-    URI uri = getClass().getResource("ehcache.xml").toURI();
-    assertThat(uri, notNullValue());
-    underTest = new EhCacheManagerProvider(uri);
+    underTest = new EhCacheManagerProvider();
   }
 
   @After

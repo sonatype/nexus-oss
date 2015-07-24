@@ -12,25 +12,17 @@
  */
 package org.sonatype.nexus.cache;
 
-import java.io.File;
-import java.net.URI;
-
 import javax.annotation.PreDestroy;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.cache.spi.CachingProvider;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * EhCache JCache {@link CacheManager} provider.
@@ -43,20 +35,9 @@ public class EhCacheManagerProvider
     extends ComponentSupport
     implements Provider<CacheManager>
 {
-  private final URI uri;
-
   private CacheManager cacheManager;
 
-  @Inject
-  public EhCacheManagerProvider(final ApplicationDirectories directories) {
-    File file = new File(directories.getAppDirectory("etc"), "ehcache.xml");
-    checkState(file.exists(), "Missing required file: %s", file.getAbsolutePath());
-    this.uri = file.toURI();
-  }
-
-  @VisibleForTesting
-  public EhCacheManagerProvider(final URI uri) {
-    this.uri = checkNotNull(uri);
+  public EhCacheManagerProvider() {
   }
 
   @VisibleForTesting
@@ -65,8 +46,8 @@ public class EhCacheManagerProvider
     ClassLoader ehcacheLoader = net.sf.ehcache.Cache.class.getClassLoader();
 
     CachingProvider provider = Caching.getCachingProvider("org.ehcache.jcache.JCacheCachingProvider", ehcacheLoader);
-    log.info("Creating cache-manager with configuration: {}", uri);
-    CacheManager cacheManager = provider.getCacheManager(uri, ehcacheLoader);
+    log.info("Creating cache-manager with default configuration");
+    CacheManager cacheManager = provider.getCacheManager(null, ehcacheLoader);
     log.debug("Created cache-manager: {}", cacheManager);
     return cacheManager;
   }
