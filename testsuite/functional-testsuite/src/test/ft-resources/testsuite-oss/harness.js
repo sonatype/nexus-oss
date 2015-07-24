@@ -66,6 +66,7 @@ NX.TestHarness.start(
       items: [
         {
           group: 'FT',
+          waitForTimeout: 60000,
           items: [
             { url: 'testsuite-oss/search/search_basic.t.js' }
           ]
