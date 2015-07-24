@@ -21,7 +21,7 @@ import org.eclipse.jetty.server.ServerConnector;
 /**
  * Jetty server connector manager.
  *
- * @since 3.9
+ * @since 3.0
  */
 public interface JettyConnectorManager
 {

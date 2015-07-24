@@ -85,6 +85,7 @@ public class JettyConnectorManagerIT
     }
     finally {
       serverConnector.stop();
+      jettyConnectorManager.removeConnector(serverConnector);
       portRegistry.releasePort(newHttpPort);
     }
   }
@@ -109,6 +110,7 @@ public class JettyConnectorManagerIT
     }
     finally {
       serverConnector.stop();
+      jettyConnectorManager.removeConnector(serverConnector);
       portRegistry.releasePort(newHttpsPort);
     }
   }

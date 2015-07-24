@@ -37,8 +37,6 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 /**
  * Default implementation of {@link JettyConnectorManager}.
- *
- * @since 2.8
  */
 @Named
 @Singleton

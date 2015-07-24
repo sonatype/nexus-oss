@@ -20,7 +20,7 @@ import org.eclipse.jetty.server.Server;
 /**
  * Jetty holder.
  *
- * @since 2.8
+ * @since 3.0
  */
 public class JettyHolder
 {
