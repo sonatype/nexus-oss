@@ -176,7 +176,6 @@ Ext.define('NX.controller.Drilldown', {
   reselect: function () {
     var lists = Ext.ComponentQuery.query('nx-drilldown-master');
 
-    console.log("reselect()");
     if (lists.length) {
       this.navigateTo(NX.Bookmarks.getBookmark());
     }
