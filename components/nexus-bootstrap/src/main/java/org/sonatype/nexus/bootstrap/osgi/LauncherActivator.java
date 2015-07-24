@@ -19,12 +19,12 @@ import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.ShutdownHelper;
 import org.sonatype.nexus.bootstrap.ShutdownHelper.ShutdownDelegate;
 import org.sonatype.nexus.bootstrap.jetty.JettyHolder;
-import org.sonatype.nexus.bootstrap.jetty.JettyHolder.Holder;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.launch.Framework;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import static java.util.Collections.singletonMap;
@@ -42,7 +42,7 @@ public class LauncherActivator
 
   private Launcher server;
 
-  private ServiceRegistration<Holder> serverService;
+  private ServiceRegistration<JettyHolder> serverService;
 
   public void start(final BundleContext bundleContext) throws Exception {
     framework = (Framework) bundleContext.getBundle(0);
@@ -60,9 +60,10 @@ public class LauncherActivator
         {
           @Override
           public void run() {
-            Holder holder = JettyHolder.getHolder();
+            JettyHolder holder = JettyHolder.getHolder();
             final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
-            serverService = bundleContext.registerService(Holder.class, holder, properties);
+            serverService = bundleContext.registerService(JettyHolder.class, holder, properties);
+            LoggerFactory.getLogger(LauncherActivator.class).info("Registered JettyHolder service");
           }
         },
         "Jetty Holder registrar"

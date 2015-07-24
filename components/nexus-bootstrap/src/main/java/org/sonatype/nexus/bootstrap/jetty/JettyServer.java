@@ -166,7 +166,7 @@ public class JettyServer
         server = (Server) object;
       }
     }
-    JettyHolder.setHolder(new JettyHolder.Holder(thread.started, server, last.getProperties(), last.getIdMap()));
+    JettyHolder.setHolder(new JettyHolder(thread.started, server, last.getProperties(), last.getIdMap()));
   }
 
   public synchronized void stop() throws Exception {

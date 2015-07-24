@@ -26,56 +26,62 @@ public class JettyHolder
 {
   private static CountDownLatch holderSet = new CountDownLatch(1);
 
-  private static Holder holder;
+  private static JettyHolder instance;
 
-  public static Holder getHolder() {
+  private final CountDownLatch started;
+
+  public static JettyHolder getHolder() {
     try {
       holderSet.await();
-      holder.started.await();
-      return holder;
+      instance.started.await();
+      return instance;
     }
     catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  public static void setHolder(final Holder h) {
-    holder = h;
+  public static void setHolder(final JettyHolder h) {
+    instance = h;
     holderSet.countDown();
   }
 
-  public static class Holder
-  {
-    private final CountDownLatch started;
+  private final Server server;
 
-    private final Server server;
+  private final Map<String, String> properties;
 
-    private final Map<String, String> properties;
+  private final Map<String, Object> namedBeans;
 
-    private final Map<String, Object> namedBeans;
-
-    public Holder(final CountDownLatch started,
-                  final Server server,
-                  final Map<String, String> properties,
-                  final Map<String, Object> namedBeans)
-    {
-      this.started = started;
-      this.server = server;
-      this.properties = properties;
-      this.namedBeans = namedBeans;
-    }
-
-    public Server getServer() {
-      return server;
-    }
-
-    public Map<String, String> getProperties() {
-      return properties;
-    }
-
-    public Map<String, Object> getNamedBeans() {
-      return namedBeans;
-    }
+  /**
+   * Needed for @Dynamic injection.
+   */
+  public JettyHolder() {
+    this.started = null;
+    this.server = null;
+    this.properties = null;
+    this.namedBeans = null;
   }
 
+  public JettyHolder(final CountDownLatch started,
+                     final Server server,
+                     final Map<String, String> properties,
+                     final Map<String, Object> namedBeans)
+  {
+    this.started = started;
+    this.server = server;
+    this.properties = properties;
+    this.namedBeans = namedBeans;
+  }
+
+  public Server getServer() {
+    return server;
+  }
+
+  public Map<String, String> getProperties() {
+    return properties;
+  }
+
+  public Map<String, Object> getNamedBeans() {
+    return namedBeans;
+  }
 }
