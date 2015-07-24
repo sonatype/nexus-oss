@@ -31,9 +31,15 @@ import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.group.GroupFacet
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
 import org.sonatype.nexus.repository.manager.RepositoryManager
+import org.sonatype.nexus.repository.negativecache.NegativeCacheFacet
+import org.sonatype.nexus.repository.proxy.ProxyFacet
+import org.sonatype.nexus.repository.search.tasks.RebuildIndexTask
 import org.sonatype.nexus.repository.security.BreadActions
 import org.sonatype.nexus.repository.security.RepositoryAdminPermission
 import org.sonatype.nexus.repository.security.RepositoryViewPermission
+import org.sonatype.nexus.scheduling.TaskConfiguration
+import org.sonatype.nexus.scheduling.TaskInfo
+import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.nexus.security.SecurityHelper
 import org.sonatype.nexus.validation.Validate
 import org.sonatype.nexus.validation.group.Create
@@ -66,6 +72,9 @@ class RepositoryComponent
 
   @Inject
   Map<String, Recipe> recipes
+
+  @Inject
+  TaskScheduler taskScheduler
 
   @DirectMethod
   List<RepositoryXO> read() {
@@ -130,6 +139,38 @@ class RepositoryComponent
     Repository repository = repositoryManager.get(name)
     securityHelper.ensurePermitted(adminPermission(repository, BreadActions.DELETE))
     repositoryManager.delete(name)
+  }
+
+  @DirectMethod
+  @RequiresAuthentication
+  @Validate
+  String rebuildIndex(final @NotEmpty String name) {
+    Repository repository = repositoryManager.get(name)
+    securityHelper.ensurePermitted(adminPermission(repository, BreadActions.EDIT))
+    TaskConfiguration taskConfiguration = taskScheduler.createTaskConfigurationInstance(RebuildIndexTask.class)
+    taskConfiguration.setString(RebuildIndexTask.REPOSITORY_NAME_FIELD_ID, repository.name)
+    TaskInfo taskInfo = taskScheduler.submit(taskConfiguration)
+    return taskInfo.id
+  }
+
+  @DirectMethod
+  @RequiresAuthentication
+  @Validate
+  void invalidateProxyCache(final @NotEmpty String name) {
+    Repository repository = repositoryManager.get(name)
+    securityHelper.ensurePermitted(adminPermission(repository, BreadActions.EDIT))
+    ProxyFacet proxyFacet = repository.facet(ProxyFacet)
+    proxyFacet.invalidateProxyCaches()
+  }
+
+  @DirectMethod
+  @RequiresAuthentication
+  @Validate
+  void invalidateNegativeCache(final @NotEmpty String name) {
+    Repository repository = repositoryManager.get(name)
+    securityHelper.ensurePermitted(adminPermission(repository, BreadActions.EDIT))
+    NegativeCacheFacet negativeCacheFacet = repository.facet(NegativeCacheFacet)
+    negativeCacheFacet.invalidate()
   }
 
   RepositoryXO asRepository(Repository input) {
