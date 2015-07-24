@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.docker.internal
 
+import java.util.regex.Matcher
+
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -47,31 +49,35 @@ class V1Tags
     def repository = context.repository
     log.info '[putTag] repository: {} tokens: {}', repository.name, state.tokens
 
-    def userAgentEntries = [:]
-    if (context.request.headers[HttpHeaders.USER_AGENT]) {
-      USER_AGENT_PATTERN.matcher(context.request.headers[HttpHeaders.USER_AGENT] as String).each {
-        userAgentEntries[it[1]] = it[2]
-      }
-    }
-    def metadata = [:]
-    if (userAgentEntries['docker']) {
-      metadata[DockerAttributes.P_DOCKER_VERSION] = userAgentEntries['docker']
-    }
-    if (userAgentEntries['go']) {
-      metadata[DockerAttributes.P_DOCKER_GO_VERSION] = userAgentEntries['go']
-    }
-    [DockerAttributes.P_ARCH, DockerAttributes.P_KERNEL, DockerAttributes.P_OS].each {
-      if (userAgentEntries[it]) {
-        metadata[it] = userAgentEntries[it]
-      }
-    }
-
     repository.facet(DockerFacet).putTag(
-        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], state.tokens['tag'], metadata,
+        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], state.tokens['tag'],
+        parseUserAgent(context),
         context.request.payload
     )
 
     return HttpResponses.ok()
+  }
+
+  protected static Map<String,String> parseUserAgent(Context context) {
+    def userAgent = [:]
+    if (context.request.headers[HttpHeaders.USER_AGENT]) {
+      def userAgentEntries = [:]
+      USER_AGENT_PATTERN.matcher(context.request.headers[HttpHeaders.USER_AGENT] as String).each {
+        userAgentEntries[it[1]] = it[2]
+      }
+      if (userAgentEntries['docker']) {
+        userAgent[DockerAttributes.P_DOCKER_VERSION] = userAgentEntries['docker']
+      }
+      if (userAgentEntries['go']) {
+        userAgent[DockerAttributes.P_DOCKER_GO_VERSION] = userAgentEntries['go']
+      }
+      [DockerAttributes.P_ARCH, DockerAttributes.P_KERNEL, DockerAttributes.P_OS].each {
+        if (userAgentEntries[it]) {
+          userAgent[it] = userAgentEntries[it]
+        }
+      }
+    }
+    return userAgent
   }
 
   Closure getTags = { Context context ->

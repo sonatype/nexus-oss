@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
+import org.sonatype.nexus.repository.http.HttpStatus
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -32,6 +33,7 @@ import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Context
 import org.sonatype.nexus.repository.view.Handler
+import org.sonatype.nexus.repository.view.Matcher
 import org.sonatype.nexus.repository.view.Response
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
@@ -40,8 +42,13 @@ import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.ActionMatcher
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
+import org.sonatype.nexus.repository.view.matchers.PrefixMatcher
 import org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
+
+import org.eclipse.aether.util.version.GenericVersionScheme
+import org.eclipse.aether.version.InvalidVersionSpecificationException
+import org.eclipse.aether.version.VersionScheme
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET
 import static org.sonatype.nexus.repository.http.HttpMethods.POST
@@ -58,6 +65,10 @@ class DockerHostedRecipe
     extends RecipeSupport
 {
   public static final String NAME = 'docker-hosted'
+
+  private static final VersionScheme SCHEME = new GenericVersionScheme()
+
+  private static final VERSION_0_10 = SCHEME.parseVersion('0.10')
 
   @Inject
   Provider<DockerSecurityFacet> securityFacet
@@ -132,6 +143,28 @@ class DockerHostedRecipe
    */
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
+
+    builder.route(new Route.Builder().matcher(
+        LogicMatchers.and(
+            new PrefixMatcher('/v1/'),
+            new Matcher() {
+              @Override
+              boolean matches(final Context context) {
+                // only allow docker versions >= 0.10
+                def dockerVersion = V1Tags.parseUserAgent(context)[DockerAttributes.P_DOCKER_VERSION]
+                try {
+                  return !dockerVersion || VERSION_0_10.compareTo(SCHEME.parseVersion(dockerVersion)) < 0
+                }
+                catch (InvalidVersionSpecificationException e) {
+                  return true
+                }
+              }
+            }
+        ))
+        .handler(timingHandler)
+        .handler(v1ExceptionHandler)
+        .handler(oldDocker())
+        .create())
 
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
@@ -340,6 +373,14 @@ class DockerHostedRecipe
       Response handle(@Nonnull final Context context) {
         return action.call(context)
       }
+    }
+  }
+
+  private Handler oldDocker() {
+    handler {
+      throw new V1ApiException(
+          'This endpoint does not support Docker daemons older than 0.10', HttpStatus.PRECONDITION_FAILED
+      )
     }
   }
 

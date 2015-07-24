@@ -288,7 +288,6 @@ public class DockerFacetImpl
   @Override
   public void putLayer(final String imageId, final Payload content) throws IOException, InvalidContentException {
     validateImageId(imageId);
-    // TODO check docker client version >= 0.10
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
       doPutLayer(imageId, streamSupplier, content);
     }
@@ -347,7 +346,6 @@ public class DockerFacetImpl
   @Override
   public void putChecksum(final String imageId, final String checksum) {
     validateImageId(imageId);
-    // TODO check docker client version >= 0.10 (same exception as bellow)
     if (checksum == null) {
       throw new V1ApiException(
           P_X_DOCKER_CHECKSUM_PAYLOAD +

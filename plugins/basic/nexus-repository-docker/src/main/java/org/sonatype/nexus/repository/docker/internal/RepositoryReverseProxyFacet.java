@@ -15,8 +15,6 @@ package org.sonatype.nexus.repository.docker.internal;
 import org.sonatype.nexus.repository.Facet;
 
 /**
- * TODO.
- *
  * @since 3.0
  */
 @Facet.Exposed
