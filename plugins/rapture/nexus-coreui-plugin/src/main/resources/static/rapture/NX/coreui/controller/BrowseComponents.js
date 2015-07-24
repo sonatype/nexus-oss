@@ -95,7 +95,7 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
         }
       },
       component: {
-        'nx-coreui-browse-repository-list': {
+        'nx-coreui-browsecomponentfeature nx-coreui-browse-repository-list': {
           beforerender: me.onBeforeRender
         },
         'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list #filter': {

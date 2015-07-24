@@ -90,7 +90,7 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
         }
       },
       component: {
-        'nx-coreui-browse-repository-list': {
+        'nx-coreui-browseassetfeature nx-coreui-browse-repository-list': {
           beforerender: me.onBeforeRender
         },
         'nx-coreui-browseassetfeature nx-coreui-component-assetcontainer': {

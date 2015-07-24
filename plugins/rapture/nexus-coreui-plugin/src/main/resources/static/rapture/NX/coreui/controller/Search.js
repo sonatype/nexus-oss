@@ -129,7 +129,7 @@ Ext.define('NX.coreui.controller.Search', {
         }
       },
       component: {
-        'nx-coreui-search-result-list': {
+        'nx-coreui-searchfeature nx-coreui-search-result-list': {
           beforerender: me.onBeforeRender
         },
         'nx-coreui-searchfeature': {
