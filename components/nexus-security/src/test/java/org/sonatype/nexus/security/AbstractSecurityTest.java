@@ -29,6 +29,7 @@ import org.sonatype.nexus.security.realm.RealmConfiguration;
 import org.sonatype.nexus.security.user.UserManager;
 import org.sonatype.sisu.litmus.testsupport.TestUtil;
 
+import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Key;
@@ -49,7 +50,7 @@ import static org.mockito.Mockito.mock;
 public abstract class AbstractSecurityTest
 {
   protected final TestUtil util = new TestUtil(this);
-  protected final String ehCacheConfigPath = "/ehcache-test.xml";
+  private final String ehCacheConfigPath = "/ehcache-test.xml";
 
   @Inject
   private BeanLocator beanLocator;
@@ -70,12 +71,12 @@ public abstract class AbstractSecurityTest
     tearDown();
   }
 
-  protected EhCacheManagerProvider createEhCacheManagerProvider() {
+  private EhCacheManagerProvider createEhCacheManagerProvider() {
     try {
       return new EhCacheManagerProvider(getClass().getResource(ehCacheConfigPath).toURI());
     }
     catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
   }
 
