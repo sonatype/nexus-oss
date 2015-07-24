@@ -29,6 +29,7 @@ public class V1ExceptionHandler
     extends ComponentSupport
     implements Handler
 {
+
   @Nonnull
   @Override
   public Response handle(@Nonnull final Context context) throws Exception {
@@ -40,11 +41,12 @@ public class V1ExceptionHandler
           context.getRequest().getAction(),
           context.getRequest().getPath(),
           e.toString());
-      // FIXME Use jackson to marshal?
+
       return new Response.Builder()
           .status(Status.failure(e.getHttpCode()))
-          .payload(new StringPayload("{\"error\":\"" + e.getMessage() + "\"}", ContentTypes.APPLICATION_JSON))
+          .payload(new StringPayload(e.getMessage(), ContentTypes.TEXT_PLAIN))
           .build();
     }
   }
+
 }
