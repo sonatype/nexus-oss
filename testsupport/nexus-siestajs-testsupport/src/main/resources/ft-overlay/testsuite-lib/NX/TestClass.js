@@ -305,12 +305,12 @@ Class('NX.TestClass', {
 
     /**
      * Convenience method for waiting on the load of a store.
-     * @param {String} cq component query for the component whose store should be loaded
+     * @param {String} storeKey id of store to wait on
      */
-    waitForStore: function(cq) {
+    waitForStore: function(storeKey) {
       return {
-        waitFor: 'storesToLoad', args: function() {
-          return this.cq1(cq).getStore();
+        waitForStoresToLoad: function() {
+          return this.Ext().data.StoreManager.getByKey(storeKey);
         }
       }
     },
