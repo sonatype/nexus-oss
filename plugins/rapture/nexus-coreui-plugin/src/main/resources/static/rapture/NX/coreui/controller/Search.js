@@ -429,6 +429,7 @@ Ext.define('NX.coreui.controller.Search', {
     var me = this,
         bookmark = NX.Bookmarks.getBookmark(),
         list_ids = bookmark.getSegments().slice(1),
+        searchResultStore = me.getSearchResult().getStore(),
         componentModel;
 
     // If no search filter has been specified, don't load any stores
@@ -436,10 +437,10 @@ Ext.define('NX.coreui.controller.Search', {
       return;
     }
 
-    me.getSearchResult().getStore().load(function() {
+    searchResultStore.load(function() {
       // Load the asset detail view
       if (list_ids[1]) {
-        componentModel = me.getSearchResult().getStore().getById(decodeURIComponent(list_ids[0]));
+        componentModel = searchResultStore.getById(decodeURIComponent(list_ids[0]));
         me.onModelChanged(0, componentModel);
         me.onSearchResultSelection(componentModel);
         me.getAssetList().getStore().load(function () {

@@ -210,16 +210,18 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
     var me = this,
         bookmark = NX.Bookmarks.getBookmark(),
         list_ids = bookmark.getSegments().slice(1),
+        repoStore = me.getRepositoryList().getStore(),
         repoModel,
+        componentStore = me.getComponentList().getStore(),
         componentModel;
 
-    me.getRepositoryList().getStore().load(function() {
+    repoStore.load(function() {
       // Load the asset detail view
       if (list_ids[2]) {
-        repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
+        repoModel = repoStore.getById(decodeURIComponent(list_ids[0]));
         me.onModelChanged(0, repoModel);
         me.onRepositorySelection(repoModel);
-        me.getComponentList().getStore().load(function() {
+        componentStore.load(function() {
           componentModel = me.getComponentList().getStore().getById(decodeURIComponent(list_ids[1]));
           me.onModelChanged(1, componentModel);
           me.onComponentSelection(componentModel);
@@ -230,10 +232,10 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
       }
       // Load the asset list view
       else if (list_ids[1]) {
-        repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
+        repoModel = repoStore.getById(decodeURIComponent(list_ids[0]));
         me.onModelChanged(0, repoModel);
         me.onRepositorySelection(repoModel);
-        me.getComponentList().getStore().load(function() {
+        componentStore.load(function() {
           me.reselect();
         });
       }

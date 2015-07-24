@@ -187,12 +187,13 @@ Ext.define('NX.coreui.controller.BrowseAssets', {
     var me = this,
       bookmark = NX.Bookmarks.getBookmark(),
       list_ids = bookmark.getSegments().slice(1),
+      repoStore = me.getRepositoryList().getStore(),
       repoModel;
 
-    me.getRepositoryList().getStore().load(function() {
+    repoStore.load(function() {
       // Load the asset detail view
       if (list_ids[1]) {
-        repoModel = me.getRepositoryList().getStore().getById(decodeURIComponent(list_ids[0]));
+        repoModel = repoStore.getById(decodeURIComponent(list_ids[0]));
         me.onModelChanged(0, repoModel);
         me.onRepositorySelection(repoModel);
         me.getAssetList().getStore().load(function() {
