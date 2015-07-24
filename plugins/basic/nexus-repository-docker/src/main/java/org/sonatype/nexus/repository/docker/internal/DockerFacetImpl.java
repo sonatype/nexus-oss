@@ -214,8 +214,6 @@ public class DockerFacetImpl
     if (!data.get("id").equals(imageId)) {
       throw new V1ApiException("JSON data contains invalid id");
     }
-    // TODO check image belongs to repository?
-    // TODO check parent is accessible via authorisation?
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String metadataAssetName = imageId + "/json";
@@ -228,6 +226,7 @@ public class DockerFacetImpl
     if (parentId != null && (parentAsset = findAsset(tx, bucket, parentId + "/json")) == null) {
       throw new V1ApiException("Image depends on a non existing parent");
     }
+    // TODO check that parent asset is accessible via authorisation once we have per assets auth
     if (parentAsset != null) {
       ancestry = parentAsset.formatAttributes().get(P_ANCESTRY, TypeTokens.LIST_STRING);
     }
