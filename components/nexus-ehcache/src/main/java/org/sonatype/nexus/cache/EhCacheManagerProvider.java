@@ -30,6 +30,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 import com.google.common.annotations.VisibleForTesting;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * EhCache JCache {@link CacheManager} provider.
@@ -48,7 +49,9 @@ public class EhCacheManagerProvider
 
   @Inject
   public EhCacheManagerProvider(final ApplicationDirectories directories) {
-    this.uri = new File(directories.getAppDirectory("etc"), "ehcache.xml").toURI();
+    File file = new File(directories.getAppDirectory("etc"), "ehcache.xml");
+    checkState(file.exists(), "Missing required file: %s", file.getAbsolutePath());
+    this.uri = file.toURI();
   }
 
   @VisibleForTesting
