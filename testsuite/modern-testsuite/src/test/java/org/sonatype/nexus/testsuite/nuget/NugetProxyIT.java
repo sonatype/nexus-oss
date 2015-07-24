@@ -68,23 +68,7 @@ public class NugetProxyIT
   public void createProxyRepo()
       throws Exception
   {
-
-    // Package counts return the full number of items available on the server
-    dispatch.serve(forOperation("Packages/$count"), remoteFeed("all-packages-count.txt"));
-    dispatch.serve(forOperation("Packages()/$count"), remoteFeed("all-packages-count.txt"));
-
-    // So do searches on nuget.org
-    dispatch.serve(forOperation("Search/$count"), remoteFeed("all-packages-count.txt"));
-    dispatch.serve(forOperation("Search()/$count"), remoteFeed("all-packages-count.txt"));
-
-    dispatch.serve(forOperation("Search").hasParam("$top", "80"),
-        remoteFeed("proxy-search-jquery-top-80.xml"));
-
-    dispatch.serve(forOperation("Packages(Id='SONATYPE.TEST',Version='1.0')"),
-        remoteFeed("sonatype-test-entry.xml"));
-
-    dispatch.serve(forOperation("/SONATYPE.TEST/1.0"),
-        file(resolveTestFile("SONATYPE.TEST.1.0.nupkg")));
+    configureProxyResources();
 
     final String remoteStorageUrl = proxyServer.getUrl().toExternalForm() + "/" + REMOTE_NUGET_REPO_PATH;
 
@@ -92,7 +76,6 @@ public class NugetProxyIT
 
     nuget = nugetClient(proxyRepo);
   }
-
 
   /**
    * Simple smoke test to ensure a proxy repo is actually reachable.
@@ -109,12 +92,12 @@ public class NugetProxyIT
    */
   @Test
   public void visualStudioInitializationQueries() throws Exception {
-    int count = nuget.count(VISUAL_STUDIO_INITIAL_COUNT_QUERY);
+    int count = nuget.vsCount();
 
     // Ensure the count reflects what is remotely available
-    assertThat("count", count, is(32091));
+    assertThat("count", count, is(VISUAL_STUDIO_INITIAL_ALL_PACKAGES_COUNT));
 
-    String feed = nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY);
+    String feed = nuget.vsSearchFeedXml();
     final List<Map<String, String>> entries = parseFeedXml(feed);
 
     assertThat(entries.size(), is(VS_DEFAULT_PAGE_REQUEST_SIZE));
@@ -146,7 +129,7 @@ public class NugetProxyIT
     final List<Map<String, String>> hashOrderedEntries = parseFeedXml(nuget.feedXml(FEED_ORDERED_BY_HASH));
 
     // Now ensure that an unspecified sort order results in default ordering (descending download count)
-    final List<Map<String, String>> entries = parseFeedXml(nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY));
+    final List<Map<String, String>> entries = parseFeedXml(nuget.vsSearchFeedXml());
 
     List<Integer> downloadCounts = extractDownloadCounts(entries);
 
@@ -159,7 +142,7 @@ public class NugetProxyIT
         file(resolveTestFile("packages-with-inline-count.xml")));
 
     // Request an inline count
-    String feed = nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY + "&$inlinecount=allpages");
+    String feed = nuget.vsSearchFeedXmlInlineCount();
     final Integer inlineCount = parseInlineCount(feed);
 
     assertThat(inlineCount, is(Matchers.notNullValue()));
@@ -178,7 +161,7 @@ public class NugetProxyIT
     proxyServer.stop();
 
     // Entries should still be served
-    final String feed = nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY);
+    final String feed = nuget.vsSearchFeedXml();
 
     final List<Map<String, String>> entries = parseFeedXml(feed);
     assertThat(entries.size(), is(VS_DEFAULT_PAGE_REQUEST_SIZE));

@@ -37,6 +37,7 @@ import org.eclipse.jetty.http.PathMap;
 import org.junit.After;
 import org.junit.Before;
 
+import static org.sonatype.nexus.testsuite.nuget.dispatch.ChainedRequestMatcher.forOperation;
 import static org.sonatype.tests.http.server.fluent.Behaviours.error;
 import static org.sonatype.tests.http.server.fluent.Behaviours.file;
 
@@ -142,6 +143,26 @@ public abstract class NugetProxyITSupport
       s = s.replace(replacement.getKey(), replacement.getValue());
     }
     return s;
+  }
+
+  void configureProxyResources() throws Exception
+  {
+    // Package counts return the full number of items available on the server
+    dispatch.serve(forOperation("Packages/$count"), remoteFeed("all-packages-count.txt"));
+    dispatch.serve(forOperation("Packages()/$count"), remoteFeed("all-packages-count.txt"));
+
+    // So do searches on nuget.org
+    dispatch.serve(forOperation("Search/$count"), remoteFeed("all-packages-count.txt"));
+    dispatch.serve(forOperation("Search()/$count"), remoteFeed("all-packages-count.txt"));
+
+    dispatch.serve(forOperation("Search").hasParam("$top", "80"),
+        remoteFeed("proxy-search-jquery-top-80.xml"));
+
+    dispatch.serve(forOperation("Packages(Id='SONATYPE.TEST',Version='1.0')"),
+        remoteFeed("sonatype-test-entry.xml"));
+
+    dispatch.serve(forOperation("/SONATYPE.TEST/1.0"),
+        file(resolveTestFile("SONATYPE.TEST.1.0.nupkg")));
   }
 
 
