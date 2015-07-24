@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.security;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
+import org.sonatype.nexus.cache.EhCacheManagerProvider;
 import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.nexus.security.config.PreconfiguredSecurityConfigurationSource;
 import org.sonatype.nexus.security.config.SecurityConfiguration;
@@ -47,6 +49,7 @@ import static org.mockito.Mockito.mock;
 public abstract class AbstractSecurityTest
 {
   protected final TestUtil util = new TestUtil(this);
+  protected final String ehCacheConfigPath = "/ehcache-test.xml";
 
   @Inject
   private BeanLocator beanLocator;
@@ -67,6 +70,15 @@ public abstract class AbstractSecurityTest
     tearDown();
   }
 
+  protected EhCacheManagerProvider createEhCacheManagerProvider() {
+    try {
+      return new EhCacheManagerProvider(getClass().getResource(ehCacheConfigPath).toURI());
+    }
+    catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   protected void customizeModules(List<Module> modules) {
     modules.add(new AbstractModule()
     {
@@ -80,6 +92,8 @@ public abstract class AbstractSecurityTest
         RealmConfiguration realmConfiguration = new RealmConfiguration();
         realmConfiguration.setRealmNames(Arrays.asList("MockRealmA", "MockRealmB"));
         bind(RealmConfiguration.class).annotatedWith(Names.named("initial")).toInstance(realmConfiguration);
+
+        bind(EhCacheManagerProvider.class).toInstance(createEhCacheManagerProvider());
 
         bind(ApplicationDirectories.class).toInstance(mock(ApplicationDirectories.class));
 
