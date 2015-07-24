@@ -47,7 +47,8 @@ public interface StorageTx
 
   /**
    * A lower level but still safe access to SQL SELECT queries, that allows caller to "browse" potentially
-   * huge result sets without worry about paging or OOMs.
+   * huge result sets without worry about paging or OOMs. This method will NOT see uncommited changes performed
+   * in this current TX, if any.
    *
    * @param selectSql The SELECT SQL in full, optionally with named parameters.
    * @param params The map holding named parameters of SELECT SQL.
@@ -86,7 +87,8 @@ public interface StorageTx
   Iterable<Bucket> browseBuckets();
 
   /**
-   * Gets all assets owned by the specified bucket.
+   * Gets all assets owned by the specified bucket. This method will NOT see unsommited changes performed in this
+   * same TX, if any.
    */
   Iterable<Asset> browseAssets(Bucket bucket);
 
@@ -101,7 +103,8 @@ public interface StorageTx
   Asset firstAsset(Component component);
 
   /**
-   * Gets all components owned by the specified bucket.
+   * Gets all components owned by the specified bucket. This method will NOT see unsommited changes performed in this
+   * same TX, if any.
    */
   Iterable<Component> browseComponents(Bucket bucket);
 

@@ -48,7 +48,9 @@ class OrientAsyncHelper
    * Executes with passed in {@link ODatabaseDocumentTx} connection the passed in {@link String} SELECT SQL command
    * and returns a true asynchronous backed {@link Iterable} of {@link ODocument} instance, that can be later
    * transformed into whatever caller needs. This means that this wrapper supports ANY SQL commands, even those
-   * performing aggregation on results, as long as iterator is not accumulated into a real array or list.
+   * performing aggregation on results, as long as iterator is not accumulated into a real array or list. Still, given
+   * the nature of non-blocking query, it's execution happens on a separate thread, hence, it will not see uncommited
+   * changes from the caller thread, if any.
    */
   public static Iterable<ODocument> asyncIterable(final ODatabaseDocumentTx db,
                                                   final String selectQuery,
