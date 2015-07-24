@@ -159,6 +159,14 @@ public class JettyServer
     thread = new JettyMainThread(components);
     thread.setContextClassLoader(classLoader);
     thread.startComponents(waitForServer);
+
+    Server server = null;
+    for (Object object : components) {
+      if (object instanceof Server) {
+        server = (Server) object;
+      }
+    }
+    JettyHolder.setHolder(new JettyHolder.Holder(thread.started, server, last.getProperties(), last.getIdMap()));
   }
 
   public synchronized void stop() throws Exception {
