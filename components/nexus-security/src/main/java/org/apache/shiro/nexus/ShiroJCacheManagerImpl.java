@@ -15,71 +15,62 @@ package org.apache.shiro.nexus;
 import javax.cache.configuration.MutableConfiguration;
 import javax.cache.expiry.EternalExpiryPolicy;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
+import com.google.common.base.Throwables;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.util.Destroyable;
 import org.apache.shiro.util.Initializable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class JCacheManager
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Shiro JCache {@link CacheManager} implementation.
+ *
+ * @since 3.0
+ */
+public class ShiroJCacheManagerImpl
+  extends ComponentSupport
   implements CacheManager, Initializable, Destroyable
 {
-  private static final Logger log = LoggerFactory.getLogger(JCacheManager.class);
-
   private final javax.cache.CacheManager cacheManager;
 
-  public JCacheManager(final javax.cache.CacheManager cacheManager) { this.cacheManager = cacheManager; }
+  public ShiroJCacheManagerImpl(final javax.cache.CacheManager cacheManager) {
+    this.cacheManager = checkNotNull(cacheManager);
+  }
 
-  /**
-   * Acquires the cache with the specified <code>name</code>.  If a cache does not yet exist with that name, a new one
-   * will be created with that name and returned.
-   *
-   * @param name the name of the cache to acquire.
-   * @return the Cache with the given name
-   * @throws CacheException if there is an error acquiring the Cache instance.
-   */
   @Override
   public <K, V> Cache<K, V> getCache(final String name) throws CacheException {
     try {
-      return new JCache<>(this.<K,V>maybeCreateCache(name));
+      return new ShiroJCacheImpl<>(this.<K,V>maybeCreateCache(name));
     }
     catch (Throwable t) {
       throw new CacheException(t);
     }
   }
 
-  /**
-   * Called when this object is being destroyed, allowing any necessary cleanup of internal resources.
-   *
-   * @throws Exception if an exception occurs during object destruction.
-   */
   @Override
   public void destroy() throws Exception {
     try {
       cacheManager.close();
     }
     catch (Throwable t) {
-      throw new Exception(t);
+      throw Throwables.propagate(t);
     }
   }
 
-  /**
-   * Initializes this object.
-   *
-   * @throws ShiroException if an exception occurs during initialization.
-   */
   @Override
   public void init() throws ShiroException {
-
+    // empty
   }
 
   private <K, V> javax.cache.Cache<K, V> maybeCreateCache(String name) {
     javax.cache.Cache<K, V> cache = cacheManager.getCache(name);
     if (cache == null) {
-      log.debug("Creating a shiro jcache named: {}", name);
+      log.debug("Creating cache: {}", name);
 
       MutableConfiguration<K, V> cacheConfig = new MutableConfiguration<K, V>()
           .setExpiryPolicyFactory(EternalExpiryPolicy.factoryOf())
@@ -87,9 +78,8 @@ public class JCacheManager
           .setStatisticsEnabled(true);
 
       cache = cacheManager.createCache(name, cacheConfig);
-      log.debug("Created a shiro cache: {}", cache);
+      log.debug("Created cache: {}", cache);
     }
     return cache;
   }
-
 }
