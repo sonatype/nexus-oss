@@ -40,6 +40,41 @@ StartTest(function(t) {
           }
       )
     }, 60000);
+    t.it('Can view asset details', function(t) {
+      t.chain(
+        function(next) {
+          var grid = t.cq1('nx-coreui-search-result-list'),
+              store = grid.getStore(),
+              model = store.getAt(0),
+              row = t.getRow(grid, model);
+
+          t.click(row, next);
+        },
+        // and wait for the asset list to load
+        function(next) {
+          t.waitForAnimations(next);
+        },
+        function(next) {
+          var grid = t.cq1('nx-coreui-component-asset-list'),
+              store = grid.getStore(),
+              model = store.getAt(0),
+              row = t.getRow(model);
+
+          t.click(row, next);
+        },
+        // and wait for the asset details to load
+        function(next) {
+          t.waitForAnimations(next);
+        },
+        {waitFor: 'CQ', args: 'nx-coreui-component-assetcontainer'}
+      )
+    });
+    t.it('Asset details still visible after refresh', function(t) {
+      t.chain(
+        t.navigateTo(this.global.NX.Bookmarks.getBookmark().getToken()),
+        {waitFor: 'CQ', args: 'nx-coreui-component-assetcontainer'}
+      );
+    });
     t.it('Maven search finds maven components', function(t) {
       t.chain(
           t.navigateTo('browse/search/maven'),
