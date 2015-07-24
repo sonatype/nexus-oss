@@ -50,7 +50,6 @@ import static org.mockito.Mockito.mock;
 public abstract class AbstractSecurityTest
 {
   protected final TestUtil util = new TestUtil(this);
-  private final String ehCacheConfigPath = "/ehcache-test.xml";
 
   @Inject
   private BeanLocator beanLocator;
@@ -73,7 +72,7 @@ public abstract class AbstractSecurityTest
 
   private EhCacheManagerProvider createEhCacheManagerProvider() {
     try {
-      return new EhCacheManagerProvider(getClass().getResource(ehCacheConfigPath).toURI());
+      return new EhCacheManagerProvider(getClass().getResource("/ehcache-test.xml").toURI());
     }
     catch (URISyntaxException e) {
       throw Throwables.propagate(e);
