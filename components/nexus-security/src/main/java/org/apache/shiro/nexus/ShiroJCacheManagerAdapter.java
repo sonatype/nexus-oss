@@ -28,24 +28,24 @@ import org.apache.shiro.util.Initializable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Shiro JCache {@link CacheManager} implementation.
+ * Shiro JCache {@link CacheManager} adapter.
  *
  * @since 3.0
  */
-public class ShiroJCacheManagerImpl
+public class ShiroJCacheManagerAdapter
   extends ComponentSupport
   implements CacheManager, Initializable, Destroyable
 {
   private final javax.cache.CacheManager cacheManager;
 
-  public ShiroJCacheManagerImpl(final javax.cache.CacheManager cacheManager) {
+  public ShiroJCacheManagerAdapter(final javax.cache.CacheManager cacheManager) {
     this.cacheManager = checkNotNull(cacheManager);
   }
 
   @Override
   public <K, V> Cache<K, V> getCache(final String name) throws CacheException {
     try {
-      return new ShiroJCacheImpl<>(this.<K,V>maybeCreateCache(name));
+      return new ShiroJCacheAdapter<>(this.<K,V>maybeCreateCache(name));
     }
     catch (Throwable t) {
       throw new CacheException(t);

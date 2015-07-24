@@ -57,7 +57,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.nexus.ShiroJCacheManagerImpl;
+import org.apache.shiro.nexus.ShiroJCacheManagerAdapter;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
@@ -142,7 +142,7 @@ public class DefaultSecuritySystem
     }
 
     // prepare shiro cache
-    realmSecurityManager.setCacheManager(new ShiroJCacheManagerImpl(cacheManager));
+    realmSecurityManager.setCacheManager(new ShiroJCacheManagerAdapter(cacheManager));
 
     // TODO: Sort out better means to invoke lifecycle here, realm-manager is only here for start/stop now
     realmManager.start();

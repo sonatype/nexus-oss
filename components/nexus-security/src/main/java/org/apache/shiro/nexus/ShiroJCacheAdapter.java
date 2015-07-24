@@ -26,16 +26,16 @@ import org.apache.shiro.cache.CacheException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Shiro JCache {@link Cache} implementation.
+ * Shiro JCache {@link Cache} adapter.
  *
  * @since 3.0
  */
-public class ShiroJCacheImpl<K, V>
+public class ShiroJCacheAdapter<K, V>
   implements Cache<K, V>
 {
   private final javax.cache.Cache<K, V> cache;
 
-  public ShiroJCacheImpl(final javax.cache.Cache<K, V> cache) {
+  public ShiroJCacheAdapter(final javax.cache.Cache<K, V> cache) {
     this.cache = checkNotNull(cache);
   }
 
