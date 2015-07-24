@@ -67,9 +67,11 @@ import org.apache.commons.lang.StringUtils;
 import static java.util.Collections.singletonList;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_ANCESTRY;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_ARCH;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IMAGE_ID;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_METADATA;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_OS;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD;
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
@@ -250,9 +252,10 @@ public class DockerFacetImpl
       metadataAsset.formatAttributes().remove(P_X_DOCKER_CHECKSUM_PAYLOAD);
     }
     metadataAsset.formatAttributes().set(P_ANCESTRY, ancestry);
+    metadataAsset.formatAttributes().set(P_ARCH, data.get("os"));
+    metadataAsset.formatAttributes().set(P_OS, data.get("architecture"));
 
     // If we reach that point, it means that this is a new image or a retry on a failed push
-    // TODO Put attributes in component/asset based on parsed metadata json file
     AttributesMap contentAttributes = null;
     if (payload instanceof Content) {
       contentAttributes = ((Content) payload).getAttributes();
