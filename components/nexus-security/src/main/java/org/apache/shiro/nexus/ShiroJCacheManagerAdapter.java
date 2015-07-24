@@ -28,7 +28,7 @@ import org.apache.shiro.util.Initializable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Shiro JCache {@link CacheManager} adapter.
+ * Shiro {@link javax.cache.CacheManager} to {@link CacheManager} adapter.
  *
  * @since 3.0
  */

@@ -26,7 +26,7 @@ import org.apache.shiro.cache.CacheException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Shiro JCache {@link Cache} adapter.
+ * Shiro {@link javax.cache.Cache} to {@link Cache} adapter.
  *
  * @since 3.0
  */
