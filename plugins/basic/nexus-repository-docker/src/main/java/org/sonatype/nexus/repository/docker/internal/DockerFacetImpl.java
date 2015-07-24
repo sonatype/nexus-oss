@@ -167,7 +167,6 @@ public class DockerFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     Content.applyToAsset(imagesIndexAsset, Content.maintainLastModified(imagesIndexAsset, contentAttributes));
-    // FIXME Nexus is changing content type from application/json to text/plain even if is a json file
     tx.setBlob(imagesIndexAsset, imagesIndexAssetName, indexStream, hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(imagesIndexAsset);
   }
@@ -261,7 +260,6 @@ public class DockerFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     Content.applyToAsset(metadataAsset, Content.maintainLastModified(metadataAsset, contentAttributes));
-    // FIXME Nexus is changing content type from application/json to text/plain even if is a json file
     tx.setBlob(metadataAsset, metadataAssetName, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(metadataAsset);
   }
@@ -325,7 +323,6 @@ public class DockerFacetImpl
       contentAttributes = ((Content) payload).getAttributes();
     }
     Content.applyToAsset(layerAsset, Content.maintainLastModified(layerAsset, contentAttributes));
-    // FIXME Nexus is changing content type from application/octet-stream to application/gzip
     tx.setBlob(layerAsset, layerAssetName, streamSupplier.get(), hashAlgorithms, null, payload.getContentType());
     tx.saveAsset(layerAsset);
 
