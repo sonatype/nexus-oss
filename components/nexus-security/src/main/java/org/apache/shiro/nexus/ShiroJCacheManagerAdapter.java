@@ -67,7 +67,7 @@ public class ShiroJCacheManagerAdapter
     // empty
   }
 
-  private <K, V> javax.cache.Cache<K, V> maybeCreateCache(String name) {
+  private <K, V> javax.cache.Cache<K, V> maybeCreateCache(final String name) {
     javax.cache.Cache<K, V> cache = cacheManager.getCache(name);
     if (cache == null) {
       log.debug("Creating cache: {}", name);
