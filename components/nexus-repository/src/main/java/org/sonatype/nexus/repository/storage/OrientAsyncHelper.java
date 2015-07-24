@@ -37,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 3.0
  */
-public class OrientAsyncHelper
+class OrientAsyncHelper
     extends ComponentSupport
 {
   private static final int BUFFER_SIZE = 128;
