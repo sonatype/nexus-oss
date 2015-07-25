@@ -13,6 +13,7 @@
 package org.sonatype.nexus.ldap.internal;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -21,6 +22,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.ServletContext;
 
+import org.sonatype.nexus.cache.EhCacheManagerProvider;
 import org.sonatype.nexus.ldap.internal.persist.LdapConfigurationSource;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection;
 import org.sonatype.nexus.ldap.internal.persist.entity.Connection.Host;
@@ -35,6 +37,7 @@ import org.sonatype.nexus.security.config.SecurityConfigurationSource;
 import org.sonatype.sisu.litmus.testsupport.ldap.LdapServer;
 import org.sonatype.sisu.litmus.testsupport.port.PortRegistry;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
@@ -64,6 +67,15 @@ public abstract class LdapTestSupport
 
   protected LdapConfigurationSource ldapConfigurationSource = new MockLdapConfigurationSource();
 
+  private EhCacheManagerProvider createEhCacheManagerProvider() {
+    try {
+      return new EhCacheManagerProvider(getClass().getResource("/ehcache-test.xml").toURI());
+    }
+    catch (URISyntaxException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
   @Override
   protected void customizeModules(final List<Module> modules) {
     super.customizeModules(modules);
@@ -87,6 +99,7 @@ public abstract class LdapTestSupport
     {
       @Override
       public void configure(final Binder binder) {
+        binder.bind(EhCacheManagerProvider.class).toInstance(createEhCacheManagerProvider());
         binder.bind(LdapConfigurationSource.class).toInstance(ldapConfigurationSource);
         final SecuritySystem securitySystem = getBoundSecuritySystem();
         if (securitySystem != null) {
