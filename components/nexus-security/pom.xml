@@ -122,6 +122,16 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-ehcache-test-config</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+    </dependency>
+
     <!--
     FIXME: Sort this out; used by ResourceMergingManagerThreadedTest
     -->
@@ -133,4 +143,38 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <!--
+    Unpack shared test-data
+    -->
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+          <excludes>META-INF/**</excludes>
+          <artifactItems>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-ehcache-test-config</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-test-common</artifactId>
+            </item>
+          </artifactItems>
+        </configuration>
+        <executions>
+          <execution>
+            <id>unpack-test-data</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

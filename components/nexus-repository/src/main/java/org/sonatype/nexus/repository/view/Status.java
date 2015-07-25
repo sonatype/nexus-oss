@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.repository.view;
 
+import java.io.Serializable;
+
 import javax.annotation.Nullable;
 
 /**
@@ -20,6 +22,7 @@ import javax.annotation.Nullable;
  * @since 3.0
  */
 public class Status
+    implements Serializable
 {
   private final boolean successful;
 
