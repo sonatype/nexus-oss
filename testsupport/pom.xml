@@ -34,6 +34,7 @@
     <module>nexus-ssl-test-data</module>
     <module>nexus-test-common</module>
     <module>nexus-pax-exam</module>
+    <module>nexus-ehcache-test-config</module>
   </modules>
 
   <dependencyManagement>
