@@ -39,6 +39,8 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * EhCache JCache {@link CacheManager} provider.
  *
+ * Loads configuration from {@code etc/ehcache.xml} if missing will use {@code ehcache-default.xml} resource.
+ *
  * @since 3.0
  */
 @Named("ehcache")
@@ -51,7 +53,9 @@ public class EhCacheManagerProvider
 
   private static final String DEFAULT_RESOURCE = "ehcache-default.xml";
 
-  private CacheManager cacheManager;
+  private volatile CacheManager cacheManager;
+
+  // TODO: Consider if we want to lazily create the instance on first get?  Unsure if it matters or not though.
 
   @Inject
   public EhCacheManagerProvider(final ApplicationDirectories directories) {
@@ -73,8 +77,7 @@ public class EhCacheManagerProvider
     this.cacheManager = create(uri);
   }
 
-  @VisibleForTesting
-  synchronized CacheManager create(@Nullable URI uri) {
+  private CacheManager create(@Nullable URI uri) {
     if (uri == null) {
       // load the configuration from defaults, this is mainly used for test environments
       log.warn("Using default configuration");
@@ -99,13 +102,13 @@ public class EhCacheManagerProvider
   }
 
   @Override
-  public synchronized CacheManager get() {
+  public CacheManager get() {
     checkState(cacheManager != null);
     return cacheManager;
   }
 
   @PreDestroy
-  public synchronized void destroy() {
+  public void destroy() {
     if (cacheManager != null) {
       cacheManager.close();
       log.info("Cache-manager closed");
