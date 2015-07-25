@@ -49,7 +49,7 @@ public class EhCacheManagerProvider
 {
   private static final String CONFIG_FILE = "ehcache.xml";
 
-  private static final String FAILSAFE_RESOURCE = "ehcache-failsafe.xml";
+  private static final String DEFAULT_RESOURCE = "ehcache-default.xml";
 
   private CacheManager cacheManager;
 
@@ -76,9 +76,10 @@ public class EhCacheManagerProvider
   @VisibleForTesting
   synchronized CacheManager create(@Nullable URI uri) {
     if (uri == null) {
-      log.warn("Using failsafe configuration");
-      URL url = getClass().getResource(FAILSAFE_RESOURCE);
-      checkState(url != null, "Missing configuration resource: %s", FAILSAFE_RESOURCE);
+      // load the configuration from defaults, this is mainly used for test environments
+      log.warn("Using default configuration");
+      URL url = getClass().getResource(DEFAULT_RESOURCE);
+      checkState(url != null, "Missing configuration resource: %s", DEFAULT_RESOURCE);
       try {
         uri = url.toURI();
       }

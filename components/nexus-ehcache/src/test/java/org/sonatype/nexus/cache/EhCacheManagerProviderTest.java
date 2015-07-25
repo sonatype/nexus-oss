@@ -37,7 +37,7 @@ public class EhCacheManagerProviderTest
 
   @Before
   public void setUp() throws Exception {
-    // Use the failsafe configuration for testing
+    // Use the default configuration for testing
     underTest = new EhCacheManagerProvider((URI)null);
   }
 
