@@ -20,20 +20,12 @@ StartTest(function(t) {
       t.chain(
           t.openPageAsAdmin('browse/search'),
           {waitForCQVisible: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
-          function(next) {
-            t.phantomjsScreenshot('beforeTyping.png');
-            next();
-          },
           { action : 'click', target : '>>nx-coreui-searchfeature field[criteriaId=keyword]' },
           function (next, searchBox) {
             searchBox.focus();
             t.type(searchBox.inputEl, 'name:aopalliance', next);
           },
-          function(next) {
-            t.phantomjsScreenshot('afterTyping.png');
-            next();
-          },
-          t.waitForStore('SearchResult'),
+          {waitForRowsVisible: 'nx-coreui-search-result-list'},
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -45,7 +37,7 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 60000);
+    });
     t.it('Maven search finds maven components', function(t) {
       t.chain(
           t.navigateTo('browse/search/maven'),
