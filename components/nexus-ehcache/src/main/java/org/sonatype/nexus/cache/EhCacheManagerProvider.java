@@ -14,7 +14,10 @@ package org.sonatype.nexus.cache;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
+import javax.annotation.Nullable;
 import javax.annotation.PreDestroy;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
@@ -28,6 +31,7 @@ import org.sonatype.nexus.common.app.ApplicationDirectories;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -43,24 +47,46 @@ public class EhCacheManagerProvider
     extends ComponentSupport
     implements Provider<CacheManager>
 {
-  private final URI uri;
+  private static final String CONFIG_FILE = "ehcache.xml";
+
+  private static final String FAILSAFE_RESOURCE = "ehcache-failsafe.xml";
 
   private CacheManager cacheManager;
 
   @Inject
   public EhCacheManagerProvider(final ApplicationDirectories directories) {
-    File file = new File(directories.getAppDirectory("etc"), "ehcache.xml");
-    checkState(file.exists(), "Missing required file: %s", file.getAbsolutePath());
-    this.uri = file.toURI();
+    checkNotNull(directories);
+
+    URI uri = null;
+    File file = new File(directories.getAppDirectory("etc"), CONFIG_FILE);
+    if (file.exists()) {
+      uri = file.toURI();
+    }
+    else {
+      log.warn("Missing configuration: {}", file.getAbsolutePath());
+    }
+    this.cacheManager = create(uri);
   }
 
   @VisibleForTesting
-  public EhCacheManagerProvider(final URI uri) {
-    this.uri = checkNotNull(uri);
+  public EhCacheManagerProvider(@Nullable final URI uri) {
+    this.cacheManager = create(uri);
   }
 
   @VisibleForTesting
-  synchronized CacheManager create() {
+  synchronized CacheManager create(@Nullable URI uri) {
+    if (uri == null) {
+      log.warn("Using failsafe configuration");
+      URL url = getClass().getResource(FAILSAFE_RESOURCE);
+      checkState(url != null, "Missing configuration resource: %s", FAILSAFE_RESOURCE);
+      try {
+        uri = url.toURI();
+      }
+      catch (URISyntaxException e) {
+        throw Throwables.propagate(e);
+      }
+    }
+
     // EHCache bundle has dynamic import, so it's the preferred choice here
     ClassLoader ehcacheLoader = net.sf.ehcache.Cache.class.getClassLoader();
 
@@ -73,9 +99,7 @@ public class EhCacheManagerProvider
 
   @Override
   public synchronized CacheManager get() {
-    if (cacheManager == null) {
-      cacheManager = create();
-    }
+    checkState(cacheManager != null);
     return cacheManager;
   }
 
@@ -84,6 +108,7 @@ public class EhCacheManagerProvider
     if (cacheManager != null) {
       cacheManager.close();
       log.info("Cache-manager closed");
+      cacheManager = null;
     }
   }
 }

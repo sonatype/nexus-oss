@@ -22,8 +22,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link EhCacheManagerProvider}.
@@ -35,21 +37,36 @@ public class EhCacheManagerProviderTest
 
   @Before
   public void setUp() throws Exception {
-    URI uri = getClass().getResource("ehcache.xml").toURI();
-    assertThat(uri, notNullValue());
-    underTest = new EhCacheManagerProvider(uri);
+    // Use the failsafe configuration for testing
+    underTest = new EhCacheManagerProvider((URI)null);
   }
 
   @After
   public void tearDown() throws Exception {
+    // safety check that we always cleanup
     if (underTest != null) {
       underTest.destroy();
     }
   }
 
   @Test
-  public void create() throws Exception {
-    CacheManager cacheManager = underTest.create();
+  public void basicLifecycle() throws Exception {
+    // get should return non-null
+    CacheManager cacheManager = underTest.get();
     assertThat(cacheManager, notNullValue());
+
+    // repeated get should return same object
+    CacheManager cacheManager2 = underTest.get();
+    assertThat(cacheManager2, is(cacheManager));
+
+    // after destroy get should fail
+    underTest.destroy();
+    try {
+      underTest.get();
+      fail();
+    }
+    catch (IllegalStateException e) {
+      // expected
+    }
   }
 }
