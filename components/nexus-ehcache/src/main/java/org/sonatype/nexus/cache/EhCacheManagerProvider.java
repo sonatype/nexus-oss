@@ -82,7 +82,7 @@ public class EhCacheManagerProvider
       // load the configuration from defaults, this is mainly used for test environments
       log.warn("Using default configuration");
       URL url = getClass().getResource(DEFAULT_RESOURCE);
-      checkState(url != null, "Missing configuration resource: %s", DEFAULT_RESOURCE);
+      checkState(url != null, "Missing default configuration resource: %s", DEFAULT_RESOURCE);
       try {
         uri = url.toURI();
       }
@@ -92,18 +92,18 @@ public class EhCacheManagerProvider
     }
 
     // EHCache bundle has dynamic import, so it's the preferred choice here
-    ClassLoader ehcacheLoader = net.sf.ehcache.Cache.class.getClassLoader();
+    ClassLoader classLoader = net.sf.ehcache.CacheManager.class.getClassLoader();
 
-    CachingProvider provider = Caching.getCachingProvider("org.ehcache.jcache.JCacheCachingProvider", ehcacheLoader);
+    CachingProvider provider = Caching.getCachingProvider("org.ehcache.jcache.JCacheCachingProvider", classLoader);
     log.info("Creating cache-manager with configuration: {}", uri);
-    CacheManager cacheManager = provider.getCacheManager(uri, ehcacheLoader);
+    CacheManager cacheManager = provider.getCacheManager(uri, classLoader);
     log.debug("Created cache-manager: {}", cacheManager);
     return cacheManager;
   }
 
   @Override
   public CacheManager get() {
-    checkState(cacheManager != null);
+    checkState(cacheManager != null, "Cache-manger destroyed");
     return cacheManager;
   }
 
