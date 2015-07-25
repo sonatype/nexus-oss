@@ -357,6 +357,19 @@ Class('NX.TestClass', {
         assertionName: 'waitForSpyToBeCalled',
         description: 'wait for spy to be called'
       });
+    },
+
+    /**
+     * Send secret code to get phantomjs to take a screenshot.
+     * Depends on modifications to phantomjs-launcher.js made in prepare_siestajs.groovy.
+     * 
+     * @param filename name of the file to save, should end in .png
+     */
+    phantomjsScreenshot: function(filename) {
+      this.todo('prime screenCapture', function(todo) {
+        todo.screenshot('screen');
+      });
+      console.log('__PHANTOMJS__:screenCapture:phantomjsScreens/'+filename);
     }
   }
 });

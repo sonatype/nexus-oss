@@ -14,21 +14,23 @@
  * Test indexing & basic searching of indexed components.
  */
 StartTest(function(t) {
-  t.todo('prime screenCapture', function(todo) {
-    todo.screenshot('screen');
-  });
+
   t.describe('Basic Indexing and Searching', function(t) {
     t.it('Keyword search finds maven components', function(t) {
       t.chain(
           t.openPageAsAdmin('browse/search'),
-          {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
+          {waitForCQVisible: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
           function(next) {
-            console.log('__PHANTOMJS__:screenCapture:beforeTyping.png');
+            t.phantomjsScreenshot('beforeTyping.png');
             next();
           },
-          {type: 'name:aopalliance', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
+          { action : 'click', target : '>>nx-coreui-searchfeature field[criteriaId=keyword]' },
+          function (next, searchBox) {
+            searchBox.focus();
+            t.type(searchBox.inputEl, 'name:aopalliance', next);
+          },
           function(next) {
-            console.log('__PHANTOMJS__:screenCapture:afterTyping.png');
+            t.phantomjsScreenshot('afterTyping.png');
             next();
           },
           t.waitForStore('SearchResult'),
