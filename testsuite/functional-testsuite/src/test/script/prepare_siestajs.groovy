@@ -35,6 +35,22 @@ ant.unzip(src: artifacts['com.bryntum.siesta:siesta-standard'].file, dest: siest
   }
 }
 
+// patch phantomjs-launcher.js to allow screenshots
+def phantomjsLauncher = ant.fileScanner {
+  fileset(dir: siestaDir, includes: '**/phantomjs-launcher.js')
+}.collect{it}[0]
+
+def lines = phantomjsLauncher.readLines()
+lines.addAll(273,
+    [
+        'if (match = command.match(/^screenCapture:([\\s\\S]+)/)) {',
+        ' currentPage.render(match[ 1 ]);',
+        ' return;',
+        '}'
+    ].collect{ "                        $it"} //indent
+)
+phantomjsLauncher.text = lines.join(System.lineSeparator())
+
 // Ensure scripts and binaries are executable
 ant.chmod(perm: 'u+x') {
   fileset(dir: "$siestaDir/bin") {
@@ -49,5 +65,6 @@ ant.unzip(src: artifacts['org.sonatype.nexus:nexus-siestajs-testsupport'].file, 
     include(name: 'ft-overlay/**')
   }
 }
+
 // Mark as prepared
 ant.touch(file: preparedFile)
