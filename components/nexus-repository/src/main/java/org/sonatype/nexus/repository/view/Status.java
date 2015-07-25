@@ -16,6 +16,8 @@ import java.io.Serializable;
 
 import javax.annotation.Nullable;
 
+// TODO: implement Externalizable
+
 /**
  * A representation of response status with an optional message.
  *
