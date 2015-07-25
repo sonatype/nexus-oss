@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.cache;
+package org.sonatype.nexus.cache.internal;
 
 import java.io.File;
 import java.net.URI;
@@ -32,6 +32,7 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
+import org.ehcache.jcache.JCacheCachingProvider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -77,14 +78,15 @@ public class EhCacheManagerProvider
     this.cacheManager = create(uri);
   }
 
-  private CacheManager create(@Nullable URI uri) {
-    if (uri == null) {
+  private CacheManager create(@Nullable final URI uri) {
+    URI config = uri;
+    if (config == null) {
       // load the configuration from defaults, this is mainly used for test environments
       log.warn("Using default configuration");
       URL url = getClass().getResource(DEFAULT_RESOURCE);
       checkState(url != null, "Missing default configuration resource: %s", DEFAULT_RESOURCE);
       try {
-        uri = url.toURI();
+        config = url.toURI();
       }
       catch (URISyntaxException e) {
         throw Throwables.propagate(e);
@@ -94,11 +96,11 @@ public class EhCacheManagerProvider
     // EHCache bundle has dynamic import, so it's the preferred choice here
     ClassLoader classLoader = net.sf.ehcache.CacheManager.class.getClassLoader();
 
-    CachingProvider provider = Caching.getCachingProvider("org.ehcache.jcache.JCacheCachingProvider", classLoader);
-    log.info("Creating cache-manager with configuration: {}", uri);
-    CacheManager cacheManager = provider.getCacheManager(uri, classLoader);
-    log.debug("Created cache-manager: {}", cacheManager);
-    return cacheManager;
+    CachingProvider provider = Caching.getCachingProvider(JCacheCachingProvider.class.getName(), classLoader);
+    log.info("Creating cache-manager with configuration: {}", config);
+    CacheManager manager = provider.getCacheManager(config, classLoader);
+    log.debug("Created cache-manager: {}", manager);
+    return manager;
   }
 
   @Override
