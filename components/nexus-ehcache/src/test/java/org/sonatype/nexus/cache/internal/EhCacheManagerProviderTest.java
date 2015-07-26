@@ -19,7 +19,6 @@ import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -71,7 +70,7 @@ public class EhCacheManagerProviderTest
   }
 
   @Test
-  @Ignore("Disabled due to https://github.com/ehcache/ehcache-jcache/issues/40")
+  //@Ignore("Disabled due to https://github.com/ehcache/ehcache-jcache/issues/40")
   public void preconfiguredCacheWithEternal() {
     CacheManager cacheManager = underTest.get();
     log(cacheManager);

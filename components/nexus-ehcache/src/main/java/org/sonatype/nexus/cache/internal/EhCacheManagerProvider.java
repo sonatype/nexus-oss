@@ -93,12 +93,13 @@ public class EhCacheManagerProvider
     }
 
     Class type = org.ehcache.jsr107.EhcacheCachingProvider.class;
-    ClassLoader classLoader = type.getClassLoader();
+    CachingProvider provider = Caching.getCachingProvider(type.getName(), type.getClassLoader());
+    log.info("Caching provider: {}", provider);
 
-    CachingProvider provider = Caching.getCachingProvider(type.getName(), classLoader);
     log.info("Creating cache-manager with configuration: {}", config);
-    CacheManager manager = provider.getCacheManager(config, classLoader);
+    CacheManager manager = provider.getCacheManager(config, getClass().getClassLoader());
     log.debug("Created cache-manager: {}", manager);
+
     return manager;
   }
 
