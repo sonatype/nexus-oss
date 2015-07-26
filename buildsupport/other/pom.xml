@@ -174,8 +174,8 @@
         <version>1.0.1</version>
         <exclusions>
           <exclusion>
-            <groupId>net.ef.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
