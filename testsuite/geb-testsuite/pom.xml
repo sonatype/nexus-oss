@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2008-present Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus.testsuite</groupId>
+    <artifactId>nexus-testsuite</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-geb-testsuite</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
+
+  <properties>
+    <!--
+    Testsuite auto-sharding support.
+    -->
+    <testsuite.basedir>${project.basedir}/..</testsuite.basedir>
+    <geb.version>0.12.0</geb.version>
+    <selenium.version>2.46.0</selenium.version>
+    <phantomjs-maven-plugin.version>0.7</phantomjs-maven-plugin.version>
+    <phantomjs.version>1.9.7</phantomjs.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-pax-exam</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.gebish</groupId>
+      <artifactId>geb-core</artifactId>
+      <version>${geb.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-support</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+    <!-- Mandatory dependencies for using Spock -->
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <!--<version>2.4.3</version>-->
+    </dependency>
+    <dependency>
+      <groupId>org.spockframework</groupId>
+      <artifactId>spock-core</artifactId>
+      <!--<version>1.0-groovy-2.4</version>-->
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-dep</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.hamcrest</groupId>-->
+      <!--<artifactId>hamcrest-library</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+    <!-- Geb browser automation -->
+    <dependency>
+      <groupId>org.gebish</groupId>
+      <artifactId>geb-spock</artifactId>
+      <version>${geb.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.gebish</groupId>
+      <artifactId>geb-junit4</artifactId>
+      <version>${geb.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-firefox-driver</artifactId>
+      <version>${selenium.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-chrome-driver</artifactId>
+      <version>${selenium.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-safari-driver</artifactId>
+      <version>${selenium.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-ie-driver</artifactId>
+      <version>${selenium.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.codeborne</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+      <version>1.2.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>servlet-api-2.5</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+    Base template bundle to be tested
+    -->
+    <dependency>
+      <groupId>${it.nexus.bundle.groupId}</groupId>
+      <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+      <version>${it.nexus.bundle.version}</version>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+    Additional plugins on top of the base template
+    -->
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus</groupId>-->
+      <!--<artifactId>nexus-repository</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
+      <!--<artifactId>nexus-repository-maven</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>org.apache.httpcomponents</groupId>-->
+      <!--<artifactId>httpmime</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!--
+            Don't halt on failures, so that the damage control report can pick up the test results.
+            CI builds set this to true so that it can analyze the test results.
+            If you want to use it locally then pass the property maven.test.failure.ignore to the build.
+
+            <testFailureIgnore>true</testFailureIgnore>
+          -->
+          <excludes>
+            <!-- Examples to be run as individual tests from Maven CLI or IDE. -->
+            <exclude>**/example/**</exclude>
+            <exclude>${exclude.tests}</exclude>
+          </excludes>
+          <includes>
+            <include>**/*Spec.*</include>
+          </includes>
+          <systemPropertyVariables>
+            <slowmo.enable>true</slowmo.enable>
+            <!--
+              Defined in GebConfig.groovy so that tests can be executed in Eclipse or from Maven CLI.
+            -->
+            <!-- <geb.build.reportsDir>${project.build.directory}/test-reports/geb</geb.build.reportsDir> -->
+            <!-- <geb.build.baseUrl>http://localhost:8070/</geb.build.baseUrl> -->
+          </systemPropertyVariables>
+          <argLine>-XX:MaxPermSize=144m</argLine>
+          <trimStackTrace>false</trimStackTrace>
+        </configuration>
+      </plugin>
+      <!--
+        A nice report using the Spock blocks
+        https://github.com/damage-control/
+      -->
+      <plugin>
+        <groupId>com.github.damage-control.report</groupId>
+        <artifactId>damage-control-maven-plugin</artifactId>
+        <version>1.1.0</version>
+        <configuration>
+          <skip>${skipTests}</skip>
+          <specDefinitionsFolder>${project.build.testSourceDirectory}</specDefinitionsFolder>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+      Unpack shared test-data
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <outputDirectory>${project.build.directory}/it-resources</outputDirectory>
+          <excludes>META-INF/**</excludes>
+          <artifactItems>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-maven-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-nuget-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-raw-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-ssl-test-data</artifactId>
+            </item>
+          </artifactItems>
+        </configuration>
+        <executions>
+          <execution>
+            <id>unpack-test-data</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+      Allow use of 'versionAsInProject' in Pax-Exam configuration
+      -->
+      <plugin>
+        <groupId>org.apache.servicemix.tooling</groupId>
+        <artifactId>depends-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.github.klieber</groupId>
+        <artifactId>phantomjs-maven-plugin</artifactId>
+        <version>${phantomjs-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
