@@ -10,46 +10,65 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.cache;
-
-import java.net.URI;
-
-import javax.cache.CacheManager;
+package org.sonatype.nexus.cache.internal;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.ConfigurationFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- * Tests for {@link EhCacheManagerProvider}.
+ * Trails of basic EhCache.
  */
-public class EhCacheManagerProviderTest
+public class EhCacheTrial
     extends TestSupport
 {
-  private EhCacheManagerProvider underTest;
+  private CacheManager underTest;
 
   @Before
   public void setUp() throws Exception {
-    URI uri = getClass().getResource("ehcache.xml").toURI();
-    assertThat(uri, notNullValue());
-    underTest = new EhCacheManagerProvider(uri);
+    Configuration configuration = ConfigurationFactory.parseConfiguration(getClass().getResource("ehcache-test.xml"));
+    configuration.setUpdateCheck(false);
+    this.underTest = new CacheManager(configuration);
   }
 
   @After
   public void tearDown() throws Exception {
     if (underTest != null) {
-      underTest.destroy();
+      underTest.shutdown();
     }
   }
 
   @Test
-  public void create() throws Exception {
-    CacheManager cacheManager = underTest.create();
-    assertThat(cacheManager, notNullValue());
+  public void preconfiguredCacheWithEternal() {
+    Cache cache = underTest.getCache("testEternalCache");
+    log(cache);
+    assertThat(cache, notNullValue());
+
+    Object key = "foo";
+    Object value = "bar";
+    cache.put(new Element(key, value));
+
+    Element result = cache.get(key);
+    log(result);
+    assertThat(result.getObjectValue(), is(value));
+
+    result = cache.get(key);
+    log(result);
+    assertThat(result.getObjectValue(), is(value));
+
+    result = cache.get(key);
+    log(result);
+    assertThat(result.getObjectValue(), is(value));
   }
 }

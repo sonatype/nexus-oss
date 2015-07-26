@@ -12,12 +12,15 @@
  */
 package org.sonatype.nexus.repository.negativecache;
 
+import java.io.Serializable;
+
 /**
  * A key for the {@link NegativeCacheFacet} negative cache.
  *
  * @since 3.0
  */
 public interface NegativeCacheKey
+    extends Serializable
 {
   /**
    * @param key child key
