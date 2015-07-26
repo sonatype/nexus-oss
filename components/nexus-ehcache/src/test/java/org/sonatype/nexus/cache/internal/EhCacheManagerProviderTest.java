@@ -12,18 +12,19 @@
  */
 package org.sonatype.nexus.cache.internal;
 
-import java.net.URI;
-
+import javax.cache.Cache;
 import javax.cache.CacheManager;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -37,8 +38,7 @@ public class EhCacheManagerProviderTest
 
   @Before
   public void setUp() throws Exception {
-    // Use the default configuration for testing
-    underTest = new EhCacheManagerProvider((URI)null);
+    underTest = new EhCacheManagerProvider(getClass().getResource("ehcache-test.xml").toURI());
   }
 
   @After
@@ -68,5 +68,41 @@ public class EhCacheManagerProviderTest
     catch (IllegalStateException e) {
       // expected
     }
+  }
+
+  @Test
+  @Ignore("Disabled due to https://github.com/ehcache/ehcache-jcache/issues/40")
+  public void preconfiguredCacheWithEternal() {
+    CacheManager cacheManager = underTest.get();
+    log(cacheManager);
+    assertThat(cacheManager, notNullValue());
+
+    Cache cache = cacheManager.getCache("testEternalCache");
+    log(cache);
+    assertThat(cache, notNullValue());
+
+    //log(JCacheConfiguration.class.getProtectionDomain().getCodeSource().getLocation());
+    //JCacheConfiguration config = (JCacheConfiguration) cache.getConfiguration(JCacheConfiguration.class);
+    //log(config.getExpiryPolicy().getExpiryForAccess());
+    //log(config.getExpiryPolicy().getExpiryForAccess().isEternal());
+    //log(config.getExpiryPolicy().getExpiryForAccess().isZero());
+
+    Object key = "foo";
+    Object value = "bar";
+    Object result = cache.getAndPut(key, value);
+    log(result);
+    assertThat(result, nullValue());
+
+    result = cache.get(key);
+    log(result);
+    assertThat(result, is(value));
+
+    result = cache.get(key);
+    log(result);
+    assertThat(result, is(value));
+
+    result = cache.get(key);
+    log(result);
+    assertThat(result, is(value));
   }
 }
