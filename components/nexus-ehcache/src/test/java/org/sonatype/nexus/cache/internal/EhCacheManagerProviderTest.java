@@ -77,7 +77,7 @@ public class EhCacheManagerProviderTest
     log(cacheManager);
     assertThat(cacheManager, notNullValue());
 
-    Cache cache = cacheManager.getCache("testEternalCache");
+    Cache<Object,Object> cache = cacheManager.getCache("testEternalCache", Object.class, Object.class);
     log(cache);
     assertThat(cache, notNullValue());
 
