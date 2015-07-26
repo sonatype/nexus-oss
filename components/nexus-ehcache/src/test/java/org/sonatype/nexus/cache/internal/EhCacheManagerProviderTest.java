@@ -70,7 +70,6 @@ public class EhCacheManagerProviderTest
   }
 
   @Test
-  //@Ignore("Disabled due to https://github.com/ehcache/ehcache-jcache/issues/40")
   public void preconfiguredCacheWithEternal() {
     CacheManager cacheManager = underTest.get();
     log(cacheManager);
@@ -79,12 +78,6 @@ public class EhCacheManagerProviderTest
     Cache<Object,Object> cache = cacheManager.getCache("testEternalCache", Object.class, Object.class);
     log(cache);
     assertThat(cache, notNullValue());
-
-    //log(JCacheConfiguration.class.getProtectionDomain().getCodeSource().getLocation());
-    //JCacheConfiguration config = (JCacheConfiguration) cache.getConfiguration(JCacheConfiguration.class);
-    //log(config.getExpiryPolicy().getExpiryForAccess());
-    //log(config.getExpiryPolicy().getExpiryForAccess().isEternal());
-    //log(config.getExpiryPolicy().getExpiryForAccess().isZero());
 
     Object key = "foo";
     Object value = "bar";

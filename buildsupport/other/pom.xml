@@ -168,17 +168,6 @@
         <version>1.0.0</version>
       </dependency>
 
-      <!--<dependency>-->
-        <!--<groupId>org.ehcache</groupId>-->
-        <!--<artifactId>jcache</artifactId>-->
-        <!--<version>1.0.1</version>-->
-        <!--<exclusions>-->
-          <!--<exclusion>-->
-            <!--<groupId>net.sf.ehcache</groupId>-->
-            <!--<artifactId>ehcache</artifactId>-->
-          <!--</exclusion>-->
-        <!--</exclusions>-->
-      <!--</dependency>-->
     </dependencies>
   </dependencyManagement>
 

@@ -64,7 +64,21 @@ Ext.define('NX.controller.dev.Stores', {
       store = Ext.data.StoreManager.get(storeId);
       if (store) {
         Ext.each(store.model.getFields(), function (field) {
-          columns.push({ text: field.name, dataIndex: field.name });
+          columns.push({
+            text: field.name,
+            dataIndex: field.name,
+            renderer: function(value) {
+              if (Ext.isObject(value) || Ext.isArray(value)) {
+                try {
+                  return Ext.encode(value);
+                }
+                catch (e) {
+                  console.error('Failed to encode value:', value, e);
+                }
+              }
+              return value;
+            }
+          });
         });
         panel.removeAll(true);
         panel.add({

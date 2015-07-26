@@ -69,11 +69,6 @@
       <artifactId>shiro-web</artifactId>
     </dependency>
 
-    <!--<dependency>-->
-      <!--<groupId>org.apache.shiro</groupId>-->
-      <!--<artifactId>shiro-ehcache</artifactId>-->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-guice</artifactId>
