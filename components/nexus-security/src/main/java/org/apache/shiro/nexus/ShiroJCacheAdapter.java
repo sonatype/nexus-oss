@@ -20,6 +20,8 @@ import java.util.Set;
 
 import javax.cache.Cache.Entry;
 
+import org.sonatype.sisu.goodies.common.ComponentSupport;
+
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 
@@ -31,52 +33,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 3.0
  */
 public class ShiroJCacheAdapter<K, V>
+  extends ComponentSupport
   implements Cache<K, V>
 {
   private final javax.cache.Cache<K, V> cache;
 
+  private final String name;
+
   public ShiroJCacheAdapter(final javax.cache.Cache<K, V> cache) {
     this.cache = checkNotNull(cache);
+    this.name = cache.getName();
   }
 
   @Override
   public V get(final K key) throws CacheException {
-    try {
-      return cache.get(key);
-    }
-    catch (Throwable t) {
-      throw new CacheException(t);
-    }
+    return cache.get(key);
   }
 
   @Override
   public V put(final K key, final V value) throws CacheException {
-    try {
-      return cache.getAndPut(key, value);
-    }
-    catch (Throwable t) {
-      throw new CacheException(t);
-    }
+    return cache.getAndPut(key, value);
   }
 
   @Override
   public V remove(final K key) throws CacheException {
-    try {
-      return cache.getAndRemove(key);
-    }
-    catch (Throwable t) {
-      throw new CacheException(t);
-    }
+    return cache.getAndRemove(key);
   }
 
   @Override
   public void clear() throws CacheException {
-    try {
-      cache.clear();
-    }
-    catch (Throwable t) {
-      throw new CacheException(t);
-    }
+    cache.clear();
   }
 
   @Override
@@ -104,5 +90,13 @@ public class ShiroJCacheAdapter<K, V>
       values.add(entry.getValue());
     }
     return Collections.unmodifiableCollection(values);
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "{" +
+        "cache=" + cache +
+        ", name='" + name + '\'' +
+        '}';
   }
 }

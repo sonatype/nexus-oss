@@ -17,7 +17,6 @@ import javax.cache.expiry.EternalExpiryPolicy;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
-import com.google.common.base.Throwables;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
@@ -44,22 +43,14 @@ public class ShiroJCacheManagerAdapter
 
   @Override
   public <K, V> Cache<K, V> getCache(final String name) throws CacheException {
-    try {
-      return new ShiroJCacheAdapter<>(this.<K,V>maybeCreateCache(name));
-    }
-    catch (Throwable t) {
-      throw new CacheException(t);
-    }
+    log.debug("Getting cache: {}", name);
+
+    return new ShiroJCacheAdapter<>(this.<K,V>maybeCreateCache(name));
   }
 
   @Override
   public void destroy() throws Exception {
-    try {
-      cacheManager.close();
-    }
-    catch (Throwable t) {
-      throw Throwables.propagate(t);
-    }
+    cacheManager.close();
   }
 
   @Override
@@ -79,6 +70,9 @@ public class ShiroJCacheManagerAdapter
 
       cache = cacheManager.createCache(name, cacheConfig);
       log.debug("Created cache: {}", cache);
+    }
+    else {
+      log.debug("Re-using existing cache: {}", cache);
     }
     return cache;
   }
