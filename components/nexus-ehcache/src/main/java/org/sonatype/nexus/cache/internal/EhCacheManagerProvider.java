@@ -32,7 +32,6 @@ import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import org.ehcache.jcache.JCacheCachingProvider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -93,10 +92,10 @@ public class EhCacheManagerProvider
       }
     }
 
-    // EHCache bundle has dynamic import, so it's the preferred choice here
-    ClassLoader classLoader = net.sf.ehcache.CacheManager.class.getClassLoader();
+    Class type = org.ehcache.jsr107.EhcacheCachingProvider.class;
+    ClassLoader classLoader = type.getClassLoader();
 
-    CachingProvider provider = Caching.getCachingProvider(JCacheCachingProvider.class.getName(), classLoader);
+    CachingProvider provider = Caching.getCachingProvider(type.getName(), classLoader);
     log.info("Creating cache-manager with configuration: {}", config);
     CacheManager manager = provider.getCacheManager(config, classLoader);
     log.debug("Created cache-manager: {}", manager);
@@ -105,7 +104,7 @@ public class EhCacheManagerProvider
 
   @Override
   public CacheManager get() {
-    checkState(cacheManager != null, "Cache-manger destroyed");
+    checkState(cacheManager != null, "Cache-manager destroyed");
     return cacheManager;
   }
 

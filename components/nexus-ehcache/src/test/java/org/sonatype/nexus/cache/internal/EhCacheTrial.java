@@ -14,18 +14,11 @@ package org.sonatype.nexus.cache.internal;
 
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.Configuration;
-import net.sf.ehcache.config.ConfigurationFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
+//import net.sf.ehcache.Cache;
+//import net.sf.ehcache.CacheManager;
+//import net.sf.ehcache.Element;
+//import net.sf.ehcache.config.Configuration;
+//import net.sf.ehcache.config.ConfigurationFactory;
 
 /**
  * Trails of basic EhCache.
@@ -33,42 +26,42 @@ import static org.junit.Assert.assertThat;
 public class EhCacheTrial
     extends TestSupport
 {
-  private CacheManager underTest;
-
-  @Before
-  public void setUp() throws Exception {
-    Configuration configuration = ConfigurationFactory.parseConfiguration(getClass().getResource("ehcache-test.xml"));
-    configuration.setUpdateCheck(false);
-    this.underTest = new CacheManager(configuration);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    if (underTest != null) {
-      underTest.shutdown();
-    }
-  }
-
-  @Test
-  public void preconfiguredCacheWithEternal() {
-    Cache cache = underTest.getCache("testEternalCache");
-    log(cache);
-    assertThat(cache, notNullValue());
-
-    Object key = "foo";
-    Object value = "bar";
-    cache.put(new Element(key, value));
-
-    Element result = cache.get(key);
-    log(result);
-    assertThat(result.getObjectValue(), is(value));
-
-    result = cache.get(key);
-    log(result);
-    assertThat(result.getObjectValue(), is(value));
-
-    result = cache.get(key);
-    log(result);
-    assertThat(result.getObjectValue(), is(value));
-  }
+  //private CacheManager underTest;
+  //
+  //@Before
+  //public void setUp() throws Exception {
+  //  Configuration configuration = ConfigurationFactory.parseConfiguration(getClass().getResource("ehcache-test.xml"));
+  //  configuration.setUpdateCheck(false);
+  //  this.underTest = new CacheManager(configuration);
+  //}
+  //
+  //@After
+  //public void tearDown() throws Exception {
+  //  if (underTest != null) {
+  //    underTest.shutdown();
+  //  }
+  //}
+  //
+  //@Test
+  //public void preconfiguredCacheWithEternal() {
+  //  Cache cache = underTest.getCache("testEternalCache");
+  //  log(cache);
+  //  assertThat(cache, notNullValue());
+  //
+  //  Object key = "foo";
+  //  Object value = "bar";
+  //  cache.put(new Element(key, value));
+  //
+  //  Element result = cache.get(key);
+  //  log(result);
+  //  assertThat(result.getObjectValue(), is(value));
+  //
+  //  result = cache.get(key);
+  //  log(result);
+  //  assertThat(result.getObjectValue(), is(value));
+  //
+  //  result = cache.get(key);
+  //  log(result);
+  //  assertThat(result.getObjectValue(), is(value));
+  //}
 }

@@ -28,16 +28,16 @@
   <packaging>bundle</packaging>
 
   <description>
-    Provides stripped down bundle of mvn:net.sf.ehcache:ehcache:${ehcache.version}.
+    Provides bundle of mvn:org.ehcache:ehcache:${ehcache.version}.
   </description>
 
   <properties>
-    <ehcache.version>2.10.0</ehcache.version>
+    <ehcache.version>3.0.0.m1</ehcache.version>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>net.sf.ehcache</groupId>
+      <groupId>org.ehcache</groupId>
       <artifactId>ehcache</artifactId>
       <version>${ehcache.version}</version>
     </dependency>
@@ -57,24 +57,18 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Description>${project.description}</Bundle-Description>
-            <Export-Package>net.sf.ehcache*;version=${ehcache.version};-split-package:=merge-first</Export-Package>
+            <Export-Package>org.ehcache*;version=${ehcache.version};-split-package:=merge-first</Export-Package>
             <Private-Package>org.terracotta.*</Private-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
             <Import-Package>
               javax.management*,
-              javax.naming*,
               javax.xml.parsers,
               org.xml.sax*,
               javax.servlet;resolution:=optional,
-              javax.transaction*;resolution:=optional,
-              org.hibernate*;resolution:=optional,
               org.slf4j;resolution:=optional,
-              javax.jms;resolution:=optional,
               sun.misc;resolution:=optional,
-              org.quartz*;resolution:=optional,
-              org.terracotta.quartz.*;resolution:=optional,
-              org.terracotta.toolkit.*;resolution:=optional,
-              com.terracotta*;resolution:=optional,
+              sun.security.action;resolution:=optional,
+              com.sun.jmx.mbeanserver;resolution:=optional,
               *
             </Import-Package>
           </instructions>
@@ -98,18 +92,14 @@
               <createSourcesJar>true</createSourcesJar>
               <artifactSet>
                 <includes>
-                  <include>net.sf.ehcache:ehcache</include>
+                  <include>org.ehcache:ehcache</include>
                 </includes>
               </artifactSet>
               <filters>
                 <filter>
-                  <artifact>net.sf.ehcache:ehcache</artifact>
+                  <artifact>org.ehcache:ehcache</artifact>
                   <includes>
-                    <include>net/sf/ehcache/**</include>
-                    <include>org/terracotta/context/**</include>
-                    <include>org/terracotta/statistics/**</include>
-                    <include>ehcache-failsafe.xml</include>
-                    <include>META-INF/maven/net.sf.ehcache/**</include>
+                    <include>**</include>
                   </includes>
                 </filter>
               </filters>
