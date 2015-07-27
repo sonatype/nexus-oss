@@ -217,6 +217,7 @@ public class JettyServer
     log.info("Stopping");
 
     thread.stopComponents();
+    connectorManager = null;
     thread = null;
 
     log.info("Stopped");
