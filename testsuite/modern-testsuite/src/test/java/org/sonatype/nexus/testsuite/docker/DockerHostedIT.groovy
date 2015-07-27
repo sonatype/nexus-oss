@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.testsuite.docker
 
-import org.sonatype.nexus.repository.Repository
-
 import org.junit.Test
 
 /**
@@ -27,6 +25,8 @@ class DockerHostedIT
   void pushAndPull() {
     def repository = createDockerHostedRepository()
     def client = createDockerClient(repository)
+
+    client.push('hello-world')
   }
 
 }

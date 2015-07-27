@@ -18,6 +18,8 @@ import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.storage.WritePolicy
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport
 
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.impl.client.StandardHttpRequestRetryHandler
 import org.junit.Rule
 import org.junit.rules.TestName
 
@@ -31,13 +33,9 @@ class DockerITSupport
   @Rule
   public TestName testName = new TestName();
 
-  //  @org.ops4j.pax.exam.Configuration
-  //  public static Option[] configureNexus() {
-  //    return options(
-  //        NexusCoreITSupport.configureNexus(),
-  //        wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject())
-  //    )
-  //  }
+  public DockerITSupport() {
+    testData.addDirectory(resolveBaseFile("target/it-resources/docker"))
+  }
 
   Repository createDockerHostedRepository() {
     return createRepository(new Configuration(
@@ -57,7 +55,9 @@ class DockerITSupport
   }
 
   DockerClient createDockerClient(final Repository repository) {
-    return new DockerClient(clientBuilder().build(), clientContext(), repository)
+    def builder = clientBuilder()
+    builder.setRetryHandler(new StandardHttpRequestRetryHandler(0, false));
+    return new DockerClient(builder.build(), clientContext(), repository, testData)
   }
 
 }
