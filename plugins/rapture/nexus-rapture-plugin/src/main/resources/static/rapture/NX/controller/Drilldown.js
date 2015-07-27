@@ -349,13 +349,33 @@ Ext.define('NX.controller.Drilldown', {
 
     // getById() throws an error if a model ID is found, but not cached, check for content first
     if (store.getCount()) {
-      model = store.getById(modelId);
+      model = me.getById(store, modelId);
       if (model === null) {
-        model = store.getById(parseInt(modelId)); // check for integer model id
+        model = me.getById(store, parseInt(modelId)); // check for integer model id
+      }
+      if (model === null) {
+        return;
       }
       lists[index].fireEvent('selection', lists[index], model);
       me.loadView(index + 1, false, model);
     }
+  },
+
+  /**
+   * @private
+   * Get a model from the specified store with the specified ID. Avoids exceptions
+   * that arise from using Ext.data.Store.getById() with buffered stores.
+   */
+  getById: function (store, modelId) {
+    var index = store.findBy(function(record) {
+      return record.getId() === modelId;
+    });
+
+    if (index !== -1) {
+      return store.getAt(index);
+    }
+
+    return null;
   },
 
   /**
