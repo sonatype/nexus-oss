@@ -96,7 +96,7 @@ Ext.define('NX.controller.Drilldown', {
     // Drilldown
     componentListener[(me.masters[0] || me.detail) + ' ^ nx-drilldown'] = {
       syncsize: me.syncSizeToOwner,
-      resetdrilldown: function() {
+      activate: function() {
         me.currentIndex = 0;
         me.reselect();
         me.syncSizeToOwner();
@@ -159,10 +159,14 @@ Ext.define('NX.controller.Drilldown', {
    * Load all of the stores associated with this controller
    */
   loadStores: function () {
+    var me = this;
     if (this.getFeature()) {
-      for (var i = 0; i < this.stores.length; ++i) {
-        this.getStore(this.stores[i]).load();
-      }
+      Ext.each(this.stores, function(store){
+        //<if debug>
+        me.logDebug('Loading Drilldown store: ', store);
+        //</if>
+        me.getStore(store).load();
+      });
     }
   },
 

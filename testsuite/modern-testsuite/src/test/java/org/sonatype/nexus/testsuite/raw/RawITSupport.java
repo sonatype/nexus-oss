@@ -28,6 +28,7 @@ import org.sonatype.nexus.repository.storage.WritePolicy;
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport;
 
 import org.junit.Before;
+import org.junit.experimental.categories.Category;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
@@ -35,6 +36,7 @@ import static java.util.Arrays.asList;
 /**
  * Support class for raw ITs.
  */
+@Category(RawTestGroup.class)
 public class RawITSupport
     extends RepositoryTestSupport
 {

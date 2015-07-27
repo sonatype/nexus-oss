@@ -41,7 +41,8 @@ NX.TestHarness.start(
             { url: 'testsuite-oss/framework/mode_button.t.js' },
             { url: 'testsuite-oss/framework/unsupported_browser.t.js' },
             { url: 'testsuite-oss/framework/bookmarking_unauthenticated.t.js' },
-            { url: 'testsuite-oss/framework/bookmarking_authenticated.t.js' }
+            { url: 'testsuite-oss/framework/bookmarking_authenticated.t.js' },
+            { url: 'testsuite-oss/framework/drilldown_back_button.t.js' }
           ]
         }
       ]
@@ -65,6 +66,7 @@ NX.TestHarness.start(
       items: [
         {
           group: 'FT',
+          waitForTimeout: 60000,
           items: [
             { url: 'testsuite-oss/search/search_basic.t.js' }
           ]
