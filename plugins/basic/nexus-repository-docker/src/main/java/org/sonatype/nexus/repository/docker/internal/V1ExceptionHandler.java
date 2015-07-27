@@ -37,9 +37,10 @@ public class V1ExceptionHandler
       return context.proceed();
     }
     catch (V1ApiException e) {
-      log.warn("Error: {} {}: {}",
+      log.warn("Error: {} {}: {} - {}",
           context.getRequest().getAction(),
           context.getRequest().getPath(),
+          e.getHttpCode(),
           e.toString());
 
       return new Response.Builder()
