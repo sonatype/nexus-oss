@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @since 3.0
  */
-public class JsonUtils
+class JsonUtils
 {
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
