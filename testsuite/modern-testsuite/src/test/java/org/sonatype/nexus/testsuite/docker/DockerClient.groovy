@@ -20,6 +20,8 @@ import org.sonatype.sisu.litmus.testsupport.TestData
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Charsets
+import com.google.common.io.ByteStreams
+import com.google.common.io.Files
 import org.apache.commons.io.FileUtils
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
@@ -71,7 +73,7 @@ class DockerClient
     def images = readImages("/v1/repositories/${name}/images/${tag}")
     def imagesToPush = []
     images.each { id ->
-      if (status(consume(getIt(endpoint, "/v1/images/${id}/json"))) == NOT_FOUND) {
+      if (status(consume(get(endpoint, "/v1/images/${id}/json"))) == NOT_FOUND) {
         imagesToPush << id
       }
     }
@@ -94,6 +96,29 @@ class DockerClient
     ))) == NO_CONTENT
   }
 
+  void pull(final String name, String tag = 'latest', final File workDir) {
+    def response = consume(get(repositoryBaseUri.toASCIIString(), "/v1/repositories/${name}/images"))
+    assert status(response) == OK
+    def endpoint = response.getFirstHeader('X-Docker-Endpoints')?.value
+    assert endpoint
+    endpoint = "http://" + endpoint
+    response = get(endpoint, "/v1/repositories/${name}/tags")
+    assert status(response) == OK
+    def tags = readTags(response)
+    def tagLayerId = tags[tag]
+    assert tagLayerId
+    response = get(endpoint, "/v1/images/${tagLayerId}/ancestry")
+    assert status(response) == OK
+    def ancestry = readAncestry(response)
+    ancestry.each { layerId ->
+      response = get(endpoint, "/v1/images/${layerId}/json", workDir)
+      def checksum = response.getFirstHeader('X-Docker-Checksum-Payload')
+      assert checksum
+      save(new ByteArrayInputStream(checksum.value.bytes), "/v1/images/${layerId}/checksum", workDir)
+      get(endpoint, "/v1/images/${layerId}/layer", workDir)
+    }
+  }
+
   private HttpResponse put(String baseUri, String path, String contentType) {
     return put(baseUri, path, path, contentType)
   }
@@ -114,9 +139,24 @@ class DockerClient
     return execute(put)
   }
 
-  private HttpResponse getIt(String baseUri, String path) {
+  private HttpResponse get(String baseUri, String path) {
     HttpGet get = new HttpGet(new URI("${baseUri}${path}"))
     return execute(get)
+  }
+
+  private HttpResponse get(String baseUri, String path, File workDir) {
+    def response = get(baseUri, path)
+    assert status(response) == OK
+    save(response.entity.content, path, workDir)
+    return response
+  }
+
+  def save(final InputStream inputStream, final String path, final File workDir) {
+    File target = new File(workDir, path)
+    Files.createParentDirs(target)
+    inputStream.withStream {
+      ByteStreams.copy(it, new FileOutputStream(target))
+    }
   }
 
   private List<String> readImages(final String path) {
@@ -126,6 +166,16 @@ class DockerClient
     return images.collect { image ->
       image['id'] as String
     }
+  }
+
+  private static Map<String, String> readTags(final HttpResponse response) {
+    TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {};
+    return mapper.readValue(response.entity.content, typeRef)
+  }
+
+  private static List<String> readAncestry(final HttpResponse response) {
+    TypeReference<List<String>> typeRef = new TypeReference<List<String>>() {};
+    return mapper.readValue(response.entity.content, typeRef)
   }
 
   private static HttpResponse consume(final HttpResponse response) {

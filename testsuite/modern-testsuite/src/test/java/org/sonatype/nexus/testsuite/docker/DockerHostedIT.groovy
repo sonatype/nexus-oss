@@ -14,6 +14,9 @@ package org.sonatype.nexus.testsuite.docker
 
 import org.junit.Test
 
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.matchSha1
+
 /**
  * Docker Hosted ITs.
  */
@@ -25,8 +28,21 @@ class DockerHostedIT
   void pushAndPull() {
     def repository = createDockerHostedRepository()
     def client = createDockerClient(repository)
+    def workDir = testIndex.getDirectory('docker')
 
     client.push('hello-world')
+    client.pull('hello-world', workDir)
+    [
+        '511136ea3c5a64f264b78b5433614aec563103b4d4702f3ba7d4d2698e22c158',
+        '31cbccb51277105ba3ae35ce33c22b69c9e3f1002e76e4c736a2e8ebff9d7b5d',
+        'e45a5af57b00862e5ef5782a9925979a02ba2b12dff832fd0991335f4a11e5c5'
+    ].each { layerId ->
+      ['json', 'layer', 'checksum'].each { type ->
+        def expected = testData.resolveFile("/v1/images/${layerId}/${type}")
+        def actual = new File(workDir, "/v1/images/${layerId}/${type}")
+        assertThat(actual, matchSha1(expected))
+      }
+    }
   }
 
 }

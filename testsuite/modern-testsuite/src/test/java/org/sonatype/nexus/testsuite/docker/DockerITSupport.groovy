@@ -18,7 +18,6 @@ import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.storage.WritePolicy
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport
 
-import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler
 import org.junit.Rule
 import org.junit.rules.TestName
