@@ -86,7 +86,7 @@ Ext.define('NX.coreui.controller.Repositories', {
     },
     visible: function() {
       // Show feature if the current user is permitted any repository-admin permissions
-      return NX.Permissions.checkExistsWithPrefix('nexus:repository-admin') && NX.State.getUser();
+      return NX.Permissions.checkExistsWithPrefix('nexus:repository-admin');
     }
   },
 
@@ -120,6 +120,18 @@ Ext.define('NX.coreui.controller.Repositories', {
         },
         'nx-coreui-repository-list button[action=new]': {
           click: me.showSelectRecipePanel
+        },
+        'nx-coreui-repository-feature button[action=rebuildIndex]': {
+          click: me.rebuildIndex,
+          afterrender: me.bindIfProxyOrHostedAndEditable
+        },
+        'nx-coreui-repository-feature button[action=invalidateProxyCache]': {
+          click: me.invalidateProxyCache,
+          afterrender: me.bindIfProxyAndEditable
+        },
+        'nx-coreui-repository-feature button[action=invalidateNegativeCache]': {
+          click: me.invalidateNegativeCache,
+          afterrender: me.bindIfProxyAndEditable
         },
         'nx-coreui-repository-settings-form': {
           submitted: me.loadStores
@@ -306,6 +318,119 @@ Ext.define('NX.coreui.controller.Repositories', {
     else {
       me.stopStatusPolling();
     }
+  },
+
+  /**
+   * @private
+   * Rebuild repository index for the selected Repository.
+   */
+  rebuildIndex: function() {
+    var me = this,
+        model = me.getList().getSelectionModel().getLastSelected();
+
+    NX.direct.coreui_Repository.rebuildIndex(model.getId(), function(response) {
+      if (Ext.isObject(response) && response.success) {
+        NX.Messages.add({ text: 'Repository index rebuilt: ' + me.getDescription(model), type: 'success' });
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Invalidate proxy cache for the selected proxy Repository.
+   */
+  invalidateProxyCache: function() {
+    var me = this,
+        model = me.getList().getSelectionModel().getLastSelected();
+
+    NX.direct.coreui_Repository.invalidateProxyCache(model.getId(), function(response) {
+      if (Ext.isObject(response) && response.success) {
+        NX.Messages.add({ text: 'Repository proxy cache invalidated: ' + me.getDescription(model), type: 'success' });
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Invalidate negative cache for the selected proxy Repository.
+   */
+  invalidateNegativeCache: function() {
+    var me = this,
+        model = me.getList().getSelectionModel().getLastSelected();
+
+    NX.direct.coreui_Repository.invalidateNegativeCache(model.getId(), function(response) {
+      if (Ext.isObject(response) && response.success) {
+        NX.Messages.add({ text: 'Repository negative cache invalidated: ' + me.getDescription(model), type: 'success' });
+      }
+    });
+  },
+
+  /**
+   * @private
+   * Enables button if the select repository is a proxy or hosted repository.
+   */
+  bindIfProxyOrHostedAndEditable: function (button) {
+    var permittedCondition;
+    button.mon(
+        NX.Conditions.and(
+            permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:edit'),
+            NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
+              permittedCondition.setPermission(
+                  'nexus:repository-admin:' + model.get('format') + ':' + model.get('name') + ':edit'
+              );
+              return true;
+            })
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
+    button.mon(
+        NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
+          return model.get('type') === 'proxy' || model.get('type') === 'hosted';
+        }),
+        {
+          satisfied: button.show,
+          unsatisfied: button.hide,
+          scope: button
+        }
+    );
+  },
+
+  /**
+   * @private
+   * Enables button if the select repository is a proxy repository.
+   */
+  bindIfProxyAndEditable: function (button) {
+    var permittedCondition;
+    button.mon(
+        NX.Conditions.and(
+            permittedCondition = NX.Conditions.isPermitted('nexus:repository-admin:*:*:edit'),
+            NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
+              permittedCondition.setPermission(
+                  'nexus:repository-admin:' + model.get('format') + ':' + model.get('name') + ':edit'
+              );
+              return true;
+            })
+        ),
+        {
+          satisfied: button.enable,
+          unsatisfied: button.disable,
+          scope: button
+        }
+    );
+    button.mon(
+        NX.Conditions.gridHasSelection('nx-coreui-repository-list', function(model) {
+          return model.get('type') === 'proxy';
+        }),
+        {
+          satisfied: button.show,
+          unsatisfied: button.hide,
+          scope: button
+        }
+    );
   },
 
   /**
