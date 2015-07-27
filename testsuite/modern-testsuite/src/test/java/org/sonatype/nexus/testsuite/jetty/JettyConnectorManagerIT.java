@@ -13,11 +13,12 @@
 package org.sonatype.nexus.testsuite.jetty;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.jetty.JettyConnectorManager;
+import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 
@@ -29,25 +30,26 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConfiguration.Customizer;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 /**
- * IT for {@link JettyConnectorManager}.
+ * IT for {@link ConnectorConfiguration}.
  */
 @ExamReactorStrategy(PerClass.class)
 public class JettyConnectorManagerIT
     extends NexusHttpsITSupport
 {
   @Inject
-  private JettyConnectorManager jettyConnectorManager;
+  private BundleContext bundleContext;
 
   private static final Customizer DUMMY_CUSTOMIZER = new Customizer()
   {
@@ -59,20 +61,31 @@ public class JettyConnectorManagerIT
   };
 
   @Test
-  public void testAvailableSchemas() {
-    // this is a NexusHttpsITSupport so both HTTP and HTTPS should be present
-    List<HttpScheme> supportedSchemes = jettyConnectorManager.supportedSchemes();
-    assertThat(supportedSchemes, contains(HttpScheme.HTTP, HttpScheme.HTTPS));
-  }
-
-  @Test
   public void testHttpConnectorAdd() throws Exception {
     final int newHttpPort = portRegistry.reservePort();
 
-    HttpConfiguration config = jettyConnectorManager.defaultHttpConfiguration(HttpScheme.HTTP);
-    config.addCustomizer(DUMMY_CUSTOMIZER);
-    final ServerConnector serverConnector = jettyConnectorManager.addConnector(HttpScheme.HTTP, newHttpPort, config);
-    serverConnector.start();
+    final ConnectorConfiguration connectorConfiguration = new ConnectorConfiguration()
+    {
+      @Override
+      public HttpScheme getScheme() {
+        return HttpScheme.HTTP;
+      }
+
+      @Override
+      public int getPort() {
+        return newHttpPort;
+      }
+
+      @Override
+      public HttpConfiguration customize(final HttpConfiguration configuration) {
+        configuration.addCustomizer(DUMMY_CUSTOMIZER);
+        return configuration;
+      }
+    };
+    final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "test"));
+    ServiceRegistration<ConnectorConfiguration> reg = bundleContext
+        .registerService(ConnectorConfiguration.class, connectorConfiguration, properties);
+
     try {
       HttpResponse response = new Maven2Client(
           clientBuilder().build(),
@@ -84,34 +97,50 @@ public class JettyConnectorManagerIT
       assertThat(entity, containsString("Jetty :: Jetty JSPC Maven Plugin"));
     }
     finally {
-      serverConnector.stop();
-      jettyConnectorManager.removeConnector(serverConnector);
+      reg.unregister();
       portRegistry.releasePort(newHttpPort);
     }
   }
 
   @Test
   public void testHttpsConnectorAdd() throws Exception {
-    final int newHttpsPort = portRegistry.reservePort();
+    final int newHttpPort = portRegistry.reservePort();
 
-    HttpConfiguration config = jettyConnectorManager.defaultHttpConfiguration(HttpScheme.HTTPS);
-    config.addCustomizer(DUMMY_CUSTOMIZER);
-    final ServerConnector serverConnector = jettyConnectorManager.addConnector(HttpScheme.HTTPS, newHttpsPort, config);
-    serverConnector.start();
+    final ConnectorConfiguration connectorConfiguration = new ConnectorConfiguration()
+    {
+      @Override
+      public HttpScheme getScheme() {
+        return HttpScheme.HTTPS;
+      }
+
+      @Override
+      public int getPort() {
+        return newHttpPort;
+      }
+
+      @Override
+      public HttpConfiguration customize(final HttpConfiguration configuration) {
+        configuration.addCustomizer(DUMMY_CUSTOMIZER);
+        return configuration;
+      }
+    };
+    final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "test"));
+    ServiceRegistration<ConnectorConfiguration> reg = bundleContext
+        .registerService(ConnectorConfiguration.class, connectorConfiguration, properties);
+
     try {
       HttpResponse response = new Maven2Client(
           clientBuilder().build(),
           clientContext(),
-          URI.create("https://localhost:"+newHttpsPort+"/")
+          URI.create("https://localhost:" + newHttpPort + "/")
       ).get("/whatever/path/it/will/be/rewritten/anyways");
       assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
       String entity = EntityUtils.toString(response.getEntity());
       assertThat(entity, containsString("Jetty :: Jetty JSPC Maven Plugin"));
     }
     finally {
-      serverConnector.stop();
-      jettyConnectorManager.removeConnector(serverConnector);
-      portRegistry.releasePort(newHttpsPort);
+      reg.unregister();
+      portRegistry.releasePort(newHttpPort);
     }
   }
 }

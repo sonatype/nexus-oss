@@ -48,9 +48,7 @@ public final class ConnectorConfigurationServiceListener
         jettyServer.addCustomConnector(connectorConfiguration);
         break;
       case ServiceEvent.MODIFIED:
-        connectorConfiguration = (ConnectorConfiguration) bundleContext.getService(event.getServiceReference());
-        jettyServer.removeCustomConnector(connectorConfiguration);
-        jettyServer.addCustomConnector(connectorConfiguration);
+        // em, what would mean this?
         break;
       case ServiceEvent.UNREGISTERING:
         connectorConfiguration = (ConnectorConfiguration) bundleContext.getService(event.getServiceReference());
