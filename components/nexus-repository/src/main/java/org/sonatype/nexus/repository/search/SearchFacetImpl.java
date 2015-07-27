@@ -13,7 +13,6 @@
 package org.sonatype.nexus.repository.search;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -36,7 +35,6 @@ import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -54,7 +52,6 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NA
 public class SearchFacetImpl
     extends FacetSupport
     implements SearchFacet
-
 {
   private final SearchService searchService;
 
@@ -77,6 +74,34 @@ public class SearchFacetImpl
   }
 
   @Override
+  @Guarded(by = STARTED)
+  public void rebuildIndex() {
+    log.info("Rebuilding index of repository {}", getRepository().getName());
+    searchService.rebuildIndex(getRepository());
+    UnitOfWork.begin(facet(StorageFacet.class).txSupplier());
+    try {
+      rebuildComponentIndex();
+    }
+    finally {
+      UnitOfWork.end();
+    }
+  }
+
+  @Transactional
+  protected void rebuildComponentIndex() {
+    final StorageTx tx = UnitOfWork.currentTransaction();
+    for (Component component : tx.browseComponents(tx.getBucket())) {
+      try {
+        put(component, tx.browseAssets(component));
+      }
+      catch (IOException e) {
+        // one "bad" should not stop processing whole repository
+        log.warn("Could not reindex component: {}", component, e);
+      }
+    }
+  }
+
+  @Override
   protected void doInit(final Configuration configuration) throws Exception {
     super.doInit(configuration);
     facet(StorageFacet.class).registerHookSupplier(searchHook);
@@ -90,20 +115,13 @@ public class SearchFacetImpl
   protected void put(final EntityId componentId) {
     checkNotNull(componentId);
     try {
-      Map<String, Object> additional = Maps.newHashMap();
-      additional.put(P_REPOSITORY_NAME, getRepository().getName());
       Component component;
-      List<Asset> assets;
-
       final StorageTx tx = UnitOfWork.currentTransaction();
       component = tx.findComponent(componentId, tx.getBucket());
       if (component == null) {
         return;
       }
-      assets = Lists.newArrayList(tx.browseAssets(component));
-
-      String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));
-      searchService.put(getRepository(), EntityHelper.id(component).toString(), json);
+      put(component, tx.browseAssets(component));
     }
     catch (IOException e) {
       throw Throwables.propagate(e);
@@ -115,6 +133,7 @@ public class SearchFacetImpl
    */
   @Guarded(by = STARTED)
   protected void delete(final EntityId componentId) {
+    checkNotNull(componentId);
     searchService.delete(getRepository(), componentId.toString());
   }
 
@@ -131,6 +150,18 @@ public class SearchFacetImpl
 
   Supplier<StorageTx> txSupplier() {
     return getRepository().facet(StorageFacet.class).txSupplier();
+  }
+
+  /**
+   * Extracts metadata from passed in {@link Component} and {@link Asset}s, and PUTs it into the repository's index.
+   *
+   * @throws IOException if some problem happens during metadata production.
+   */
+  private void put(final Component component, final Iterable<Asset> assets) throws IOException {
+    Map<String, Object> additional = Maps.newHashMap();
+    additional.put(P_REPOSITORY_NAME, getRepository().getName());
+    String json = JsonUtils.merge(componentMetadata(component, assets), JsonUtils.from(additional));
+    searchService.put(getRepository(), EntityHelper.id(component).toString(), json);
   }
 
   /**
