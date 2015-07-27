@@ -88,7 +88,7 @@ public class SearchFacetImpl
   }
 
   @Transactional
-  private void rebuildComponentIndex() {
+  protected void rebuildComponentIndex() {
     final StorageTx tx = UnitOfWork.currentTransaction();
     for (Component component : tx.browseComponents(tx.getBucket())) {
       try {
