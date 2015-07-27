@@ -121,6 +121,10 @@
           <artifactItems>
             <item>
               <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-docker-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-maven-test-data</artifactId>
             </item>
             <item>
