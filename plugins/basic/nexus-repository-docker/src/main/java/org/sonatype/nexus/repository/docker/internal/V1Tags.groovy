@@ -12,11 +12,10 @@
  */
 package org.sonatype.nexus.repository.docker.internal
 
-import java.util.regex.Matcher
-
 import javax.inject.Named
 import javax.inject.Singleton
 
+import org.sonatype.nexus.repository.docker.DockerFacet
 import org.sonatype.nexus.repository.http.HttpResponses
 import org.sonatype.nexus.repository.view.Context
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
@@ -58,7 +57,7 @@ class V1Tags
     return HttpResponses.ok()
   }
 
-  protected static Map<String,String> parseUserAgent(Context context) {
+  protected static Map<String, String> parseUserAgent(Context context) {
     def userAgent = [:]
     if (context.request.headers[HttpHeaders.USER_AGENT]) {
       def userAgentEntries = [:]

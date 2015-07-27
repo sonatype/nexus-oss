@@ -20,6 +20,7 @@ import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
+import org.sonatype.nexus.repository.docker.RepositoryReverseProxyFacet;
 
 import com.google.common.base.Throwables;
 import org.eclipse.jetty.server.Server;

@@ -22,6 +22,7 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
+import org.sonatype.nexus.repository.docker.DockerFacet
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.http.HttpStatus
 import org.sonatype.nexus.repository.partial.PartialFetchHandler

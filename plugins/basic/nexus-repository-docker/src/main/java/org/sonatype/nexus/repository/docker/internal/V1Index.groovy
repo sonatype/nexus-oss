@@ -16,6 +16,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 import org.sonatype.nexus.repository.Repository
+import org.sonatype.nexus.repository.docker.DockerFacet
 import org.sonatype.nexus.repository.http.HttpResponses
 import org.sonatype.nexus.repository.view.Context
 import org.sonatype.nexus.repository.view.Response
