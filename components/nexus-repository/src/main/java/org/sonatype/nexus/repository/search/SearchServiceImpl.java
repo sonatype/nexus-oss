@@ -18,8 +18,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -55,7 +55,6 @@ import org.elasticsearch.search.internal.InternalSearchResponse;
 import org.elasticsearch.search.sort.SortBuilder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NAME;
 
 /**
  * Default {@link SearchService} implementation. It does not expects that {@link Repository} have storage facet
@@ -84,6 +83,8 @@ public class SearchServiceImpl
 
   private final List<IndexSettingsContributor> indexSettingsContributors;
 
+  private final ConcurrentMap<String, Boolean> indexRegistry;
+
   @Inject
   public SearchServiceImpl(final Provider<Client> client,
                            final RepositoryManager repositoryManager,
@@ -94,6 +95,7 @@ public class SearchServiceImpl
     this.repositoryManager = checkNotNull(repositoryManager);
     this.securityHelper = checkNotNull(securityHelper);
     this.indexSettingsContributors = checkNotNull(indexSettingsContributors);
+    this.indexRegistry = Maps.newConcurrentMap();
   }
 
   @Override
@@ -134,6 +136,7 @@ public class SearchServiceImpl
         throw Throwables.propagate(e);
       }
     }
+    indexRegistry.put(repository.getName(), Boolean.TRUE);
   }
 
   @Override
@@ -143,6 +146,14 @@ public class SearchServiceImpl
       log.debug("Removing index of {}", repository);
       client.get().admin().indices().prepareDelete(safeIndexName(repository)).execute().actionGet();
     }
+    indexRegistry.remove(repository.getName());
+  }
+
+  public void rebuildIndex(final Repository repository) {
+    checkNotNull(repository);
+    indexRegistry.remove(repository.getName());
+    deleteIndex(repository);
+    createIndex(repository);
   }
 
   @Override
@@ -150,9 +161,10 @@ public class SearchServiceImpl
     checkNotNull(repository);
     checkNotNull(identifier);
     checkNotNull(json);
+    if (!indexRegistry.replace(repository.getName(), Boolean.TRUE, Boolean.TRUE)) {
+      return;
+    }
     log.debug("Adding to index document {} from {}: {}", identifier, repository, json);
-    Map<String, Object> additional = Maps.newHashMap();
-    additional.put(P_REPOSITORY_NAME, repository.getName());
     client.get().prepareIndex(safeIndexName(repository), TYPE, identifier)
         .setSource(json).execute();
   }
@@ -161,6 +173,9 @@ public class SearchServiceImpl
   public void delete(final Repository repository, final String identifier) {
     checkNotNull(repository);
     checkNotNull(identifier);
+    if (!indexRegistry.replace(repository.getName(), Boolean.TRUE, Boolean.TRUE)) {
+      return;
+    }
     log.debug("Removing from index document {} from {}", identifier, repository);
     client.get().prepareDelete(safeIndexName(repository), TYPE, identifier).execute();
   }

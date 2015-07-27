@@ -42,6 +42,11 @@ public interface SearchService
   void deleteIndex(Repository repository);
 
   /**
+   * Rebuilds index for specific reppsitory.
+   */
+  void rebuildIndex(Repository repository);
+
+  /**
    * Puts data with given identifier into index of given repository.
    */
   void put(Repository repository, String identifier, String json);
