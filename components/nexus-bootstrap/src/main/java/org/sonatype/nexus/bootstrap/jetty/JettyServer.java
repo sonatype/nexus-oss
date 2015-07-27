@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Jetty server.
- * 
+ *
  * @since 2.8
  */
 public class JettyServer
@@ -50,6 +50,8 @@ public class JettyServer
   private final String[] args;
 
   private JettyMainThread thread;
+
+  private ConnectorManager connectorManager;
 
   public JettyServer(final ClassLoader classLoader, final Map<String, String> properties, final String[] args) {
     if (classLoader == null) {
@@ -79,6 +81,14 @@ public class JettyServer
       throw (Error) e;
     }
     throw new Error(e);
+  }
+
+  public void addCustomConnector(final ConnectorConfiguration connectorConfiguration) {
+    connectorManager.addConnector(connectorConfiguration);
+  }
+
+  public void removeCustomConnector(final ConnectorConfiguration connectorConfiguration) {
+    connectorManager.removeConnector(connectorConfiguration);
   }
 
   public synchronized void start(final boolean waitForServer) throws Exception {
@@ -156,17 +166,17 @@ public class JettyServer
       throw new Exception("Failed to configure any components");
     }
 
-    thread = new JettyMainThread(components);
-    thread.setContextClassLoader(classLoader);
-    thread.startComponents(waitForServer);
-
     Server server = null;
     for (Object object : components) {
       if (object instanceof Server) {
         server = (Server) object;
       }
     }
-    JettyHolder.setHolder(new JettyHolder(thread.started, server, last.getProperties(), last.getIdMap()));
+    connectorManager = new ConnectorManager(server, last.getProperties(), last.getIdMap());
+
+    thread = new JettyMainThread(components);
+    thread.setContextClassLoader(classLoader);
+    thread.startComponents(waitForServer);
   }
 
   public synchronized void stop() throws Exception {
@@ -214,7 +224,7 @@ public class JettyServer
 
   /**
    * Jetty thread used to start components, wait for the server's threads to join and stop components.
-   * 
+   *
    * Needed so that once {@link JettyServer#stop()} returns that we know that the server has actually stopped,
    * which is required for embedding.
    */

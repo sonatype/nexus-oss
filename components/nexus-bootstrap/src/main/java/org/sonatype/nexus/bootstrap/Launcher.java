@@ -153,6 +153,10 @@ public class Launcher
     this.server = new JettyServer(cl, props, args);
   }
 
+  public JettyServer getServer() {
+    return server;
+  }
+
   public void start() throws Exception {
     start(true);
   }
