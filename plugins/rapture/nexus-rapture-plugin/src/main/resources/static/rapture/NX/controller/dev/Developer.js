@@ -20,6 +20,7 @@
 Ext.define('NX.controller.dev.Developer', {
   extend: 'NX.app.Controller',
   requires: [
+    'Ext.state.Manager',
     'NX.State',
     'NX.Messages'
   ],
@@ -78,6 +79,9 @@ Ext.define('NX.controller.dev.Developer', {
         },
         'nx-dev-tests button[action=toggleUnsupportedBrowser]': {
           click: me.toggleUnsupportedBrowser
+        },
+        'nx-dev-tests button[action=clearLocalState]': {
+          click: me.clearLocalState
         }
       }
     });
@@ -193,6 +197,19 @@ Ext.define('NX.controller.dev.Developer', {
    */
   toggleUnsupportedBrowser: function() {
     NX.State.setBrowserSupported(!NX.State.isBrowserSupported());
+  },
+
+  /**
+   * Clear local browser state.
+   *
+   * @private
+   */
+  clearLocalState: function() {
+    var provider = Ext.state.Manager.getProvider();
+    // HACK: provider.state is private
+    Ext.Object.each(provider.state, function (key, value) {
+      provider.clear(key);
+    });
   }
 
 });
