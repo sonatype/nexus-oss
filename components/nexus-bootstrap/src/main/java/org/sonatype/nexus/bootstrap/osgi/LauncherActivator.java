@@ -15,12 +15,9 @@ package org.sonatype.nexus.bootstrap.osgi;
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.ShutdownHelper;
 import org.sonatype.nexus.bootstrap.ShutdownHelper.ShutdownDelegate;
-import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
 import org.slf4j.MDC;
 
@@ -38,7 +35,7 @@ public class LauncherActivator
 
   private Launcher launcher;
 
-  private ConnectorConfigurationServiceListener connectorConfigurationServiceListener;
+  private ConnectorConfigurationTracker connectorConfigurationTracker;
 
   public void start(final BundleContext bundleContext) throws Exception {
     framework = (Framework) bundleContext.getBundle(0);
@@ -51,24 +48,17 @@ public class LauncherActivator
     launcher = new Launcher(basePath, null, null, args.split(","));
     launcher.startAsync();
 
-    connectorConfigurationServiceListener = new ConnectorConfigurationServiceListener(
+    connectorConfigurationTracker = new ConnectorConfigurationTracker(
         bundleContext,
         launcher.getServer()
     );
-    final String connectorFilter = "(objectclass=" + ConnectorConfiguration.class.getName() + ")";
-    bundleContext.addServiceListener(connectorConfigurationServiceListener, connectorFilter);
-
-    // activate so far registered ones
-    ServiceReference<?> references[] = bundleContext.getServiceReferences((String) null, connectorFilter);
-    for (int i = 0; references != null && i < references.length; i++) {
-      connectorConfigurationServiceListener.serviceChanged(new ServiceEvent(ServiceEvent.REGISTERED, references[i]));
-    }
+    connectorConfigurationTracker.open();
   }
 
   public void stop(final BundleContext bundleContext) throws Exception {
     try {
-      if (connectorConfigurationServiceListener != null) {
-        bundleContext.removeServiceListener(connectorConfigurationServiceListener);
+      if (connectorConfigurationTracker != null) {
+        connectorConfigurationTracker.close();
       }
       if (launcher != null) {
         launcher.stop();

@@ -16,7 +16,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import org.eclipse.jetty.http.HttpScheme;
-import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -26,68 +25,80 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 /**
  * Jetty's internal connector manager to manage custom {@link ConnectorConfiguration}s.
+ * <p/>
+ * Note: This class relies on "id" properties in Jetty XML configuration! Hence, the existing beans in Jetty XML
+ * should NOT be renamed, while adding new (with unique, non-clashing) IDs is okay thing to do.
  */
 public class ConnectorManager
 {
-  private final Server server;
+  private static final String HTTP_CONFIG_ID = "httpConfig";
 
-  private final Map<String, String> properties;
+  private static final String HTTP_CONNECTOR_ID = "httpConnector";
+
+  private static final String SSL_CONTEXT_FACTORY_ID = "sslContextFactory";
+
+  private static final String HTTPS_CONFIG_ID = "httpsConfig";
+
+  private static final String HTTPS_CONNECTOR_ID = "httpsConnector";
+
+  private final Server server;
 
   private final Map<String, Object> namedBeans;
 
   private final IdentityHashMap<ConnectorConfiguration, ServerConnector> managedConnectors;
 
   public ConnectorManager(final Server server,
-                          final Map<String, String> properties,
                           final Map<String, Object> namedBeans)
   {
     this.server = server;
-    this.properties = properties;
     this.namedBeans = namedBeans;
     this.managedConnectors = new IdentityHashMap<>();
   }
 
+  /**
+   * Adds and starts connector to Jetty based on passed in configuration.
+   */
   public ServerConnector addConnector(final ConnectorConfiguration connectorConfiguration)
   {
+    verifyConfiguration(connectorConfiguration.getScheme());
+
     final HttpConfiguration httpConfiguration =
         connectorConfiguration.customize(defaultHttpConfiguration(connectorConfiguration.getScheme()));
-
+    final ServerConnector connectorPrototype =
+        defaultConnector(connectorConfiguration.getScheme());
     final ServerConnector serverConnector;
     if (HttpScheme.HTTP == connectorConfiguration.getScheme()) {
-      final ConnectionFactory connectionFactory = new InstrumentedConnectionFactory(
-          new HttpConnectionFactory(httpConfiguration)
-      );
       serverConnector = new ServerConnector(
           server,
-          Integer.valueOf(property("http.acceptors", "-1")),
-          Integer.valueOf(property("http.selectors", "-1")),
-          connectionFactory
+          connectorPrototype.getAcceptors(),
+          connectorPrototype.getSelectorManager().getSelectorCount(),
+          new InstrumentedConnectionFactory(
+              new HttpConnectionFactory(httpConfiguration)
+          )
       );
     }
     else if (HttpScheme.HTTPS == connectorConfiguration.getScheme()) {
-      verifyHttpsEnabled();
-      final SslContextFactory sslContextFactory = bean("sslContextFactory", SslContextFactory.class);
-      final ConnectionFactory connectionFactory = new InstrumentedConnectionFactory(
-          new SslConnectionFactory(sslContextFactory, "http/1.1")
-      );
+      final SslContextFactory sslContextFactory = bean(SSL_CONTEXT_FACTORY_ID, SslContextFactory.class);
       serverConnector = new ServerConnector(
           server,
-          Integer.valueOf(property("ssl.acceptors", "-1")),
-          Integer.valueOf(property("ssl.selectors", "-1")),
-          connectionFactory,
+          connectorPrototype.getAcceptors(),
+          connectorPrototype.getSelectorManager().getSelectorCount(),
+          new InstrumentedConnectionFactory(
+              new SslConnectionFactory(sslContextFactory, "http/1.1")
+          ),
           new HttpConnectionFactory(httpConfiguration)
       );
     }
     else {
       throw new IllegalArgumentException("Unsupported HTTP Scheme: " + connectorConfiguration.getScheme());
     }
-    serverConnector.setHost(property("application-host", null));
+    serverConnector.setHost(connectorPrototype.getHost());
     serverConnector.setPort(connectorConfiguration.getPort());
-    serverConnector.setIdleTimeout(Long.valueOf(property("http.tineout", "30000")));
-    serverConnector.setSoLingerTime(Integer.valueOf(property("http.soLingerTime", "-1")));
-    serverConnector.setAcceptorPriorityDelta(Integer.valueOf(property("http.acceptorPriorityDelta", "0")));
-    serverConnector.setSelectorPriorityDelta(Integer.valueOf(property("http.selectorPriorityDelta", "0")));
-    serverConnector.setAcceptQueueSize(Integer.valueOf(property("http.acceptQueueSize", "0")));
+    serverConnector.setIdleTimeout(connectorPrototype.getIdleTimeout());
+    serverConnector.setSoLingerTime(connectorPrototype.getSoLingerTime());
+    serverConnector.setAcceptorPriorityDelta(connectorPrototype.getAcceptorPriorityDelta());
+    serverConnector.setSelectorPriorityDelta(connectorPrototype.getSelectorPriorityDelta());
+    serverConnector.setAcceptQueueSize(connectorPrototype.getAcceptQueueSize());
 
     managedConnectors.put(connectorConfiguration, serverConnector);
     server.addConnector(serverConnector);
@@ -101,6 +112,9 @@ public class ConnectorManager
     return serverConnector;
   }
 
+  /**
+   * Stops and removes the connector configuration from Jetty.
+   */
   public void removeConnector(final ConnectorConfiguration connectorConfiguration) {
     final ServerConnector serverConnector = managedConnectors.remove(connectorConfiguration);
     if (serverConnector != null) {
@@ -116,42 +130,68 @@ public class ConnectorManager
 
   // ==
 
-  private HttpConfiguration defaultHttpConfiguration(final HttpScheme httpScheme) {
-    if (HttpScheme.HTTP == httpScheme) {
-      return bean("httpConfig", HttpConfiguration.class);
-    }
-    else if (HttpScheme.HTTPS == httpScheme) {
-      verifyHttpsEnabled();
-      return bean("httpsConfig", HttpConfiguration.class);
-    }
-    else {
-      throw new IllegalArgumentException("Unsupported HTTP Scheme: " + httpScheme);
-    }
-  }
-
-  private void verifyHttpsEnabled() {
+  /**
+   * Verifies all the needed bits are present in Jetty XML configuration (as HTTPS must be enabled by users).
+   */
+  private void verifyConfiguration(final HttpScheme scheme) {
     try {
-      bean("sslContextFactory", SslContextFactory.class);
+      if (HttpScheme.HTTP == scheme) {
+        bean(HTTP_CONFIG_ID, HttpConfiguration.class);
+        bean(HTTP_CONNECTOR_ID, ServerConnector.class);
+      }
+      else if (HttpScheme.HTTPS == scheme) {
+        bean(SSL_CONTEXT_FACTORY_ID, SslContextFactory.class);
+        bean(HTTPS_CONFIG_ID, HttpConfiguration.class);
+        bean(HTTPS_CONNECTOR_ID, ServerConnector.class);
+      }
+      else {
+        throw new IllegalArgumentException("Unsupported HTTP Scheme: " + scheme);
+      }
     }
     catch (IllegalStateException e) {
       throw new IllegalStateException("Jetty HTTPS is not enabled in Nexus", e);
     }
   }
 
+  /**
+   * Returns the OOTB defined configuration for given HTTP scheme.
+   */
+  private HttpConfiguration defaultHttpConfiguration(final HttpScheme httpScheme) {
+    if (HttpScheme.HTTP == httpScheme) {
+      return bean(HTTP_CONFIG_ID, HttpConfiguration.class);
+    }
+    else if (HttpScheme.HTTPS == httpScheme) {
+      return bean(HTTPS_CONFIG_ID, HttpConfiguration.class);
+    }
+    else {
+      throw new IllegalArgumentException("Unsupported HTTP Scheme: " + httpScheme);
+    }
+  }
+
+  /**
+   * Returns the OOTB defined connector for given HTTP scheme.
+   */
+  private ServerConnector defaultConnector(final HttpScheme httpScheme) {
+    if (HttpScheme.HTTP == httpScheme) {
+      return bean(HTTP_CONNECTOR_ID, ServerConnector.class);
+    }
+    else if (HttpScheme.HTTPS == httpScheme) {
+      return bean(HTTPS_CONNECTOR_ID, ServerConnector.class);
+    }
+    else {
+      throw new IllegalArgumentException("Unsupported HTTP Scheme: " + httpScheme);
+    }
+  }
+
+  /**
+   * Gets a bean for Jetty XML configuration by name, casted to given type.
+   */
   private <T> T bean(final String name, final Class<T> clazz) {
     final Object bean = namedBeans.get(name);
     if (bean == null) {
-      throw new IllegalStateException("Jetty XML configuration does not contain bean with name: " + name);
+      throw new IllegalStateException(
+          "Jetty XML configuration does not contain bean with name: " + name + ", type=" + clazz.getName());
     }
     return clazz.cast(bean);
-  }
-
-  private String property(final String name, final String defaultValue) {
-    if (properties.containsKey(name)) {
-      return properties.get(name);
-    }
-    else {
-      return defaultValue;
-    }
   }
 }

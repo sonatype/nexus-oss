@@ -172,7 +172,7 @@ public class JettyServer
         server = (Server) object;
       }
     }
-    connectorManager = new ConnectorManager(server, last.getProperties(), last.getIdMap());
+    connectorManager = new ConnectorManager(server, last.getIdMap());
 
     thread = new JettyMainThread(components);
     thread.setContextClassLoader(classLoader);

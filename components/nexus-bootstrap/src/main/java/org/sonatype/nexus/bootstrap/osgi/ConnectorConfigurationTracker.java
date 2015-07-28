@@ -17,46 +17,36 @@ import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
+import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Watches for a {@link ConnectorConfiguration} services and registers them with {@link JettyServer}.
  *
  * @since 3.0
  */
-public final class ConnectorConfigurationServiceListener
-    implements ServiceListener
+public final class ConnectorConfigurationTracker
+    extends ServiceTracker<ConnectorConfiguration, ConnectorConfiguration>
 {
-  private final BundleContext bundleContext;
-
   private final JettyServer jettyServer;
 
-  public ConnectorConfigurationServiceListener(BundleContext bundleContext, JettyServer jettyServer)
+  public ConnectorConfigurationTracker(BundleContext bundleContext, JettyServer jettyServer)
       throws InvalidSyntaxException
   {
-    this.bundleContext = bundleContext;
+    super(bundleContext, ConnectorConfiguration.class.getName(), null);
     this.jettyServer = jettyServer;
   }
 
   @Override
-  public void serviceChanged(final ServiceEvent event) {
-    ConnectorConfiguration connectorConfiguration;
-    switch (event.getType()) {
-      case ServiceEvent.REGISTERED:
-        connectorConfiguration = (ConnectorConfiguration) bundleContext.getService(event.getServiceReference());
-        jettyServer.addCustomConnector(connectorConfiguration);
-        break;
-      case ServiceEvent.MODIFIED:
-        // em, what would mean this?
-        break;
-      case ServiceEvent.UNREGISTERING:
-        connectorConfiguration = (ConnectorConfiguration) bundleContext.getService(event.getServiceReference());
-        jettyServer.removeCustomConnector(connectorConfiguration);
-        break;
+  public ConnectorConfiguration addingService(ServiceReference<ConnectorConfiguration> reference) {
+    ConnectorConfiguration service = super.addingService(reference);
+    jettyServer.addCustomConnector(service);
+    return service;
+  }
 
-      default:
-        break;
-    }
+  @Override
+  public void removedService(ServiceReference<ConnectorConfiguration> reference, ConnectorConfiguration service) {
+    jettyServer.removeCustomConnector(service);
+    super.removedService(reference, service);
   }
 }
