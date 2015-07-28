@@ -73,7 +73,7 @@ public interface DockerFacet
    * @param layerId layer id
    * @param payload layer content
    */
-  void putLayer(String layerId, Payload payload) throws IOException;
+  void putLayerContent(String layerId, Payload payload) throws IOException;
 
   /**
    * Store layer checksum (validates storage of layer metadata/content)
@@ -111,11 +111,11 @@ public interface DockerFacet
   /**
    * Stores mapping between a tag and its layer id.
    *
-   * @param name     image name
-   * @param tag      image tag
-   * @param metadata metadata about docker daemon used (versions, os, arch)
-   * @param payload  layer id (JSON
+   * @param name           image name
+   * @param tag            image tag
+   * @param daemonMetadata metadata about used docker daemon (versions, os, arch)
+   * @param payload        layer id (JSON
    */
-  void putTag(String name, String tag, Map<String, String> metadata, Payload payload)
+  void putTag(String name, String tag, Map<String, String> daemonMetadata, Payload payload)
       throws IOException;
 }

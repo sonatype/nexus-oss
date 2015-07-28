@@ -72,7 +72,7 @@ class V1Images
     def repository = context.repository
     log.info '[putLayerContent] repository: {} tokens: {}', repository.name, state.tokens
 
-    repository.facet(DockerFacet).putLayer(state.tokens['layerId'], context.request.payload)
+    repository.facet(DockerFacet).putLayerContent(state.tokens['layerId'], context.request.payload)
 
     return HttpResponses.ok()
   }

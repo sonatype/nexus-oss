@@ -21,15 +21,13 @@ public interface DockerAttributes
 {
   String P_IN_PROGRESS = "inProgress";
 
-  String P_X_DOCKER_CHECKSUM = "X-Docker-Checksum";
-
   String P_X_DOCKER_CHECKSUM_PAYLOAD = "X-Docker-Checksum-Payload";
 
   String P_X_DOCKER_SIZE = "X-Docker-Size";
 
-  String P_METADATA = "metadata";
+  String P_DAEMON_METADATA = "daemonMetadata";
 
-  String P_IMAGE_ID = "layer";
+  String P_LAYER_ID = "layerId";
 
   String P_IMAGE_NAME = "imageName";
 

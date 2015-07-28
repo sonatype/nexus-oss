@@ -87,7 +87,7 @@ public class DockerFacetImpl
 
   private final static ObjectMapper mapper = new ObjectMapper();
 
-  private final static Pattern validImageId = Pattern.compile("^([a-f0-9]{16}|[a-f0-9]{64})$");
+  private final static Pattern validLayerId = Pattern.compile("^([a-f0-9]{16}|[a-f0-9]{64})$");
 
   private final static Pattern validTag = Pattern.compile("^[\\w][\\w.-]{0,127}$");
 
@@ -170,7 +170,7 @@ public class DockerFacetImpl
   @Override
   @Transactional(retryOn = IllegalStateException.class)
   public Payload getLayerMetadata(final String layerId) throws IOException {
-    validateImageId(layerId);
+    validateLayerId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String metadataAssetName = layerId + "/json";
@@ -192,28 +192,28 @@ public class DockerFacetImpl
 
   @Override
   public void putLayerMetadata(final String layerId, final Payload content) throws IOException {
-    validateImageId(layerId);
+    validateLayerId(layerId);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutMetadata(layerId, streamSupplier, content);
+      doPutLayerMetadata(layerId, streamSupplier, content);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutMetadata(final String imageId,
-                               final Supplier<InputStream> streamSupplier,
-                               final Payload payload)
+  protected void doPutLayerMetadata(final String layerId,
+                                    final Supplier<InputStream> streamSupplier,
+                                    final Payload payload)
       throws IOException
   {
     Map<String, Object> data = readMetadata(streamSupplier);
     if (!data.containsKey("id")) {
       throw new V1ApiException("Missing key 'id' in JSON");
     }
-    if (!data.get("id").equals(imageId)) {
+    if (!data.get("id").equals(layerId)) {
       throw new V1ApiException("JSON data contains invalid id");
     }
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = imageId + "/json";
+    String metadataAssetName = layerId + "/json";
     String parentId = (String) data.get(DockerAttributes.P_PARENT);
 
     Bucket bucket = tx.getBucket();
@@ -230,7 +230,7 @@ public class DockerFacetImpl
     if (ancestry == null) {
       ancestry = Lists.newArrayList();
     }
-    ancestry.add(0, imageId);
+    ancestry.add(0, layerId);
 
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     if (metadataAsset == null) {
@@ -263,7 +263,7 @@ public class DockerFacetImpl
   @Override
   @Transactional(retryOn = IllegalStateException.class)
   public Payload getLayerContent(final String layerId) throws IOException {
-    validateImageId(layerId);
+    validateLayerId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String metadataAssetName = layerId + "/json";
@@ -283,21 +283,23 @@ public class DockerFacetImpl
   }
 
   @Override
-  public void putLayer(final String layerId, final Payload content) throws IOException, InvalidContentException {
-    validateImageId(layerId);
+  public void putLayerContent(final String layerId, final Payload content) throws IOException, InvalidContentException {
+    validateLayerId(layerId);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutLayer(layerId, streamSupplier, content);
+      doPutLayerContent(layerId, streamSupplier, content);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutLayer(final String imageId, final Supplier<InputStream> streamSupplier, final Payload payload)
+  protected void doPutLayerContent(final String layerId,
+                                   final Supplier<InputStream> streamSupplier,
+                                   final Payload payload)
       throws IOException
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = imageId + "/json";
-    String layerAssetName = imageId + "/layer";
+    String metadataAssetName = layerId + "/json";
+    String layerAssetName = layerId + "/layer";
 
     Bucket bucket = tx.getBucket();
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
@@ -341,7 +343,7 @@ public class DockerFacetImpl
 
   @Override
   public void putLayerChecksum(final String layerId, final String checksum) {
-    validateImageId(layerId);
+    validateLayerId(layerId);
     if (checksum == null) {
       throw new V1ApiException(
           P_X_DOCKER_CHECKSUM_PAYLOAD +
@@ -355,33 +357,15 @@ public class DockerFacetImpl
     if (checksum.split(":").length != 2) {
       throw new V1ApiException("Invalid checksum format");
     }
-    doPutChecksum(layerId, checksum);
-  }
-
-  @Override
-  @Transactional(retryOn = IllegalStateException.class)
-  public Payload getLayerAncestry(final String layerId) throws IOException {
-    validateImageId(layerId);
-    StorageTx tx = UnitOfWork.currentTransaction();
-
-    String metadataAssetName = layerId + "/json";
-
-    Bucket bucket = tx.getBucket();
-    Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
-    if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
-    }
-
-    String ancestry = mapper.writeValueAsString(metadataAsset.formatAttributes().get(P_ANCESTRY));
-    return new StringPayload(ancestry, Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
+    doPutLayerChecksum(layerId, checksum);
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
-  protected void doPutChecksum(final String imageId, final String checksum)
+  protected void doPutLayerChecksum(final String layerId, final String checksum)
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = imageId + "/json";
+    String metadataAssetName = layerId + "/json";
 
     Bucket bucket = tx.getBucket();
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
@@ -402,13 +386,31 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
+  public Payload getLayerAncestry(final String layerId) throws IOException {
+    validateLayerId(layerId);
+    StorageTx tx = UnitOfWork.currentTransaction();
+
+    String metadataAssetName = layerId + "/json";
+
+    Bucket bucket = tx.getBucket();
+    Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
+    if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
+      throw new V1ApiException("Image not found", HttpStatus.NOT_FOUND);
+    }
+
+    String ancestry = mapper.writeValueAsString(metadataAsset.formatAttributes().get(P_ANCESTRY));
+    return new StringPayload(ancestry, Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
+  }
+
+  @Override
+  @Transactional(retryOn = IllegalStateException.class)
   public Payload getTags(final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     Iterable<Component> tagComponents = findComponents(tx, name);
     Map<String, String> tags = new HashMap<>();
     for (Component tagComponent : tagComponents) {
-      tags.put(tagComponent.version(), tagComponent.formatAttributes().get(P_IMAGE_ID, String.class));
+      tags.put(tagComponent.version(), tagComponent.formatAttributes().get(P_LAYER_ID, String.class));
     }
     if (tags.isEmpty()) {
       throw new V1ApiException("images not found", HttpStatus.NOT_FOUND);
@@ -425,34 +427,34 @@ public class DockerFacetImpl
     if (tagComponent == null) {
       throw new V1ApiException("Tag not found", HttpStatus.NOT_FOUND);
     }
-    String imageId = tagComponent.formatAttributes().get(P_IMAGE_ID, String.class);
-    return new StringPayload(mapper.writeValueAsString(imageId), Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
+    String layerId = tagComponent.formatAttributes().get(P_LAYER_ID, String.class);
+    return new StringPayload(mapper.writeValueAsString(layerId), Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
   }
 
   @Override
   public void putTag(final String name,
                      final String tag,
-                     final Map<String, String> metadata,
+                     final Map<String, String> daemonMetadata,
                      final Payload content)
       throws IOException
   {
     validateTagName(tag);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutTag(name, tag, readLayer(streamSupplier), metadata);
+      doPutTag(name, tag, readLayer(streamSupplier), daemonMetadata);
     }
   }
 
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
   protected void doPutTag(final String name,
                           final String tag,
-                          final String imageId,
-                          final Map<String, String> metadata)
+                          final String layerId,
+                          final Map<String, String> daemonMetadata)
       throws IOException
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String imageIndexAssetName = name + "/images";
-    String metadataAssetName = imageId + "/json";
+    String metadataAssetName = layerId + "/json";
 
     Bucket bucket = tx.getBucket();
     Asset imageIndexAsset = findAsset(tx, bucket, imageIndexAssetName);
@@ -475,12 +477,12 @@ public class DockerFacetImpl
     tagComponent.formatAttributes().set(P_IMAGE_NAME, name);
     tagComponent.formatAttributes().set(P_IMAGE_TAG, tag);
     // set layer reference
-    tagComponent.formatAttributes().set(P_IMAGE_ID, imageId);
+    tagComponent.formatAttributes().set(P_LAYER_ID, layerId);
     // set metadata
-    NestedAttributesMap metadataTag = tagComponent.formatAttributes().child(P_METADATA);
-    metadataTag.clear();
-    for (Entry<String, String> entry : metadata.entrySet()) {
-      metadataTag.set(entry.getKey(), entry.getValue());
+    NestedAttributesMap tagDaemonMetadata = tagComponent.formatAttributes().child(P_DAEMON_METADATA);
+    tagDaemonMetadata.clear();
+    for (Entry<String, String> entry : daemonMetadata.entrySet()) {
+      tagDaemonMetadata.set(entry.getKey(), entry.getValue());
     }
     tx.saveComponent(tagComponent);
   }
@@ -544,11 +546,11 @@ public class DockerFacetImpl
     }
   }
 
-  private String validateImageId(final String imageId) {
-    if (!validImageId.matcher(imageId).matches()) {
+  private String validateLayerId(final String layerId) {
+    if (!validLayerId.matcher(layerId).matches()) {
       throw new V1ApiException("Invalid image ID", HttpStatus.NOT_FOUND);
     }
-    return imageId;
+    return layerId;
   }
 
   private void validateTagName(final String tag) {
@@ -559,7 +561,7 @@ public class DockerFacetImpl
 
   private String readLayer(final Supplier<InputStream> streamSupplier) {
     try {
-      return validateImageId(mapper.readValue(streamSupplier.get(), String.class));
+      return validateLayerId(mapper.readValue(streamSupplier.get(), String.class));
     }
     catch (Exception e) {
       throw new V1ApiException("Invalid data");
