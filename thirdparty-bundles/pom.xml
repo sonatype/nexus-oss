@@ -24,7 +24,7 @@
   </parent>
 
   <groupId>org.sonatype.nexus.bundles</groupId>
-  <artifactId>nexus-bundles</artifactId>
+  <artifactId>nexus-thirdparty-bundles</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 

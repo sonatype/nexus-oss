@@ -121,7 +121,7 @@
 
   <modules>
     <module>buildsupport</module>
-    <module>bundles</module>
+    <module>thirdparty-bundles</module>
     <module>testsupport</module>
     <module>components</module>
     <module>assemblies</module>
