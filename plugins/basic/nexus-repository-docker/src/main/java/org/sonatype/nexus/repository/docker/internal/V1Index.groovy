@@ -37,7 +37,7 @@ class V1Index
   Closure getImagesIndex = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[getImagesIndex] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[getImagesIndex] repository: {} tokens: {}', repository.name, state.tokens
 
     return addHeaders(
         repository,
@@ -50,7 +50,7 @@ class V1Index
   Closure putImagesIndex = { Context context, boolean images ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[putImagesIndex] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[putImagesIndex] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putImagesIndex(
         (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], context.request.payload

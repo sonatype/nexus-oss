@@ -19,6 +19,7 @@ import org.sonatype.nexus.repository.docker.DockerFacet
 import org.sonatype.nexus.repository.http.HttpResponses
 import org.sonatype.nexus.repository.view.Content
 import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.Payload
 import org.sonatype.nexus.repository.view.Response
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 import org.sonatype.sisu.goodies.common.ComponentSupport
@@ -40,7 +41,7 @@ class V1Images
   Closure getLayerMetadata = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[getLayerMetadata] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[getLayerMetadata] repository: {} tokens: {}', repository.name, state.tokens
 
     Content metadata = repository.facet(DockerFacet).getLayerMetadata(state.tokens['layerId'])
     Response response = HttpResponses.ok(metadata)
@@ -52,7 +53,7 @@ class V1Images
   Closure putLayerMetadata = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[putLayerMetadata] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[putLayerMetadata] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putLayerMetadata(state.tokens['layerId'], context.request.payload)
 
@@ -62,7 +63,7 @@ class V1Images
   Closure getLayerContent = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[getLayerContent] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[getLayerContent] repository: {} tokens: {}', repository.name, state.tokens
 
     return HttpResponses.ok(repository.facet(DockerFacet).getLayerContent(state.tokens['layerId']))
   }
@@ -70,7 +71,7 @@ class V1Images
   Closure putLayer = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[putLayerContent] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[putLayerContent] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putLayerContent(state.tokens['layerId'], context.request.payload)
 
@@ -80,7 +81,7 @@ class V1Images
   Closure putLayerChecksum = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[putLayerChecksum] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[putLayerChecksum] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putLayerChecksum(
         state.tokens['layerId'], (String) context.request.headers[P_X_DOCKER_CHECKSUM_PAYLOAD]
@@ -92,7 +93,7 @@ class V1Images
   Closure getLayerAncestry = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[getLayerAncestry] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[getLayerAncestry] repository: {} tokens: {}', repository.name, state.tokens
 
     return HttpResponses.ok(repository.facet(DockerFacet).getLayerAncestry(state.tokens['layerId']))
   }

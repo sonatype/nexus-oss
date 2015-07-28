@@ -55,7 +55,7 @@ class V1Search
 
   Closure search = { Context context ->
     def query = context.request.parameters.get('q')
-    log.info '[search] query: {}', query
+    log.debug '[search] query: {}', query
 
     def searchResults = new SearchResults(query: query, num_results: 0)
     if (query) {

@@ -38,7 +38,7 @@ class V1Tags
   Closure getTag = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[getTag] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[getTag] repository: {} tokens: {}', repository.name, state.tokens
 
     return HttpResponses.ok(repository.facet(DockerFacet).getTag(
         (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], state.tokens['tag']
@@ -48,7 +48,7 @@ class V1Tags
   Closure putTag = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[putTag] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[putTag] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putTag(
         (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], state.tokens['tag'],
@@ -84,7 +84,7 @@ class V1Tags
   Closure getTags = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[getTags] repository: {} tokens: {}', repository.name, state.tokens
+    log.debug '[getTags] repository: {} tokens: {}', repository.name, state.tokens
 
     return HttpResponses.ok(repository.facet(DockerFacet).getTags(
         (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository']
