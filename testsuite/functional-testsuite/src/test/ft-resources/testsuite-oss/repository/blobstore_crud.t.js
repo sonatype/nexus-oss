@@ -12,14 +12,7 @@
  */
 StartTest(function(t) {
 
-  var // generate a unique pattern
-      name = 'Test-' + new Date().getTime(),
-  // a reusable function to wait for grid to load
-      waitForStoreToLoad = {
-        waitFor: 'storesToLoad', args: function() {
-          return t.cq1('nx-coreui-blobstore-list').getStore();
-        }
-      };
+  var name = t.uniqueId();
 
   t.describe('BlobStore administration', function(t) {
     t.it('BlobStore CRUD', function(t) {
@@ -40,11 +33,11 @@ StartTest(function(t) {
             // type a name
             {type: name, target: '>>nx-coreui-blobstore-add [itemId=name]'},
             {
-              type: Ext.encode({file: {path: '/tmp/blobstore'}}), //TODO - property to get temp dir consistently on all platforms?
+              type: Ext.encode({file: {path: '/tmp/blobstore'}}),
               target: '>>nx-coreui-blobstore-add textarea[name=attributes]'
             },
             // we are ready to go, so press the "Add" button and wait for grid to refresh
-            Ext.apply(Ext.clone(waitForStoreToLoad),
+            Ext.apply(t.waitForStore('Blobstore'),
                 {trigger: {click: '>>nx-coreui-blobstore-add button[action=add]'}}
             ),
             // verify that the blobstore was added
@@ -81,7 +74,7 @@ StartTest(function(t) {
               });
             },
             // and wait for confirmation box
-            Ext.apply(Ext.clone(waitForStoreToLoad),
+            Ext.apply(t.waitForStore('Blobstore'),
                 {trigger: {click: '>>button[text=Yes]'}}
             ),
             // then check that deleted task is no longer available in grid

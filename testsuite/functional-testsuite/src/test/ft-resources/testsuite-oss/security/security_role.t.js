@@ -15,12 +15,7 @@
  */
 StartTest(function(t) {
 
-  var // generate a unique pattern
-      id = t.uniqueId(),
-  // a reusable function to wait for grid to load
-      waitForStoreToLoad = { waitFor: 'storesToLoad', args: function() {
-        return t.cq1('nx-coreui-role-list').getStore();
-      }};
+  var id = t.uniqueId();
 
   t.chain(
       t.openPageAsAdmin('admin/security/roles'),
@@ -40,7 +35,7 @@ StartTest(function(t) {
       // add roles
       { dblclick: 'nx-coreui-role-add nx-itemselector[name=roles] multiselectfield[title=Available] boundlist => .x-boundlist-item:contains(admin)'},
       // we are ready to go, so press the "Add" button and wait for grid to refresh
-      Ext.apply(Ext.clone(waitForStoreToLoad),
+      Ext.apply(t.waitForStore('Role'),
           { trigger: { click: '>>nx-coreui-role-add button[action=add]' } }
       ),
       // verify that the rule was added
@@ -97,7 +92,7 @@ StartTest(function(t) {
       { dblclick: 'nx-coreui-role-settings multiselectfield[title=Contained] boundlist => .x-boundlist-item:contains(admin)'},
       { dblclick: 'nx-coreui-role-settings multiselectfield[title=Available] boundlist => .x-boundlist-item:contains(anonymous)'},
       // save changes and wait for grid to refresh
-      Ext.apply(Ext.clone(waitForStoreToLoad),
+      Ext.apply(t.waitForStore('Role'),
           { trigger: { click: '>>nx-coreui-role-settings button[action=save]' } }
       ),
       // and verify that:
@@ -123,7 +118,7 @@ StartTest(function(t) {
       // press delete button
       { click: '>>nx-coreui-role-feature button[action=delete]' },
       // then agree with removal and wait for grid to refresh
-      Ext.apply(Ext.clone(waitForStoreToLoad),
+      Ext.apply(t.waitForStore('Role'),
           { trigger: { click: '>>button[text=Yes]' } }
       ),
       // then check that deleted rule is no longer available in grid

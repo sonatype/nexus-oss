@@ -14,11 +14,6 @@
  * Tests system capabilities CRUD.
  */
 StartTest(function(t) {
-  var waitForStoreToLoad = {
-        waitFor: 'storesToLoad', args: function() {
-          return t.cq1('nx-coreui-capability-list').getStore();
-        }
-      };
 
   // Name/type-id of Capability tested
   var capabilityTypeName = 'UI: Branding',
@@ -49,7 +44,7 @@ StartTest(function(t) {
             t.waitForAnimations(next);
           },
           // Press the "Add" button and wait for grid to refresh
-          Ext.apply(Ext.clone(waitForStoreToLoad),
+          Ext.apply(t.waitForStore('Capability'),
               {trigger: {click: '>>nx-coreui-capability-add button[action=add]'}}
           ),
           // READ: Verify that our record is saved
@@ -86,7 +81,7 @@ StartTest(function(t) {
           // then set capability to disabled
           {click: '>>nx-coreui-capability-settings field[name=enabled]'},
           // Save changes
-          Ext.apply(Ext.clone(waitForStoreToLoad),
+          Ext.apply(t.waitForStore('Capability'),
               {trigger: {click: '>>nx-coreui-capability-settings button[action=save]'}}
           ),
 
@@ -110,7 +105,7 @@ StartTest(function(t) {
           // DELETE: Press delete button
           {click: '>>nx-coreui-capability-feature button[action=delete]'},
           // then agree with removal and wait for grid to refresh
-          Ext.apply(Ext.clone(waitForStoreToLoad),
+          Ext.apply(t.waitForStore('Capability'),
               {trigger: {click: '>>button[text=Yes]'}}
           ),
           // Check that deleted capability is no longer available in grid

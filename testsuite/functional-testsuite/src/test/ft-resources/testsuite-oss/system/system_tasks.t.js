@@ -15,14 +15,7 @@
  */
 StartTest(function(t) {
 
-  var // generate a unique pattern
-      name = 'Test-' + new Date().getTime(),
-  // a reusable function to wait for grid to load
-      waitForStoreToLoad = {
-        waitFor: 'storesToLoad', args: function() {
-          return t.cq1('nx-coreui-task-list').getStore();
-        }
-      };
+  var name = t.uniqueId();
 
   t.describe('Task administration', function(t) {
     t.it('Task CRUD testing', function(t) {
@@ -54,7 +47,7 @@ StartTest(function(t) {
           {click: 'combobox[name=schedule] => .x-form-text'},
           {click: '.x-boundlist-item:contains(Manual)'},
           // we are ready to go, so press the "Add" button and wait for grid to refresh
-          Ext.apply(Ext.clone(waitForStoreToLoad),
+          Ext.apply(t.waitForStore('Task'),
               {trigger: {click: '>>nx-coreui-task-add button[action=add]'}}
           ),
           // verify that the task was added
@@ -87,7 +80,7 @@ StartTest(function(t) {
           },
           {type: '[UP]', target: '>>nx-coreui-task-settings field[name=property_purgeOlderThan]'},
           // save changes and wait for grid to refresh
-          Ext.apply(Ext.clone(waitForStoreToLoad),
+          Ext.apply(t.waitForStore('Task'),
               {trigger: {click: '>>nx-coreui-task-settings button[action=save]'}}
           ),
           // and verify that:
@@ -113,7 +106,7 @@ StartTest(function(t) {
           // press delete button
           {click: '>>nx-coreui-task-feature button[action=delete]'},
           // then agree with removal and wait for grid to refresh
-          Ext.apply(Ext.clone(waitForStoreToLoad),
+          Ext.apply(t.waitForStore('Task'),
               {trigger: {click: '>>button[text=Yes]'}}
           ),
           // then check that deleted task is no longer available in grid

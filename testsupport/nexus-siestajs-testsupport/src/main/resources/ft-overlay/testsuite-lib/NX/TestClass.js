@@ -305,12 +305,12 @@ Class('NX.TestClass', {
 
     /**
      * Convenience method for waiting on the load of a store.
-     * @param {String} cq component query for the component whose store should be loaded
+     * @param {String} storeKey id of store to wait on
      */
-    waitForStore: function(cq) {
+    waitForStore: function(storeKey) {
       return {
-        waitFor: 'storesToLoad', args: function() {
-          return this.cq1(cq).getStore();
+        waitForStoresToLoad: function() {
+          return this.Ext().data.StoreManager.getByKey(storeKey);
         }
       }
     },
@@ -357,6 +357,19 @@ Class('NX.TestClass', {
         assertionName: 'waitForSpyToBeCalled',
         description: 'wait for spy to be called'
       });
+    },
+
+    /**
+     * Send secret code to get phantomjs to take a screenshot.
+     * Depends on modifications to phantomjs-launcher.js made in prepare_siestajs.groovy.
+     * 
+     * @param filename name of the file to save, should end in .png
+     */
+    phantomjsScreenshot: function(filename) {
+      this.todo('prime screenCapture', function(todo) {
+        todo.screenshot('screen');
+      });
+      console.log('__PHANTOMJS__:screenCapture:phantomjsScreens/'+filename);
     }
   }
 });

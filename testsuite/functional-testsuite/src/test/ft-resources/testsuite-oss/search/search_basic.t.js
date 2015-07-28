@@ -15,19 +15,17 @@
  */
 StartTest(function(t) {
 
-  var waitForStoreToLoad = {
-    waitFor: 'storesToLoad', args: function() {
-      return t.cq1('nx-coreui-search-result-list').getStore();
-    }
-  };
-
   t.describe('Basic Indexing and Searching', function(t) {
     t.it('Keyword search finds maven components', function(t) {
       t.chain(
           t.openPageAsAdmin('browse/search'),
-          {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
-          {type: 'name:aopalliance', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
-          Ext.clone(waitForStoreToLoad),
+          {waitForCQVisible: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
+          { action : 'click', target : '>>nx-coreui-searchfeature field[criteriaId=keyword]' },
+          function (next, searchBox) {
+            searchBox.focus();
+            t.type(searchBox.inputEl, 'name:aopalliance', next);
+          },
+          {waitForRowsVisible: 'nx-coreui-search-result-list'},
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -39,13 +37,13 @@ StartTest(function(t) {
             next();
           }
       )
-    }, 60000);
+    });
     t.it('Maven search finds maven components', function(t) {
       t.chain(
           t.navigateTo('browse/search/maven'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'aopalliance', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.maven2.artifactId]'},
-          Ext.clone(waitForStoreToLoad),
+          t.waitForStore('SearchResult'),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -63,7 +61,7 @@ StartTest(function(t) {
           t.navigateTo('browse/search'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'name:SONATYPE.TEST', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
-          Ext.clone(waitForStoreToLoad),
+          t.waitForStore('SearchResult'),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -81,7 +79,7 @@ StartTest(function(t) {
           t.navigateTo('browse/search/nuget'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'SONATYPE.TEST', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.nuget.id]'},
-          Ext.clone(waitForStoreToLoad),
+          t.waitForStore('SearchResult'),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -99,7 +97,7 @@ StartTest(function(t) {
           t.navigateTo('browse/search'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'name:alphabet.txt', target: '>>nx-coreui-searchfeature field[criteriaId=keyword]'},
-          Ext.clone(waitForStoreToLoad),
+          t.waitForStore('SearchResult'),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
@@ -117,7 +115,7 @@ StartTest(function(t) {
           t.navigateTo('browse/search/raw'),
           {waitFor: 'CQ', args: 'nx-coreui-search-result-list'},
           {type: 'alphabet.txt', target: '>>nx-coreui-searchfeature field[criteriaId=attributes.raw.path.tree]'},
-          Ext.clone(waitForStoreToLoad),
+          t.waitForStore('SearchResult'),
           function(next) {
             var grid = t.cq1('nx-coreui-search-result-list'),
                 store = grid.getStore(),
