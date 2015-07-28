@@ -500,6 +500,8 @@ public class DockerFacetImpl
     tagComponent.formatAttributes().set(P_IMAGE_TAG, tag);
     // set layer reference
     tagComponent.formatAttributes().set(P_LAYER_ID, layerId);
+    // copy ancestry from referenced layer (so we can search images that include the layer)
+    tagComponent.formatAttributes().set(P_LAYER_ANCESTRY, metadataAsset.formatAttributes().get(P_ANCESTRY));
     // set docker daemon metadata
     NestedAttributesMap tagDaemonMetadata = tagComponent.formatAttributes().child(P_DAEMON_METADATA);
     tagDaemonMetadata.clear();

@@ -43,8 +43,15 @@ Ext.define('NX.coreui.controller.SearchDocker', {
         id: 'attributes.docker.imageTag',
         group: NX.I18n.get('SearchDocker_Group'),
         config: {
-          fieldLabel: NX.I18n.get('SearchDocker_Image_Tag_FieldLabel'),
-          width: 300
+          fieldLabel: NX.I18n.get('SearchDocker_Image_Tag_FieldLabel')
+        }
+      },
+      {
+        id: 'attributes.docker.layerAncestry',
+        group: NX.I18n.get('SearchDocker_Group'),
+        config: {
+          fieldLabel: NX.I18n.get('SearchDocker_LayerId_FieldLabel'),
+          width: 500
         }
       }
     ], me);
@@ -58,7 +65,8 @@ Ext.define('NX.coreui.controller.SearchDocker', {
       criterias: [
         { id: 'format', value: 'docker', hidden: true },
         { id: 'attributes.docker.imageName' },
-        { id: 'attributes.docker.imageTag' }
+        { id: 'attributes.docker.imageTag' },
+        { id: 'attributes.docker.layerAncestry' }
       ]
     }, me);
   }

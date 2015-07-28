@@ -81,6 +81,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Search_TextSearchCriteria_Filter_EmptyText: 'Any',
     SearchDocker_Image_Name_FieldLabel: 'Image Name',
     SearchDocker_Image_Tag_FieldLabel: 'Image Tag',
+    SearchDocker_LayerId_FieldLabel: 'Layer Id',
     SearchMaven_ArtifactID_FieldLabel: 'Artifact Id',
     SearchMaven_BaseVersion_FieldLabel: 'Base Version',
     SearchMaven_Extension_FieldLabel: 'Extension',
