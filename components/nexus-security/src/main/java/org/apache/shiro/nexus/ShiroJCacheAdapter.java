@@ -60,15 +60,13 @@ public class ShiroJCacheAdapter<K, V>
     return cache.getAndRemove(key);
   }
 
+  // NOTE: This appears unused in Shiro, but used by NX
   @Override
   public void clear() {
     cache.clear();
   }
 
-  /**
-   * Avoid usage, this is problematic depending on the implementation of JCache (and why JCache doesn't expose a size).
-   * This also appears unused in Shrio, which because of above is good, but for now leaving this impl in place.
-   */
+  // NOTE: This appears unused in Shiro.
   @Override
   public int size() {
     int size = 0;
@@ -79,6 +77,7 @@ public class ShiroJCacheAdapter<K, V>
     return size;
   }
 
+  // NOTE: This appears unused in Shiro.
   @Override
   public Set<K> keys() {
     Set<K> keys = new HashSet<>();
