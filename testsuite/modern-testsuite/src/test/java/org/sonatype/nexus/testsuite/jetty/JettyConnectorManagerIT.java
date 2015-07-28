@@ -13,12 +13,11 @@
 package org.sonatype.nexus.testsuite.jetty;
 
 import java.net.URI;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.inject.Inject;
 
 import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
+import org.sonatype.nexus.jetty.ConnectorRegistrar;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 
@@ -33,10 +32,7 @@ import org.eclipse.jetty.server.Request;
 import org.junit.Test;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -49,14 +45,15 @@ public class JettyConnectorManagerIT
     extends NexusHttpsITSupport
 {
   @Inject
-  private BundleContext bundleContext;
+  private ConnectorRegistrar connectorRegistrar;
 
   private static final Customizer DUMMY_CUSTOMIZER = new Customizer()
   {
     @Override
     public void customize(final Connector connector, final HttpConfiguration channelConfig, final Request request) {
-      request
-          .setUri(new HttpURI("http://localhost:1234/repository/maven-central/org/eclipse/jetty/maven-metadata.xml"));
+      request.setUri(
+          new HttpURI("http://localhost:1234/repository/maven-central/org/eclipse/jetty/maven-metadata.xml")
+      );
     }
   };
 
@@ -82,9 +79,7 @@ public class JettyConnectorManagerIT
         return configuration;
       }
     };
-    final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "test"));
-    ServiceRegistration<ConnectorConfiguration> reg = bundleContext
-        .registerService(ConnectorConfiguration.class, connectorConfiguration, properties);
+    connectorRegistrar.addConnector(connectorConfiguration);
 
     try {
       HttpResponse response = new Maven2Client(
@@ -97,7 +92,7 @@ public class JettyConnectorManagerIT
       assertThat(entity, containsString("Jetty :: Jetty JSPC Maven Plugin"));
     }
     finally {
-      reg.unregister();
+      connectorRegistrar.removeConnector(connectorConfiguration);
       portRegistry.releasePort(newHttpPort);
     }
   }
@@ -124,9 +119,7 @@ public class JettyConnectorManagerIT
         return configuration;
       }
     };
-    final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "test"));
-    ServiceRegistration<ConnectorConfiguration> reg = bundleContext
-        .registerService(ConnectorConfiguration.class, connectorConfiguration, properties);
+    connectorRegistrar.addConnector(connectorConfiguration);
 
     try {
       HttpResponse response = new Maven2Client(
@@ -139,7 +132,7 @@ public class JettyConnectorManagerIT
       assertThat(entity, containsString("Jetty :: Jetty JSPC Maven Plugin"));
     }
     finally {
-      reg.unregister();
+      connectorRegistrar.removeConnector(connectorConfiguration);
       portRegistry.releasePort(newHttpPort);
     }
   }
