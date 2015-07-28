@@ -46,13 +46,20 @@ public class LauncherActivator
 
     MDC.put("userId", SYSTEM_USERID);
     launcher = new Launcher(basePath, null, null, args.split(","));
-    launcher.startAsync();
-
-    connectorConfigurationTracker = new ConnectorConfigurationTracker(
-        bundleContext,
-        launcher.getServer()
+    launcher.startAsync(
+        new Runnable()
+        {
+          @Override
+          public void run() {
+            connectorConfigurationTracker = new ConnectorConfigurationTracker(
+                bundleContext,
+                launcher.getServer()
+            );
+            connectorConfigurationTracker.open();
+          }
+        }
     );
-    connectorConfigurationTracker.open();
+
   }
 
   public void stop(final BundleContext bundleContext) throws Exception {

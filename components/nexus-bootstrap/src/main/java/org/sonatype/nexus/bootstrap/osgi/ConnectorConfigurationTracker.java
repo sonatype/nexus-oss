@@ -31,7 +31,6 @@ public final class ConnectorConfigurationTracker
   private final JettyServer jettyServer;
 
   public ConnectorConfigurationTracker(BundleContext bundleContext, JettyServer jettyServer)
-      throws InvalidSyntaxException
   {
     super(bundleContext, ConnectorConfiguration.class.getName(), null);
     this.jettyServer = jettyServer;
