@@ -121,7 +121,7 @@
 
   <modules>
     <module>buildsupport</module>
-    <module>bundles</module>
+    <module>thirdparty-bundles</module>
     <module>testsupport</module>
     <module>components</module>
     <module>assemblies</module>
@@ -206,7 +206,7 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-ehcache</artifactId>
+        <artifactId>nexus-cache</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
 

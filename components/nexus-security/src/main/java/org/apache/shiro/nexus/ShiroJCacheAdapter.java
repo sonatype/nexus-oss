@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.cache.Cache.Entry;
@@ -23,7 +24,6 @@ import javax.cache.Cache.Entry;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import org.apache.shiro.cache.Cache;
-import org.apache.shiro.cache.CacheException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,38 +46,42 @@ public class ShiroJCacheAdapter<K, V>
   }
 
   @Override
-  public V get(final K key) throws CacheException {
+  public V get(final K key) {
     return cache.get(key);
   }
 
   @Override
-  public V put(final K key, final V value) throws CacheException {
+  public V put(final K key, final V value) {
     return cache.getAndPut(key, value);
   }
 
   @Override
-  public V remove(final K key) throws CacheException {
+  public V remove(final K key) {
     return cache.getAndRemove(key);
   }
 
+  // NOTE: This appears unused in Shiro, but used by NX
   @Override
-  public void clear() throws CacheException {
+  public void clear() {
     cache.clear();
   }
 
+  // NOTE: This appears unused in Shiro.
   @Override
   public int size() {
     int size = 0;
-    for (final Entry<K, V> ignored : cache) {
+    Iterator<Entry<K, V>> iter = cache.iterator();
+    while (iter.hasNext()) {
       size++;
     }
     return size;
   }
 
+  // NOTE: This appears unused in Shiro.
   @Override
   public Set<K> keys() {
     Set<K> keys = new HashSet<>();
-    for (final Entry<K, V> entry : cache) {
+    for (Entry<K, V> entry : cache) {
       keys.add(entry.getKey());
     }
     return Collections.unmodifiableSet(keys);
@@ -86,7 +90,7 @@ public class ShiroJCacheAdapter<K, V>
   @Override
   public Collection<V> values() {
     Collection<V> values = new ArrayList<>();
-    for (final Entry<K, V> entry : cache) {
+    for (Entry<K, V> entry : cache) {
       values.add(entry.getValue());
     }
     return Collections.unmodifiableCollection(values);

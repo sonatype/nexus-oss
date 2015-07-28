@@ -55,8 +55,6 @@ public class EhCacheManagerProvider
 
   private volatile CacheManager cacheManager;
 
-  // TODO: Consider if we want to lazily create the instance on first get?  Unsure if it matters or not though.
-
   @Inject
   public EhCacheManagerProvider(final ApplicationDirectories directories) {
     checkNotNull(directories);
