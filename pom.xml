@@ -363,6 +363,12 @@
 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-concurrent</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-siestajs-testsupport</artifactId>
         <version>3.0.0-SNAPSHOT</version>
       </dependency>
