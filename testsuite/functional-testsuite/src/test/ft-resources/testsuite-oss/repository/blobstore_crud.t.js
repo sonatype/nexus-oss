@@ -28,8 +28,7 @@ StartTest(function(t) {
               t.waitForAnimations(next);
             },
             // select type
-            {click: '>>nx-coreui-blobstore-add combobox[name=type] => .x-form-text'},
-            {click: '[itemId=type].getPicker() => .x-boundlist-item:contains(File)'},
+            t.comboSelect('#type', 'File'),
             // type a name
             {type: name, target: '>>nx-coreui-blobstore-add [itemId=name]'},
             {

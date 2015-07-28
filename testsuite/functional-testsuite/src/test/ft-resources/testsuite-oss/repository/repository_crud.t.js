@@ -60,13 +60,9 @@ StartTest(function(t) {
           {waitForCQ: '>>nx-coreui-repository-add field[name=name]'},
           // fill out the form
           {type: name, target: '>>nx-coreui-repository-add field[name=name]'},
-          {click: '#versionPolicy => .x-form-text'},
-          {click: '#versionPolicy.getPicker() => .x-boundlist-item:contains(Mixed)'},
-          {click: '#blobStoreName => .x-form-text'},
-          {click: '#blobStoreName.getPicker() => .x-boundlist-item:contains(default)'},
-          {click: '#writePolicy => .x-form-text'},
-          {click: '#writePolicy.getPicker() => .x-boundlist-item:contains(Allow redeploy)'},
-
+          t.comboSelect('#versionPolicy', 'Mixed'),
+          t.comboSelect('#blobStoreName', 'default'),
+          t.comboSelect('#writePolicy', 'Allow redeploy'),
           // we are ready to go, so press the "Add" button and wait for grid to refresh
           Ext.apply(t.waitForStore('Repository'),
               {trigger: {click: '>>nx-coreui-repository-add button[action=add]'}}
@@ -123,8 +119,7 @@ StartTest(function(t) {
     t.it('Repository update', function(t) {
       t.chain(
           //update the writePolicy
-          {click: '#writePolicy => .x-form-text'},
-          {click: '#writePolicy.getPicker() => .x-boundlist-item:contains(Disable redeploy)'},
+          t.comboSelect('#writePolicy', 'Disable redeploy'),
           Ext.apply(t.waitForStore('Repository'),
               {trigger: {click: '>>nx-coreui-repository-settings button[action=save]'}}
           ),
