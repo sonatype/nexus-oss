@@ -17,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -24,12 +25,16 @@ import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.MissingFacetException;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.cache.CacheController;
+import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.view.Content;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterables;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -67,6 +72,8 @@ public class GroupFacetImpl
 
   private Config config;
 
+  private CacheController cacheController;
+
   @Inject
   public GroupFacetImpl(final RepositoryManager repositoryManager) {
     this.repositoryManager = checkNotNull(repositoryManager);
@@ -80,7 +87,22 @@ public class GroupFacetImpl
   @Override
   protected void doConfigure(final Configuration configuration) throws Exception {
     config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+
+    cacheController = new CacheController(-1, null);
+
     log.debug("Config: {}", config);
+  }
+
+  @Override
+  protected void doUpdate(final Configuration configuration) throws Exception {
+    // detect member changes
+    Set<String> previousMemberNames = config.memberNames;
+    super.doUpdate(configuration);
+
+    // check whether any members or their ordering have changed
+    if (!Iterables.elementsEqual(config.memberNames, previousMemberNames)) {
+      cacheController.invalidateCache();
+    }
   }
 
   @Override
@@ -132,5 +154,20 @@ public class GroupFacetImpl
     }
 
     return leafMembers;
+  }
+
+  /**
+   * Returns {@code true} if the content is considered stale; otherwise {@code false}.
+   */
+  protected boolean isStale(@Nullable final Content content) {
+    return content == null || cacheController.isStale(content.getAttributes().require(CacheInfo.class));
+  }
+
+  /**
+   * Maintains the latest cache information in the given content's attributes.
+   */
+  protected Content maintainCacheInfo(final Content content) {
+    content.getAttributes().set(CacheInfo.class, cacheController.current());
+    return content;
   }
 }
