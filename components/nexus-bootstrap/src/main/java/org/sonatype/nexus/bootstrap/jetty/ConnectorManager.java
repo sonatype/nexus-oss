@@ -107,7 +107,7 @@ public class ConnectorManager
       serverConnector.start();
     }
     catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException(e); // NOSONAR: no guava in scope
     }
 
     return serverConnector;
@@ -123,7 +123,7 @@ public class ConnectorManager
         serverConnector.stop();
       }
       catch (Exception e) {
-        throw new RuntimeException(e);
+        throw new RuntimeException(e); // NOSONAR: no guava in scope
       }
       server.removeConnector(serverConnector);
     }

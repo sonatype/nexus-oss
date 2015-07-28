@@ -16,7 +16,6 @@ import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
 import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
