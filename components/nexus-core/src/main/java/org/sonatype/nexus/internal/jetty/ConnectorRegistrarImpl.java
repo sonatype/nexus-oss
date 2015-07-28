@@ -14,7 +14,6 @@ package org.sonatype.nexus.internal.jetty;
 
 import java.util.IdentityHashMap;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -23,7 +22,9 @@ import org.sonatype.nexus.bootstrap.jetty.ConnectorRegistrar;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -40,13 +41,9 @@ public class ConnectorRegistrarImpl
     extends ComponentSupport
     implements ConnectorRegistrar
 {
-  private final BundleContext bundleContext;
-
   private final IdentityHashMap<ConnectorConfiguration, ServiceRegistration<ConnectorConfiguration>> managedConfigurations;
 
-  @Inject
-  public ConnectorRegistrarImpl(final BundleContext bundleContext) {
-    this.bundleContext = checkNotNull(bundleContext);
+  public ConnectorRegistrarImpl() {
     this.managedConfigurations = Maps.newIdentityHashMap();
   }
 
@@ -54,6 +51,19 @@ public class ConnectorRegistrarImpl
   public void addConnector(final ConnectorConfiguration connectorConfiguration) {
     checkNotNull(connectorConfiguration);
     checkState(!managedConfigurations.containsKey(connectorConfiguration));
+
+    final Bundle bundle = FrameworkUtil.getBundle(connectorConfiguration.getClass());
+    if (bundle == null) {
+      log.warn("No bundle found for {}, not registering connector", connectorConfiguration);
+      return;
+    }
+    final BundleContext bundleContext = bundle.getBundleContext();
+    if (bundleContext == null) {
+      log.warn("No context found for bundle {}, not registering connector", bundle);
+      return;
+    }
+
+    log.info("Adding connector configuration {}", connectorConfiguration);
     final ServiceRegistration<ConnectorConfiguration> serviceRegistration =
         bundleContext.registerService(ConnectorConfiguration.class, connectorConfiguration, null);
     managedConfigurations.put(connectorConfiguration, serviceRegistration);
@@ -65,6 +75,7 @@ public class ConnectorRegistrarImpl
     final ServiceRegistration<ConnectorConfiguration> serviceRegistration =
         managedConfigurations.remove(connectorConfiguration);
     if (serviceRegistration != null) {
+      log.info("Removing connector configuration {}", connectorConfiguration);
       serviceRegistration.unregister();
     }
   }
