@@ -40,16 +40,15 @@ def phantomjsLauncher = ant.fileScanner {
   fileset(dir: siestaDir, includes: '**/phantomjs-launcher.js')
 }.collect{it}[0]
 
-def lines = phantomjsLauncher.readLines()
-lines.addAll(273,
-    [
-        'if (match = command.match(/^screenCapture:([\\s\\S]+)/)) {',
-        ' currentPage.render(match[ 1 ]);',
-        ' return;',
-        '}'
-    ].collect{ "                        $it"} //indent
-)
-phantomjsLauncher.text = lines.join(System.lineSeparator())
+def text = phantomjsLauncher.text
+phantomjsLauncher.text = text.replace(
+    '''debug('Received command: ' + command)''',
+    '''debug('Received command: ' + command)
+                        if (match = command.match(/^screenCapture:([\\s\\S]+)/)) {
+                            currentPage.render(match[ 1 ]);
+                            return;
+                        }
+''')
 
 // Ensure scripts and binaries are executable
 ant.chmod(perm: 'u+x') {
@@ -65,6 +64,5 @@ ant.unzip(src: artifacts['org.sonatype.nexus:nexus-siestajs-testsupport'].file, 
     include(name: 'ft-overlay/**')
   }
 }
-
 // Mark as prepared
 ant.touch(file: preparedFile)
