@@ -35,6 +35,21 @@ ant.unzip(src: artifacts['com.bryntum.siesta:siesta-standard'].file, dest: siest
   }
 }
 
+// patch phantomjs-launcher.js to allow screenshots
+def phantomjsLauncher = ant.fileScanner {
+  fileset(dir: siestaDir, includes: '**/phantomjs-launcher.js')
+}.collect{it}[0]
+
+def text = phantomjsLauncher.text
+phantomjsLauncher.text = text.replace(
+    '''debug('Received command: ' + command)''',
+    '''debug('Received command: ' + command)
+                        if (match = command.match(/^screenCapture:([\\s\\S]+)/)) {
+                            currentPage.render(match[ 1 ]);
+                            return;
+                        }
+''')
+
 // Ensure scripts and binaries are executable
 ant.chmod(perm: 'u+x') {
   fileset(dir: "$siestaDir/bin") {

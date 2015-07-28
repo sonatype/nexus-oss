@@ -33,6 +33,9 @@ Ext.define('NX.coreui.view.repository.RepositoryFeature', {
   tabs: { xtype: 'nx-coreui-repository-settings' },
 
   actions: [
-    { xtype: 'button', text: NX.I18n.get('Repository_RepositoryFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true }
+    { xtype: 'button', text: NX.I18n.get('Repository_RepositoryFeature_Delete_Button'), glyph: 'xf056@FontAwesome' /* fa-minus-circle */, action: 'delete', disabled: true },
+    { xtype: 'button', text: NX.I18n.get('Repository_RepositoryFeature_RebuildIndex_Button'), glyph: 'xf0ad@FontAwesome' /* fa-wrench */, action: 'rebuildIndex', disabled: true },
+    { xtype: 'button', text: NX.I18n.get('Repository_RepositoryFeature_InvalidateProxyCache_Button'), glyph: 'xf12d@FontAwesome' /* fa-eraser */, action: 'invalidateProxyCache', disabled: true },
+    { xtype: 'button', text: NX.I18n.get('Repository_RepositoryFeature_InvalidateNegativeCache_Button'), glyph: 'xf12d@FontAwesome' /* fa-eraser */, action: 'invalidateNegativeCache', disabled: true }
   ]
 });
