@@ -17,7 +17,7 @@ import java.net.URI;
 import javax.inject.Inject;
 
 import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
-import org.sonatype.nexus.jetty.ConnectorRegistrar;
+import org.sonatype.nexus.bootstrap.jetty.ConnectorRegistrar;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 

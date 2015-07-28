@@ -19,7 +19,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
-import org.sonatype.nexus.jetty.ConnectorRegistrar;
+import org.sonatype.nexus.bootstrap.jetty.ConnectorRegistrar;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
