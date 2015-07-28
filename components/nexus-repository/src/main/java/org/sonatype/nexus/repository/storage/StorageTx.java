@@ -48,11 +48,13 @@ public interface StorageTx
   /**
    * A lower level but still safe access to SQL SELECT queries, that allows caller to "browse" potentially
    * huge result sets without worry about paging or OOMs. This method will NOT see uncommited changes performed
-   * in this current TX, if any.
+   * in this current TX, if any. The returned {@link Iterable} may throw {@link RuntimeException} if timeout to
+   * receive new elements is breached.
    *
    * @param selectSql The SELECT SQL in full, optionally with named parameters.
-   * @param params The map holding named parameters of SELECT SQL.
+   * @param params    The map holding named parameters of SELECT SQL.
    * @return Iterable of SELECTed {@link ODocument}s.
+   * @see OrientAsyncHelper
    */
   Iterable<ODocument> browse(String selectSql, @Nullable Map<String, Object> params);
 
@@ -88,7 +90,10 @@ public interface StorageTx
 
   /**
    * Gets all assets owned by the specified bucket. This method will NOT see unsommited changes performed in this
-   * same TX, if any.
+   * same TX, if any. The returned {@link Iterable} may throw {@link RuntimeException} if timeout to
+   * receive new elements is breached.
+   *
+   * @see OrientAsyncHelper
    */
   Iterable<Asset> browseAssets(Bucket bucket);
 
@@ -104,7 +109,10 @@ public interface StorageTx
 
   /**
    * Gets all components owned by the specified bucket. This method will NOT see unsommited changes performed in this
-   * same TX, if any.
+   * same TX, if any. The returned {@link Iterable} may throw {@link RuntimeException} if timeout to
+   * receive new elements is breached.
+   *
+   * @see OrientAsyncHelper
    */
   Iterable<Component> browseComponents(Bucket bucket);
 
