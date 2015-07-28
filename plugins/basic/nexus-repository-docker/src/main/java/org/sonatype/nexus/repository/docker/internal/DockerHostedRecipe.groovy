@@ -24,7 +24,6 @@ import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.docker.DockerFacet
 import org.sonatype.nexus.repository.http.HttpHandlers
-import org.sonatype.nexus.repository.http.HttpStatus
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -33,9 +32,7 @@ import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Context
-import org.sonatype.nexus.repository.view.Handler
 import org.sonatype.nexus.repository.view.Matcher
-import org.sonatype.nexus.repository.view.Response
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
@@ -105,22 +102,7 @@ class DockerHostedRecipe
   UnitOfWorkHandler unitOfWorkHandler
 
   @Inject
-  V1ExceptionHandler v1ExceptionHandler
-
-  @Inject
-  V1Users v1Users
-
-  @Inject
-  V1Index v1Index
-
-  @Inject
-  V1Tags v1Tags
-
-  @Inject
-  V1Images v1Images
-
-  @Inject
-  V1Search v1Search
+  V1Handlers v1Handlers
 
   @Inject
   DockerHostedRecipe(@Named(HostedType.NAME) final Type type,
@@ -152,7 +134,7 @@ class DockerHostedRecipe
               @Override
               boolean matches(final Context context) {
                 // only allow docker versions >= 0.10
-                def dockerVersion = V1Tags.parseUserAgent(context)[DockerAttributes.P_DOCKER_VERSION]
+                def dockerVersion = V1Handlers.parseUserAgent(context)[DockerAttributes.P_DOCKER_VERSION]
                 try {
                   return dockerVersion && VERSION_0_10.compareTo(SCHEME.parseVersion(dockerVersion)) > 0
                 }
@@ -163,8 +145,8 @@ class DockerHostedRecipe
             }
         ))
         .handler(timingHandler)
-        .handler(v1ExceptionHandler)
-        .handler(oldDocker())
+        .handler(v1Handlers.v1Exception)
+        .handler(v1Handlers.oldDocker)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -174,7 +156,7 @@ class DockerHostedRecipe
         ))
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
-        .handler(handler(v1Users.getUsers))
+        .handler(v1Handlers.getUsers)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -183,7 +165,7 @@ class DockerHostedRecipe
             LogicMatchers.or(new LiteralMatcher('/v1/users'), new LiteralMatcher('/v1/users/'))
         ))
         .handler(timingHandler)
-        .handler(handler(v1Users.createUser))
+        .handler(v1Handlers.createUser)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -192,7 +174,7 @@ class DockerHostedRecipe
             new TokenMatcher('/v1/users/{username}')
         ))
         .handler(timingHandler)
-        .handler(handler(v1Users.updateUser))
+        .handler(v1Handlers.updateUser)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -201,7 +183,7 @@ class DockerHostedRecipe
             new LiteralMatcher('/v1/search')
         ))
         .handler(timingHandler)
-        .handler(handler(v1Search.search))
+        .handler(v1Handlers.search)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -214,9 +196,9 @@ class DockerHostedRecipe
         ))
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Index.getImagesIndex)
+        .handler(v1Handlers.getImagesIndex)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -228,9 +210,9 @@ class DockerHostedRecipe
             )
         ))
         .handler(timingHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Index.putImagesIndex.rcurry(true))
+        .handler(v1Handlers.putImagesIndex.rcurry(true))
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -242,9 +224,9 @@ class DockerHostedRecipe
             )
         ))
         .handler(timingHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Index.putImagesIndex.rcurry(false))
+        .handler(v1Handlers.putImagesIndex.rcurry(false))
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -257,9 +239,9 @@ class DockerHostedRecipe
         ))
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Tags.getTags)
+        .handler(v1Handlers.getTags)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -272,9 +254,9 @@ class DockerHostedRecipe
         ))
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Tags.getTag)
+        .handler(v1Handlers.getTag)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -286,9 +268,9 @@ class DockerHostedRecipe
             )
         ))
         .handler(timingHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Tags.putTag)
+        .handler(v1Handlers.putTag)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -298,9 +280,9 @@ class DockerHostedRecipe
         ))
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.getLayerMetadata)
+        .handler(v1Handlers.getLayerMetadata)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -309,9 +291,9 @@ class DockerHostedRecipe
             new TokenMatcher('/v1/images/{layerId}/json'),
         ))
         .handler(timingHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.putLayerMetadata)
+        .handler(v1Handlers.putLayerMetadata)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -322,9 +304,9 @@ class DockerHostedRecipe
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(partialFetchHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.getLayerContent)
+        .handler(v1Handlers.getLayerContent)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -333,9 +315,9 @@ class DockerHostedRecipe
             new TokenMatcher('/v1/images/{layerId}/layer'),
         ))
         .handler(timingHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.putLayer)
+        .handler(v1Handlers.putLayer)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -344,9 +326,9 @@ class DockerHostedRecipe
             new TokenMatcher('/v1/images/{layerId}/checksum'),
         ))
         .handler(timingHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.putLayerChecksum)
+        .handler(v1Handlers.putLayerChecksum)
         .create())
 
     builder.route(new Route.Builder().matcher(
@@ -356,9 +338,9 @@ class DockerHostedRecipe
         ))
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
-        .handler(v1ExceptionHandler)
+        .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.getLayerAncestry)
+        .handler(v1Handlers.getLayerAncestry)
         .create())
 
     builder.defaultHandlers(HttpHandlers.badRequest())
@@ -366,23 +348,6 @@ class DockerHostedRecipe
     facet.configure(builder.create())
 
     return facet
-  }
-
-  private Handler handler(final Closure action) {
-    return new Handler() {
-      @Override
-      Response handle(@Nonnull final Context context) {
-        return action.call(context)
-      }
-    }
-  }
-
-  private Handler oldDocker() {
-    handler {
-      throw new V1ApiException(
-          'This endpoint does not support Docker daemons older than 0.10', HttpStatus.PRECONDITION_FAILED
-      )
-    }
   }
 
 }
