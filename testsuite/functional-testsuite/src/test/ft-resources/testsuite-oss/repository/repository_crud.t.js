@@ -142,7 +142,7 @@ StartTest(function(t) {
             next();
           }
       );
-    });
+    }, 60000);
     t.it('Repository delete', function(t) {
       t.chain(
           {click: '>>nx-actions button[text=Delete repository] => .x-btn-inner'},
