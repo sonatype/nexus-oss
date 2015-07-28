@@ -18,54 +18,41 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.buildsupport</groupId>
-    <artifactId>nexus-buildsupport</artifactId>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-oss</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-buildsupport-shiro</artifactId>
+  <groupId>org.sonatype.nexus.bundles</groupId>
+  <artifactId>nexus-thirdparty-bundles</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <packaging>pom</packaging>
 
-  <properties>
-    <apache-shiro.version>1.2.3</apache-shiro.version>
-  </properties>
+  <modules>
+    <module>ehcache</module>
+  </modules>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-core</artifactId>
-        <version>${apache-shiro.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
+
+      <!-- IMPORTS -->
 
       <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-guice</artifactId>
-        <version>${apache-shiro.version}</version>
+        <groupId>org.sonatype.nexus.buildsupport</groupId>
+        <artifactId>nexus-buildsupport-all</artifactId>
+        <type>pom</type>
+        <version>3.0.0-SNAPSHOT</version>
+        <scope>import</scope>
       </dependency>
 
+      <!-- INTERNAL -->
+
       <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-web</artifactId>
-        <version>${apache-shiro.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.sonatype.nexus.bundles</groupId>
+        <artifactId>org.sonatype.nexus.bundles.ehcache</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
       </dependency>
+
     </dependencies>
   </dependencyManagement>
 

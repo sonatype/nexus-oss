@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.cache.CacheManager;
 import javax.servlet.ServletContext;
 
 import org.sonatype.nexus.ldap.internal.persist.LdapConfigurationSource;
@@ -40,7 +41,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
-import net.sf.ehcache.CacheManager;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -172,7 +172,13 @@ public abstract class LdapTestSupport
 
   @After
   public void stopLdap() throws Exception {
-    lookup(CacheManager.class).shutdown();
+    try {
+      lookup(CacheManager.class).close();
+    }
+    catch (Exception e) {
+      util.getLog().warn("Failed to shutdown cache-manager", e);
+    }
+
     stopLdapServers();
   }
 

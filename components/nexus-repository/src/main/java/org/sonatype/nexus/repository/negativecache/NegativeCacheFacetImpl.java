@@ -12,6 +12,14 @@
  */
 package org.sonatype.nexus.repository.negativecache;
 
+import java.util.concurrent.TimeUnit;
+
+import javax.cache.Cache;
+import javax.cache.Cache.Entry;
+import javax.cache.CacheManager;
+import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.CreatedExpiryPolicy;
+import javax.cache.expiry.Duration;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -24,21 +32,16 @@ import org.sonatype.nexus.repository.view.Status;
 import org.sonatype.sisu.goodies.common.Time;
 
 import com.google.common.annotations.VisibleForTesting;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static net.sf.ehcache.Status.STATUS_ALIVE;
 import static org.sonatype.nexus.repository.FacetSupport.State.STARTED;
 
 /**
- * EHCache based {@link NegativeCacheFacet} implementation.
+ * Default {@link NegativeCacheFacet} implementation.
  *
  * @since 3.0
  */
-@Named("default")
+@Named
 public class NegativeCacheFacetImpl
     extends FacetSupport
     implements NegativeCacheFacet
@@ -69,7 +72,7 @@ public class NegativeCacheFacetImpl
 
   private Config config;
 
-  private Ehcache cache;
+  private Cache<NegativeCacheKey, Status> cache;
 
   @Inject
   public NegativeCacheFacetImpl(final CacheManager cacheManager) {
@@ -124,29 +127,24 @@ public class NegativeCacheFacetImpl
   private void maybeCreateCache() {
     if (cache == null) {
       log.debug("Creating negative-cache for: {}", getRepository());
-      cache = newCache("negative-cache-" + getRepository().getName(), config.timeToLive);
-      cacheManager.addCache(cache);
+
+      MutableConfiguration<NegativeCacheKey, Status> cacheConfig = new MutableConfiguration<>();
+      cacheConfig.setTypes(NegativeCacheKey.class, Status.class);
+      cacheConfig.setExpiryPolicyFactory(
+          CreatedExpiryPolicy.factoryOf(new Duration(TimeUnit.SECONDS, config.timeToLive))
+      );
+      cacheConfig.setManagementEnabled(true);
+      cacheConfig.setStatisticsEnabled(true);
+
+      cache = cacheManager.createCache(getRepository().getName() + "#negative-cache", cacheConfig);
+      log.debug("Created negative-cache: {}", cache);
     }
   }
 
-  @VisibleForTesting
-  Ehcache newCache(final String name, final int timeToLiveSeconds) {
-    return new Cache(
-        name,
-        10000, // maxElementsInMemory
-        false, // overflowToDisk
-        false, // eternal
-        timeToLiveSeconds,
-        0 // timeToIdleSeconds
-    );
-  }
-
   private void maybeDestroyCache() {
-    if (cache != null) {
+    if (cache != null && !cacheManager.isClosed()) {
       log.debug("Destroying negative-cache for: {}", getRepository());
-      if (STATUS_ALIVE.equals(cacheManager.getStatus())) {
-        cacheManager.removeCache(cache.getName());
-      }
+      cacheManager.destroyCache(cache.getName());
       cache = null;
     }
   }
@@ -156,8 +154,7 @@ public class NegativeCacheFacetImpl
   public Status get(final NegativeCacheKey key) {
     checkNotNull(key);
     if (cache != null) {
-      Element element = cache.get(key);
-      return element == null || element.isExpired() ? null : (Status) element.getObjectValue();
+      return cache.get(key);
     }
     return null;
   }
@@ -169,7 +166,7 @@ public class NegativeCacheFacetImpl
     checkNotNull(status);
     if (cache != null) {
       log.debug("Adding {}={} to negative-cache of {}", key, status, getRepository());
-      cache.put(new Element(key, status));
+      cache.put(key, status);
     }
   }
 
@@ -185,10 +182,12 @@ public class NegativeCacheFacetImpl
 
   @Override
   public void invalidateSubset(final NegativeCacheKey key) {
-    invalidate(key);
-    for (Object entry : cache.getKeys()) {
-      if (!key.equals(entry) && key.isParentOf((NegativeCacheKey) entry)) {
-        invalidate((NegativeCacheKey) entry);
+    if (cache != null) {
+      invalidate(key);
+      for (final Entry<NegativeCacheKey, Status> entry : cache) {
+        if (!key.equals(entry.getKey()) && key.isParentOf(entry.getKey())) {
+          invalidate(entry.getKey());
+        }
       }
     }
   }

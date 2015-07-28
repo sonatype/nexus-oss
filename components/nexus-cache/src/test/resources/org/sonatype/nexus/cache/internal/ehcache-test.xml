@@ -5,7 +5,7 @@
          monitoring="on"
          dynamicConfig="true">
 
-  <diskStore path="java.io.tmpdir/nexus-ehcache"/>
+  <diskStore path="java.io.tmpdir"/>
 
   <defaultCache
       maxElementsInMemory="10000"
@@ -18,15 +18,8 @@
     <persistence strategy="localTempSwap"/>
   </defaultCache>
 
-  <!--
-  FIXME: We can not use pre-configured cache with eternal=true until this is fixed:
-  https://github.com/ehcache/ehcache-jcache/issues/40
-  -->
-  <!--<cache name="shiro-activeSessionCache"-->
-         <!--maxElementsInMemory="10000"-->
-         <!--eternal="true"-->
-         <!--diskExpiryThreadIntervalSeconds="600">-->
-    <!--<persistence strategy="localTempSwap"/>-->
-  <!--</cache>-->
+  <cache name="testEternalCache"
+         maxElementsInMemory="10000"
+         eternal="true"/>
 
 </ehcache>

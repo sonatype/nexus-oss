@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
+import javax.cache.CacheManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -49,15 +50,14 @@ import org.sonatype.nexus.security.user.UserStatus;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 
-import net.sf.ehcache.CacheManager;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.nexus.ShiroJCacheManagerAdapter;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
@@ -142,9 +142,7 @@ public class DefaultSecuritySystem
     }
 
     // prepare shiro cache
-    EhCacheManager shiroCacheManager = new EhCacheManager();
-    shiroCacheManager.setCacheManager(cacheManager);
-    realmSecurityManager.setCacheManager(shiroCacheManager);
+    realmSecurityManager.setCacheManager(new ShiroJCacheManagerAdapter(cacheManager));
 
     // TODO: Sort out better means to invoke lifecycle here, realm-manager is only here for start/stop now
     realmManager.start();

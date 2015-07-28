@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.cache.CacheManager;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
@@ -32,7 +33,6 @@ import com.google.inject.Guice;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
-import net.sf.ehcache.CacheManager;
 import org.apache.shiro.util.ThreadContext;
 import org.eclipse.sisu.inject.BeanLocator;
 import org.eclipse.sisu.space.BeanScanning;
@@ -109,7 +109,7 @@ public abstract class AbstractSecurityTest
     }
 
     try {
-      lookup(CacheManager.class).shutdown();
+      lookup(CacheManager.class).close();
     }
     catch (Exception e) {
       util.getLog().warn("Failed to shutdown cache-manager", e);
