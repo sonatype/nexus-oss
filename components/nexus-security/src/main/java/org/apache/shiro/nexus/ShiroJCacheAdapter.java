@@ -23,6 +23,7 @@ import javax.cache.Cache.Entry;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.collect.Iterables;
 import org.apache.shiro.cache.Cache;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -69,12 +70,7 @@ public class ShiroJCacheAdapter<K, V>
   // NOTE: This appears unused in Shiro.
   @Override
   public int size() {
-    int size = 0;
-    Iterator<Entry<K, V>> iter = cache.iterator();
-    while (iter.hasNext()) {
-      size++;
-    }
-    return size;
+    return Iterables.size(cache);
   }
 
   // NOTE: This appears unused in Shiro.
