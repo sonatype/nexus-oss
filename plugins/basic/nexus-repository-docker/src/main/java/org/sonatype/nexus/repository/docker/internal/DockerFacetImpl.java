@@ -109,7 +109,7 @@ public class DockerFacetImpl
 
   @Override
   public void putImagesIndex(final String name, final Payload content) throws IOException {
-    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
       validateImagesIndex(streamSupplier);
       doPutImagesIndex(name, streamSupplier, content);
     }
@@ -193,7 +193,7 @@ public class DockerFacetImpl
   @Override
   public void putLayerMetadata(final String layerId, final Payload content) throws IOException {
     validateLayerId(layerId);
-    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
       doPutLayerMetadata(layerId, streamSupplier, content);
     }
   }
@@ -285,7 +285,7 @@ public class DockerFacetImpl
   @Override
   public void putLayerContent(final String layerId, final Payload content) throws IOException, InvalidContentException {
     validateLayerId(layerId);
-    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
       doPutLayerContent(layerId, streamSupplier, content);
     }
   }
@@ -439,7 +439,7 @@ public class DockerFacetImpl
       throws IOException
   {
     validateTagName(tag);
-    try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
+    try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
       doPutTag(name, tag, readLayer(streamSupplier), daemonMetadata);
     }
   }
@@ -488,11 +488,11 @@ public class DockerFacetImpl
   }
 
   private Component findComponent(final StorageTx tx, final String name, final String version) {
-    final ComponentQuery query = new Builder()
+    ComponentQuery query = new Builder()
         .where(P_NAME + "=").param(name)
         .where(" AND " + P_VERSION + "=").param(version)
         .build();
-    final Iterable<Component> components = tx.findComponents(
+    Iterable<Component> components = tx.findComponents(
         query.getWhere(), query.getParameters(), singletonList(getRepository()), null
     );
     if (components.iterator().hasNext()) {
@@ -502,7 +502,7 @@ public class DockerFacetImpl
   }
 
   private Iterable<Component> findComponents(final StorageTx tx, final String name) {
-    final ComponentQuery query = new Builder()
+    ComponentQuery query = new Builder()
         .where(P_NAME + "=").param(name)
         .build();
     return tx.findComponents(
@@ -569,7 +569,7 @@ public class DockerFacetImpl
   }
 
   private Content marshall(final Asset asset, final Blob blob) {
-    final Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
+    Content content = new Content(new BlobPayload(blob, asset.requireContentType()));
     Content.extractFromAsset(asset, hashAlgorithms, content.getAttributes());
     return content;
   }
