@@ -28,7 +28,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- * Trails of basic EhCache.
+ * Trials of basic EhCache.
  */
 public class EhCacheTrial
     extends TestSupport
