@@ -170,6 +170,7 @@ public class JettyServer
     for (Object object : components) {
       if (object instanceof Server) {
         server = (Server) object;
+        break;
       }
     }
     connectorManager = new ConnectorManager(server, last.getIdMap());
