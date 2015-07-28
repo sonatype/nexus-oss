@@ -67,14 +67,7 @@ import org.apache.commons.lang.StringUtils;
 
 import static java.util.Collections.singletonList;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_ANCESTRY;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_ARCH;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IMAGE_ID;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_IN_PROGRESS;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_METADATA;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_OS;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_CHECKSUM_PAYLOAD;
-import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE;
+import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.*;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
@@ -478,6 +471,9 @@ public class DockerFacetImpl
           .version(tag);
     }
 
+    // set image name and tag
+    tagComponent.formatAttributes().set(P_IMAGE_NAME, name);
+    tagComponent.formatAttributes().set(P_IMAGE_TAG, tag);
     // set layer reference
     tagComponent.formatAttributes().set(P_IMAGE_ID, imageId);
     // set metadata
