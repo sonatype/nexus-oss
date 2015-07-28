@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.search;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.Repository;
 
 /**
  * Search {@link Facet}, that index/de-index component metadata.
@@ -23,4 +24,9 @@ import org.sonatype.nexus.repository.Facet;
 public interface SearchFacet
     extends Facet
 {
+  /**
+   * Forcefully rebuilds index of the {@link Repository} this facet is attached to. Rebuild happens by dropping current
+   * index and recreating it from scratch.
+   */
+  void rebuildIndex();
 }
