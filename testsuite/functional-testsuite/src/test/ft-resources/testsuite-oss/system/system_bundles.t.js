@@ -17,41 +17,36 @@ StartTest(function(t) {
   t.describe('System Bundles', function(t) {
     t.it('Bundles view is populated', function(t) {
       t.chain(
-          function(next) { t.phantomjsScreenshot('itsfuckingbroked01.png'); next() },
           t.openPageAsAdmin('admin/system/bundles'),
-          function(next) { t.phantomjsScreenshot('itsfuckingbroked02.png'); next() },
           {waitForRowsVisible: 'nx-coreui-system-bundlelist'}
       );
     });
     t.it('Can filter bundles by name', function(t) {
       t.chain(
-        function(next) { t.phantomjsScreenshot('itsfuckingbroked03.png'); next() },
+        function(next) { t.phantomjsScreenshot('beforeexpect.png'); next() },
         { type: 'nexus-bootstrap', target: '>>nx-coreui-system-bundlelist nx-searchbox' },
-        function(next) { t.phantomjsScreenshot('itsfuckingbroked04.png'); next() },
         function(next) {
           var store = t.cq1('nx-coreui-system-bundlelist').getStore();
           t.waitFor(function() {
             return store.isFiltered();
           }, next)
         },
-        function(next) { t.phantomjsScreenshot('itsfuckingbroked05.png'); next() },
         function(next) {
           var store = t.cq1('nx-coreui-system-bundlelist').getStore();
           t.expect(store.count()).toBe(1);
           next();
-        }
+        },
+        function(next) { t.phantomjsScreenshot('afterexpect.png'); next() }
       )
     });
     t.it('Can drill-down by bundle', function(t) {
       t.chain(
-        function(next) { t.phantomjsScreenshot('itsfuckingbroked06.png'); next() },
         function(next) {
           var grid = t.cq1('nx-coreui-system-bundlelist'),
               name = 'org.sonatype.nexus:nexus-bootstrap',
               bundleRow = t.getRow(grid, grid.getStore().find('name', name));
           t.click(bundleRow, next);
         },
-        function(next) { t.phantomjsScreenshot('itsfuckingbroked07.png'); next() },
         { waitFor: 'selector', args: '.nx-info-entry-name:contains(Bundle-Activator)' }
       )
     });
