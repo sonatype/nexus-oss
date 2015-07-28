@@ -113,10 +113,6 @@ class TestSpec extends GebReportingTest
   @Inject
   protected TaskScheduler taskScheduler;
 
-  @Inject
-  @Named('nexus-uber')
-  ClassLoader classLoader
-
   protected final Logger log = checkNotNull(createLogger());
 
   protected Logger createLogger() {
@@ -139,7 +135,7 @@ class TestSpec extends GebReportingTest
       go '/'
 
 //    then:
-      assert title == 'blah'
+      assert title == 'Welcome - Sonatype Nexus'
   }
 
   @Configuration
@@ -148,10 +144,35 @@ class TestSpec extends GebReportingTest
         nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
 
         // Add testsuite dependencies as bundles
-        //TODO - KR tried several variations on this, none of which appear to make available the needed classes when Geb tries to load config
-        wrappedBundle(maven('org.codehaus.groovy', 'groovy-all').versionAsInProject()).overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*"),
-        wrappedBundle(maven('org.gebish', 'geb-core').versionAsInProject()).overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*"),
-        wrappedBundle(maven('org.gebish', 'geb-junit4').versionAsInProject()).overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*"),
+
+        mavenBundle('org.codehaus.groovy', 'groovy-all').versionAsInProject(),
+        mavenBundle('org.apache.commons', 'commons-exec').versionAsInProject(),
+
+        // Attach GEB code to nexus-pax-exam
+
+        wrappedBundle(maven('org.gebish', 'geb-core').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('org.gebish', 'geb-ast').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('org.gebish', 'geb-waiting').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('org.gebish', 'geb-exceptions').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('org.gebish', 'geb-implicit-assertions').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('org.gebish', 'geb-junit4').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+
+        // Attach Selenium code to nexus-pax-exam
+
+        wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-api').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-support').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-remote-driver').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-firefox-driver').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
 
         // FIXME: This does not take effect unless you do *NOT* have NEXUS_RESOURCE_DIRS set
         // FIXME: Needs to include more resource-dirs as well to pick up changes
@@ -537,11 +558,4 @@ class TestSpec extends GebReportingTest
       return NEXUS_PAX_EXAM_TIMEOUT_DEFAULT;
     }
   }
-
-  //TODO - KR possible that the explicit reference to a classloader in the parent causes this to fail?
-
-//  @Override
-//  geb.Configuration createConf() {
-//    new ConfigurationLoader(gebConfEnv, System.properties, new GroovyClassLoader(classLoader)).getConf(gebConfScript)
-//  }
 }
