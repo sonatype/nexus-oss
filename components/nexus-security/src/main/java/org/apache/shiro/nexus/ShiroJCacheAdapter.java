@@ -65,6 +65,10 @@ public class ShiroJCacheAdapter<K, V>
     cache.clear();
   }
 
+  /**
+   * Avoid usage, this is problematic depending on the implementation of JCache (and why JCache doesn't expose a size).
+   * This also appears unused in Shrio, which because of above is good, but for now leaving this impl in place.
+   */
   @Override
   public int size() {
     int size = 0;
