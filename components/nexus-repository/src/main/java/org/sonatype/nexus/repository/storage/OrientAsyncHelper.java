@@ -133,9 +133,6 @@ class OrientAsyncHelper
 
     @Override
     public boolean hasNext() {
-      if (next == SENTINEL) {
-        return false;
-      }
       if (next == null) {
         try {
           next = queue.poll(timeoutSeconds, TimeUnit.SECONDS);
