@@ -46,50 +46,50 @@ public interface DockerFacet
   /**
    * Retrieve layer metadata.
    *
-   * @param imageId layer id
+   * @param layerId layer id
    * @return layer metadata (JSON)
    */
-  Payload getMetadata(String imageId) throws IOException;
+  Payload getLayerMetadata(String layerId) throws IOException;
 
   /**
    * Store layer metadata.
    *
-   * @param imageId layer id
+   * @param layerId layer id
    * @param payload layer metadata (JSON)
    */
-  void putMetadata(String imageId, Payload payload) throws IOException;
+  void putLayerMetadata(String layerId, Payload payload) throws IOException;
 
   /**
    * Retrieve layer content.
    *
-   * @param imageId layer id
+   * @param layerId layer id
    * @return layer content
    */
-  Payload getLayer(String imageId) throws IOException;
+  Payload getLayerContent(String layerId) throws IOException;
 
   /**
    * Store layer content.
    *
-   * @param imageId layer id
+   * @param layerId layer id
    * @param payload layer content
    */
-  void putLayer(String imageId, Payload payload) throws IOException;
+  void putLayer(String layerId, Payload payload) throws IOException;
 
   /**
    * Store layer checksum (validates storage of layer metadata/content)
    *
-   * @param imageId  layer id
+   * @param layerId  layer id
    * @param checksum checksum of layer metadata + content
    */
-  void putChecksum(String imageId, String checksum) throws IOException;
+  void putLayerChecksum(String layerId, String checksum) throws IOException;
 
   /**
    * Retrieve layer ancestry (list of all parents)
    *
-   * @param imageId layer id
+   * @param layerId layer id
    * @return layer ancestry (JSON)
    */
-  Payload getAncestry(String imageId) throws IOException;
+  Payload getLayerAncestry(String layerId) throws IOException;
 
   /**
    * Retrieve ilayer id corresponding to an image.

@@ -176,11 +176,11 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getMetadata(final String imageId) throws IOException {
-    validateImageId(imageId);
+  public Payload getLayerMetadata(final String layerId) throws IOException {
+    validateImageId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = imageId + "/json";
+    String metadataAssetName = layerId + "/json";
 
     Bucket bucket = tx.getBucket();
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
@@ -198,10 +198,10 @@ public class DockerFacetImpl
   }
 
   @Override
-  public void putMetadata(final String imageId, final Payload content) throws IOException {
-    validateImageId(imageId);
+  public void putLayerMetadata(final String layerId, final Payload content) throws IOException {
+    validateImageId(layerId);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutMetadata(imageId, streamSupplier, content);
+      doPutMetadata(layerId, streamSupplier, content);
     }
   }
 
@@ -269,12 +269,12 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getLayer(final String imageId) throws IOException {
-    validateImageId(imageId);
+  public Payload getLayerContent(final String layerId) throws IOException {
+    validateImageId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = imageId + "/json";
-    String layerAssetName = imageId + "/layer";
+    String metadataAssetName = layerId + "/json";
+    String layerAssetName = layerId + "/layer";
 
     Bucket bucket = tx.getBucket();
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
@@ -290,10 +290,10 @@ public class DockerFacetImpl
   }
 
   @Override
-  public void putLayer(final String imageId, final Payload content) throws IOException, InvalidContentException {
-    validateImageId(imageId);
+  public void putLayer(final String layerId, final Payload content) throws IOException, InvalidContentException {
+    validateImageId(layerId);
     try (final TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
-      doPutLayer(imageId, streamSupplier, content);
+      doPutLayer(layerId, streamSupplier, content);
     }
   }
 
@@ -347,8 +347,8 @@ public class DockerFacetImpl
   }
 
   @Override
-  public void putChecksum(final String imageId, final String checksum) {
-    validateImageId(imageId);
+  public void putLayerChecksum(final String layerId, final String checksum) {
+    validateImageId(layerId);
     if (checksum == null) {
       throw new V1ApiException(
           P_X_DOCKER_CHECKSUM_PAYLOAD +
@@ -362,16 +362,16 @@ public class DockerFacetImpl
     if (checksum.split(":").length != 2) {
       throw new V1ApiException("Invalid checksum format");
     }
-    doPutChecksum(imageId, checksum);
+    doPutChecksum(layerId, checksum);
   }
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getAncestry(final String imageId) throws IOException {
-    validateImageId(imageId);
+  public Payload getLayerAncestry(final String layerId) throws IOException {
+    validateImageId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = imageId + "/json";
+    String metadataAssetName = layerId + "/json";
 
     Bucket bucket = tx.getBucket();
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);

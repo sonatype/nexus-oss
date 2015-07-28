@@ -37,64 +37,64 @@ class V1Images
     extends ComponentSupport
 {
 
-  Closure getMetadata = { Context context ->
+  Closure getLayerMetadata = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[getMetadata] repository: {} tokens: {}', repository.name, state.tokens
+    log.info '[getLayerMetadata] repository: {} tokens: {}', repository.name, state.tokens
 
-    Content metadata = repository.facet(DockerFacet).getMetadata(state.tokens['image'])
+    Content metadata = repository.facet(DockerFacet).getLayerMetadata(state.tokens['layerId'])
     Response response = HttpResponses.ok(metadata)
     copyAttributeAsHeader(metadata, response, P_X_DOCKER_SIZE)
     copyAttributeAsHeader(metadata, response, P_X_DOCKER_CHECKSUM_PAYLOAD)
     return response
   }
 
-  Closure putMetadata = { Context context ->
+  Closure putLayerMetadata = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[putMetadata] repository: {} tokens: {}', repository.name, state.tokens
+    log.info '[putLayerMetadata] repository: {} tokens: {}', repository.name, state.tokens
 
-    repository.facet(DockerFacet).putMetadata(state.tokens['image'], context.request.payload)
+    repository.facet(DockerFacet).putLayerMetadata(state.tokens['layerId'], context.request.payload)
 
     return HttpResponses.ok()
   }
 
-  Closure getLayer = { Context context ->
+  Closure getLayerContent = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[getLayer] repository: {} tokens: {}', repository.name, state.tokens
+    log.info '[getLayerContent] repository: {} tokens: {}', repository.name, state.tokens
 
-    return HttpResponses.ok(repository.facet(DockerFacet).getLayer(state.tokens['image']))
+    return HttpResponses.ok(repository.facet(DockerFacet).getLayerContent(state.tokens['layerId']))
   }
 
   Closure putLayer = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[putLayer] repository: {} tokens: {}', repository.name, state.tokens
+    log.info '[putLayerContent] repository: {} tokens: {}', repository.name, state.tokens
 
-    repository.facet(DockerFacet).putLayer(state.tokens['image'], context.request.payload)
+    repository.facet(DockerFacet).putLayer(state.tokens['layerId'], context.request.payload)
 
     return HttpResponses.ok()
   }
 
-  Closure putChecksum = { Context context ->
+  Closure putLayerChecksum = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[putChecksum] repository: {} tokens: {}', repository.name, state.tokens
+    log.info '[putLayerChecksum] repository: {} tokens: {}', repository.name, state.tokens
 
-    repository.facet(DockerFacet).putChecksum(
-        state.tokens['image'], (String) context.request.headers[P_X_DOCKER_CHECKSUM_PAYLOAD]
+    repository.facet(DockerFacet).putLayerChecksum(
+        state.tokens['layerId'], (String) context.request.headers[P_X_DOCKER_CHECKSUM_PAYLOAD]
     )
 
     return HttpResponses.ok()
   }
 
-  Closure getAncestry = { Context context ->
+  Closure getLayerAncestry = { Context context ->
     def state = context.attributes.require(TokenMatcher.State)
     def repository = context.repository
-    log.info '[getAncestry] repository: {} tokens: {}', repository.name, state.tokens
+    log.info '[getLayerAncestry] repository: {} tokens: {}', repository.name, state.tokens
 
-    return HttpResponses.ok(repository.facet(DockerFacet).getAncestry(state.tokens['image']))
+    return HttpResponses.ok(repository.facet(DockerFacet).getLayerAncestry(state.tokens['layerId']))
   }
 
   private void copyAttributeAsHeader(final Content content, final Response response, final String name) {

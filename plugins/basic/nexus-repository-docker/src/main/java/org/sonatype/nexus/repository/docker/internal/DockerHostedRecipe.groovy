@@ -294,43 +294,43 @@ class DockerHostedRecipe
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET),
-            new TokenMatcher('/v1/images/{image}/json'),
+            new TokenMatcher('/v1/images/{layerId}/json'),
         ))
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.getMetadata)
+        .handler(v1Images.getLayerMetadata)
         .create())
 
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(PUT),
-            new TokenMatcher('/v1/images/{image}/json'),
+            new TokenMatcher('/v1/images/{layerId}/json'),
         ))
         .handler(timingHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.putMetadata)
+        .handler(v1Images.putLayerMetadata)
         .create())
 
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET),
-            new TokenMatcher('/v1/images/{image}/layer'),
+            new TokenMatcher('/v1/images/{layerId}/layer'),
         ))
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(partialFetchHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.getLayer)
+        .handler(v1Images.getLayerContent)
         .create())
 
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(PUT),
-            new TokenMatcher('/v1/images/{image}/layer'),
+            new TokenMatcher('/v1/images/{layerId}/layer'),
         ))
         .handler(timingHandler)
         .handler(v1ExceptionHandler)
@@ -341,24 +341,24 @@ class DockerHostedRecipe
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(PUT),
-            new TokenMatcher('/v1/images/{image}/checksum'),
+            new TokenMatcher('/v1/images/{layerId}/checksum'),
         ))
         .handler(timingHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.putChecksum)
+        .handler(v1Images.putLayerChecksum)
         .create())
 
     builder.route(new Route.Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET),
-            new TokenMatcher('/v1/images/{image}/ancestry'),
+            new TokenMatcher('/v1/images/{layerId}/ancestry'),
         ))
         .handler(timingHandler)
         .handler(conditionalRequestHandler)
         .handler(v1ExceptionHandler)
         .handler(unitOfWorkHandler)
-        .handler(v1Images.getAncestry)
+        .handler(v1Images.getLayerAncestry)
         .create())
 
     builder.defaultHandlers(HttpHandlers.badRequest())
