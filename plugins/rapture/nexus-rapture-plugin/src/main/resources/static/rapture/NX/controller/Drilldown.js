@@ -354,6 +354,10 @@ Ext.define('NX.controller.Drilldown', {
         model = me.getById(store, parseInt(modelId)); // check for integer model id
       }
       if (model === null) {
+        NX.Messages.add({
+          text: "TODO: model not in local cache",
+          type: 'warning'
+        });
         return;
       }
       lists[index].fireEvent('selection', lists[index], model);
