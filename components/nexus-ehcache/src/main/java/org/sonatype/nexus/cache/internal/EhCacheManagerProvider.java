@@ -96,11 +96,19 @@ public class EhCacheManagerProvider
     CachingProvider provider = Caching.getCachingProvider(type.getName(), type.getClassLoader());
     log.info("Caching provider: {}", provider);
 
-    log.info("Creating cache-manager with configuration: {}", config);
-    CacheManager manager = provider.getCacheManager(config, getClass().getClassLoader());
-    log.debug("Created cache-manager: {}", manager);
+    ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(type.getClassLoader());
 
-    return manager;
+      log.info("Creating cache-manager with configuration: {}", config);
+      CacheManager manager = provider.getCacheManager(config, null);
+      log.debug("Created cache-manager: {}", manager);
+
+      return manager;
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(tccl);
+    }
   }
 
   @Override
