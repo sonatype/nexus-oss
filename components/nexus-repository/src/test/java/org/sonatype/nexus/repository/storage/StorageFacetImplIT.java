@@ -404,10 +404,7 @@ public class StorageFacetImplIT
       tx.deleteComponent(tx.findComponent(componentId, bucket));
 
       tx.commit();
-    }
-
-    try (StorageTx tx = beginTX()) {
-      Bucket bucket = tx.getBucket();
+      tx.begin();
 
       checkSize(tx.browseAssets(bucket), 0);
       checkSize(tx.browseComponents(bucket), 0);

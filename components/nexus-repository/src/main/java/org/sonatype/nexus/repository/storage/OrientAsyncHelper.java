@@ -45,6 +45,8 @@ class OrientAsyncHelper
 
   private static final long TIMEOUT_SECONDS = 60L;
 
+  private OrientAsyncHelper() {}
+
   /**
    * Executes with passed in {@link ODatabaseDocumentTx} connection the passed in {@link String} SELECT SQL command
    * and returns a true asynchronous backed {@link Iterable} of {@link ODocument} instance, that can be later
@@ -141,7 +143,7 @@ class OrientAsyncHelper
           throw Throwables.propagate(e);
         }
       }
-      return next != SENTINEL;
+      return next != SENTINEL; // NOSONAR: we are specific with Sentinel instance
     }
 
     @Override
