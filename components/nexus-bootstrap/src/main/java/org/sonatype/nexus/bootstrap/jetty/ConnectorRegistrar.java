@@ -19,7 +19,16 @@ package org.sonatype.nexus.bootstrap.jetty;
  */
 public interface ConnectorRegistrar
 {
+  /**
+   * Registers a new Jetty {@link ConnectorConfiguration}, that creates a new connector on Jetty based on passed
+   * in configuration.
+   */
   void addConnector(ConnectorConfiguration connectorConfiguration);
 
+  /**
+   * Removes a Jetty {@link ConnectorConfiguration} by closing and removing the Jetty connector. Caller MUST use the
+   * same instance of {@link ConnectorConfiguration} that was used with {@link #addConnector(ConnectorConfiguration)}
+   * method to create a connector in the first place.
+   */
   void removeConnector(ConnectorConfiguration connectorConfiguration);
 }

@@ -76,7 +76,13 @@ public class ConnectorRegistrarImpl
         managedConfigurations.remove(connectorConfiguration);
     if (serviceRegistration != null) {
       log.info("Removing connector configuration {}", connectorConfiguration);
-      serviceRegistration.unregister();
+      try {
+        serviceRegistration.unregister();
+      }
+      catch (IllegalStateException e) {
+        // nop, happens on shutdown when context unregisters automatically all services
+        log.debug("Could not unregister connector", e);
+      }
     }
   }
 }

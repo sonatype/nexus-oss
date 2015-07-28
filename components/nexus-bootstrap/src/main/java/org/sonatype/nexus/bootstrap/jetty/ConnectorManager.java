@@ -60,14 +60,15 @@ public class ConnectorManager
    */
   public ServerConnector addConnector(final ConnectorConfiguration connectorConfiguration)
   {
-    verifyConfiguration(connectorConfiguration.getScheme());
+    final HttpScheme httpScheme = connectorConfiguration.getScheme();
+    verifyConfiguration(httpScheme);
 
     final HttpConfiguration httpConfiguration =
-        connectorConfiguration.customize(defaultHttpConfiguration(connectorConfiguration.getScheme()));
+        connectorConfiguration.customize(defaultHttpConfiguration(httpScheme));
     final ServerConnector connectorPrototype =
-        defaultConnector(connectorConfiguration.getScheme());
+        defaultConnector(httpScheme);
     final ServerConnector serverConnector;
-    if (HttpScheme.HTTP == connectorConfiguration.getScheme()) {
+    if (HttpScheme.HTTP == httpScheme) {
       serverConnector = new ServerConnector(
           server,
           connectorPrototype.getAcceptors(),
@@ -77,7 +78,7 @@ public class ConnectorManager
           )
       );
     }
-    else if (HttpScheme.HTTPS == connectorConfiguration.getScheme()) {
+    else if (HttpScheme.HTTPS == httpScheme) {
       final SslContextFactory sslContextFactory = bean(SSL_CONTEXT_FACTORY_ID, SslContextFactory.class);
       serverConnector = new ServerConnector(
           server,
@@ -90,7 +91,7 @@ public class ConnectorManager
       );
     }
     else {
-      throw new IllegalArgumentException("Unsupported HTTP Scheme: " + connectorConfiguration.getScheme());
+      throw new UnsupportedHttpSchemeException(httpScheme);
     }
     serverConnector.setHost(connectorPrototype.getHost());
     serverConnector.setPort(connectorConfiguration.getPort());
@@ -133,19 +134,19 @@ public class ConnectorManager
   /**
    * Verifies all the needed bits are present in Jetty XML configuration (as HTTPS must be enabled by users).
    */
-  private void verifyConfiguration(final HttpScheme scheme) {
+  private void verifyConfiguration(final HttpScheme httpScheme) {
     try {
-      if (HttpScheme.HTTP == scheme) {
+      if (HttpScheme.HTTP == httpScheme) {
         bean(HTTP_CONFIG_ID, HttpConfiguration.class);
         bean(HTTP_CONNECTOR_ID, ServerConnector.class);
       }
-      else if (HttpScheme.HTTPS == scheme) {
+      else if (HttpScheme.HTTPS == httpScheme) {
         bean(SSL_CONTEXT_FACTORY_ID, SslContextFactory.class);
         bean(HTTPS_CONFIG_ID, HttpConfiguration.class);
         bean(HTTPS_CONNECTOR_ID, ServerConnector.class);
       }
       else {
-        throw new IllegalArgumentException("Unsupported HTTP Scheme: " + scheme);
+        throw new UnsupportedHttpSchemeException(httpScheme);
       }
     }
     catch (IllegalStateException e) {
@@ -164,7 +165,7 @@ public class ConnectorManager
       return bean(HTTPS_CONFIG_ID, HttpConfiguration.class);
     }
     else {
-      throw new IllegalArgumentException("Unsupported HTTP Scheme: " + httpScheme);
+      throw new UnsupportedHttpSchemeException(httpScheme);
     }
   }
 
@@ -179,7 +180,7 @@ public class ConnectorManager
       return bean(HTTPS_CONNECTOR_ID, ServerConnector.class);
     }
     else {
-      throw new IllegalArgumentException("Unsupported HTTP Scheme: " + httpScheme);
+      throw new UnsupportedHttpSchemeException(httpScheme);
     }
   }
 
