@@ -37,7 +37,7 @@
     <module>nexus-commands</module>
     <module>nexus-common</module>
     <module>nexus-core</module>
-    <module>nexus-ehcache</module>
+    <module>nexus-cache</module>
     <module>nexus-elasticsearch</module>
     <module>nexus-email</module>
     <module>nexus-extender</module>
