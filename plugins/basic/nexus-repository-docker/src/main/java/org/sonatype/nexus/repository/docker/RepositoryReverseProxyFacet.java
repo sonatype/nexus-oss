@@ -22,6 +22,9 @@ public interface RepositoryReverseProxyFacet
     extends Facet
 {
 
+  /**
+   * @return configured reverse proxy connector port
+   */
   int getPort();
 
 }

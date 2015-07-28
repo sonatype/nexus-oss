@@ -23,6 +23,9 @@ import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 /**
+ * An {@link Handler} that will map Docker {@link V1ApiException}s to HTTP failures based on the code/message present
+ * in mapped exception.
+ *
  * @since 3.0
  */
 public class V1ExceptionHandler

@@ -80,6 +80,8 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_VERSION;
 
 /**
+ * {@link DockerFacet} implementation.
+ *
  * @since 3.0
  */
 @Named

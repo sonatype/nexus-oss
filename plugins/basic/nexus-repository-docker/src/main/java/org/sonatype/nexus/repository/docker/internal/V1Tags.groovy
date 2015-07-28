@@ -24,6 +24,8 @@ import org.sonatype.sisu.goodies.common.ComponentSupport
 import com.google.common.net.HttpHeaders
 
 /**
+ * Tag handlers for Docker v1 protocol.
+ *
  * @since 3.0
  */
 @Named

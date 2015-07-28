@@ -27,6 +27,8 @@ import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X
 import static org.sonatype.nexus.repository.docker.internal.DockerAttributes.P_X_DOCKER_SIZE
 
 /**
+ * Images handlers for Docker v1 protocol.
+ *
  * @since 3.0
  */
 @Named

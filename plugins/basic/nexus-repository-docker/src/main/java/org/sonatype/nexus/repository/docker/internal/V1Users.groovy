@@ -19,6 +19,8 @@ import org.sonatype.nexus.repository.http.HttpResponses
 import org.sonatype.nexus.repository.view.Context
 
 /**
+ * Users (hub like) handlers for Docker v1 protocol.
+ *
  * @since 3.0
  */
 @Named

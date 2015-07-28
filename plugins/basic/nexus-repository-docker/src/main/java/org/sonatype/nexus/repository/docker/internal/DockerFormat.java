@@ -17,6 +17,11 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Format;
 
+/**
+ * Docker repository format.
+ *
+ * @since 3.0
+ */
 @Named(DockerFormat.NAME)
 @Singleton
 public class DockerFormat

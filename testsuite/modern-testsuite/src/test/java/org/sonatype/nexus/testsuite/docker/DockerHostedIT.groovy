@@ -24,6 +24,9 @@ class DockerHostedIT
     extends DockerITSupport
 {
 
+  /**
+   * Push and pull a v1 repository, checking that we get back the same layers.
+   */
   @Test
   void pushAndPull() {
     def repository = createDockerHostedRepository()

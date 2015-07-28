@@ -24,6 +24,8 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 import org.sonatype.sisu.goodies.common.ComponentSupport
 
 /**
+ * Index (hub like) handlers for Docker v1 protocol.
+ *
  * @since 3.0
  */
 @Named

@@ -20,7 +20,7 @@ import org.sonatype.nexus.repository.security.SecurityFacetSupport;
 import org.sonatype.nexus.security.SecurityHelper;
 
 /**
- * RAW security facet.
+ * Docker format security facet.
  *
  * @since 3.0
  */

@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.docker.internal;
 import org.sonatype.nexus.repository.http.HttpStatus;
 
 /**
+ * Thrown in case of an Docker v1 protocol violation.
+ *
  * @since 3.0
  */
 public class V1ApiException

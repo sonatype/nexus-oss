@@ -13,6 +13,8 @@
 package org.sonatype.nexus.repository.docker.internal;
 
 /**
+ * Docker format specific attributes.
+ *
  * @since 3.0
  */
 public interface DockerAttributes

@@ -33,6 +33,8 @@ import org.elasticsearch.search.sort.SortBuilders
 import org.elasticsearch.search.sort.SortOrder
 
 /**
+ * Search handler for Docker v1 protocol.
+ *
  * @since 3.0
  */
 @Named
