@@ -142,7 +142,7 @@ public class NegativeCacheFacetImpl
   }
 
   private void maybeDestroyCache() {
-    if (cache != null) {
+    if (cache != null && !cacheManager.isClosed()) {
       log.debug("Destroying negative-cache for: {}", getRepository());
       cacheManager.destroyCache(cache.getName());
       cache = null;
