@@ -19,16 +19,16 @@ import org.sonatype.nexus.repository.http.HttpStatus;
  *
  * @since 3.0
  */
-public class V1Exception
+public abstract class V1Exception
     extends RuntimeException
 {
   private final int httpCode;
 
-  private V1Exception(final String message) {
+  protected V1Exception(final String message) {
     this(message, HttpStatus.BAD_REQUEST);
   }
 
-  private V1Exception(final String message, final int httpCode) {
+  protected V1Exception(final String message, final int httpCode) {
     super(message);
     this.httpCode = httpCode;
   }
@@ -37,7 +37,7 @@ public class V1Exception
     return httpCode;
   }
 
-  static class ImagesNotFound
+  public static class ImagesNotFound
       extends V1Exception
   {
     public ImagesNotFound() {
@@ -45,7 +45,7 @@ public class V1Exception
     }
   }
 
-  static class TagNotFound
+  public static class TagNotFound
       extends V1Exception
   {
     public TagNotFound() {
@@ -53,7 +53,7 @@ public class V1Exception
     }
   }
 
-  static class ImageNotFound
+  public static class ImageNotFound
       extends V1Exception
   {
     public ImageNotFound() {
@@ -61,7 +61,7 @@ public class V1Exception
     }
   }
 
-  static class ImageAlreadyExists
+  public static class ImageAlreadyExists
       extends V1Exception
   {
     public ImageAlreadyExists() {
@@ -73,7 +73,7 @@ public class V1Exception
     }
   }
 
-  static class InvalidLayerMetadata
+  public static class InvalidLayerMetadata
       extends V1Exception
   {
     public InvalidLayerMetadata(final String message) {
@@ -81,7 +81,7 @@ public class V1Exception
     }
   }
 
-  static class InvalidImageId
+  public static class InvalidImageId
       extends V1Exception
   {
     public InvalidImageId() {
@@ -89,7 +89,7 @@ public class V1Exception
     }
   }
 
-  static class InvalidTagName
+  public static class InvalidTagName
       extends V1Exception
   {
     public InvalidTagName() {
@@ -97,7 +97,7 @@ public class V1Exception
     }
   }
 
-  static class InvalidChecksum
+  public static class InvalidChecksum
       extends V1Exception
   {
     public InvalidChecksum(final String message) {
@@ -105,7 +105,7 @@ public class V1Exception
     }
   }
 
-  static class InvalidJson
+  public static class InvalidJson
       extends V1Exception
   {
     public InvalidJson() {
@@ -117,7 +117,7 @@ public class V1Exception
     }
   }
 
-  static class OldDocker
+  public static class OldDocker
       extends V1Exception
   {
     public OldDocker() {
