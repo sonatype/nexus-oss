@@ -18,7 +18,8 @@ StartTest(function(t) {
           ' nx-settingsform',
       waitForUnmasked = function() {
         return !t.cq1(smtpSettingsFormCQ).el.isMasked();
-      };
+      },
+      uniqueId = t.uniqueId();
 
   t.describe('Given an admin administering Email Server', function(t) {
     t.it('Should be able to view the configuration', function(t) {
@@ -37,9 +38,9 @@ StartTest(function(t) {
     t.it('Should be able to discard settings on the form', function(t) {
       t.chain(
           // type in some test strings to empty fields
-          t.selectAndType('_test', smtpSettingsCQ + ' field[name=subjectPrefix]'),
-          t.selectAndType('_testUser', smtpSettingsCQ + ' field[name=username]'),
-          t.selectAndType('_testPassword', smtpSettingsCQ + ' field[name=password]'),
+          t.selectAndType(uniqueId, smtpSettingsCQ + ' field[name=subjectPrefix]'),
+          t.selectAndType(uniqueId, smtpSettingsCQ + ' field[name=username]'),
+          t.selectAndType(uniqueId, smtpSettingsCQ + ' field[name=password]'),
           {
             waitFor: 'Event', args: [smtpSettingsFormCQ, 'load'],
             trigger: {click: smtpSettingsCQ + ' button[action=discard]', desc: 'Discard all changes'}
@@ -87,7 +88,7 @@ StartTest(function(t) {
           // press the "Save" button
           {
             waitFor: 'Event', args: [smtpSettingsFormCQ, 'submitted'],
-            trigger: {click: smtpSettingsCQ + ' button[action=save]', desc: 'Save new settings'},
+            trigger: {click: smtpSettingsCQ + ' button[action=save][enabled=true]', desc: 'Save new settings'},
           },
           {waitFor: waitForUnmasked},
           function(next) {
