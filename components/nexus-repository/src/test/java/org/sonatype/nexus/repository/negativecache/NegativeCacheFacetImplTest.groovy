@@ -12,26 +12,24 @@
  */
 package org.sonatype.nexus.repository.negativecache
 
+import javax.cache.Cache
+import javax.cache.CacheManager
+import javax.cache.configuration.MutableConfiguration
+
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
 import org.sonatype.nexus.repository.config.ConfigurationFacet
 import org.sonatype.nexus.repository.http.HttpStatus
 import org.sonatype.nexus.repository.view.Status
-import org.sonatype.sisu.goodies.common.Time
 import org.sonatype.sisu.goodies.eventbus.EventBus
 import org.sonatype.sisu.litmus.testsupport.TestSupport
 
 import com.google.common.collect.Lists
-import net.sf.ehcache.Cache
-import net.sf.ehcache.CacheManager
-import net.sf.ehcache.Ehcache
-import net.sf.ehcache.Element
+import com.google.common.collect.Maps
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 
-import static net.sf.ehcache.Status.STATUS_ALIVE
-import static net.sf.ehcache.Status.STATUS_SHUTDOWN
 import static org.mockito.Matchers.any
 import static org.mockito.Mockito.eq
 import static org.mockito.Mockito.mock
@@ -53,7 +51,7 @@ class NegativeCacheFacetImplTest
 
   private CacheManager cacheManager
 
-  private Ehcache cache
+  private Cache cache
 
   private Repository repository
 
@@ -62,17 +60,10 @@ class NegativeCacheFacetImplTest
   @Before
   void setUp() {
     cacheManager = mock(CacheManager)
-    when(cacheManager.status).thenReturn(STATUS_ALIVE)
-    cache = mock(Ehcache)
-    underTest = new NegativeCacheFacetImpl(cacheManager) {
-      @Override
-      Ehcache newCache(final String name, final int timeToLiveSeconds) {
-        assert name == 'negative-cache-test'
-        assert timeToLiveSeconds.equals(Time.hours(24).toSecondsI())
-        when(cache.name).thenReturn(name)
-        return cache
-      }
-    }
+    when(cacheManager.isClosed()).thenReturn(false)
+    cache = mock(Cache)
+    when(cacheManager.createCache(any(String), any(MutableConfiguration))).thenReturn(cache)
+    underTest = new NegativeCacheFacetImpl(cacheManager)
     underTest.installDependencies(mock(EventBus))
     key = mock(NegativeCacheKey)
     status = Status.failure(HttpStatus.NOT_FOUND, '404')
@@ -103,14 +94,14 @@ class NegativeCacheFacetImplTest
     underTest.attach(repository)
     underTest.init()
     underTest.start()
-    verify(cacheManager, never()).addCache(any(Cache))
+    verify(cacheManager, never()).createCache(any(String), any(MutableConfiguration))
     assert underTest.get(key) == null
     underTest.put(key, Status.failure(HttpStatus.NOT_FOUND, '404'))
     underTest.invalidate(key)
     underTest.invalidate()
     underTest.stop()
     underTest.destroy()
-    verify(cacheManager, never()).removeCache(any(String))
+    verify(cacheManager, never()).destroyCache(any(String))
   }
 
   /**
@@ -129,14 +120,14 @@ class NegativeCacheFacetImplTest
     underTest.attach(repository)
     underTest.init()
     underTest.start()
-    verify(cacheManager, never()).addCache(any(Cache))
+    verify(cacheManager, never()).createCache(any(String), any(MutableConfiguration))
     assert underTest.get(key) == null
     underTest.put(key, Status.failure(HttpStatus.NOT_FOUND, '404'))
     underTest.invalidate(key)
     underTest.invalidate()
     underTest.stop()
     underTest.destroy()
-    verify(cacheManager, never()).removeCache(any(String))
+    verify(cacheManager, never()).destroyCache(any(String))
   }
 
   /**
@@ -153,10 +144,13 @@ class NegativeCacheFacetImplTest
     underTest.attach(repository)
     underTest.init()
     underTest.start()
-    verify(cacheManager).addCache(cache)
+    ArgumentCaptor<String> cacheNameCaptor = ArgumentCaptor.forClass(String)
+    ArgumentCaptor<MutableConfiguration> configCaptor = ArgumentCaptor.forClass(MutableConfiguration)
+    verify(cacheManager).createCache(cacheNameCaptor.capture(), configCaptor.capture())
+    when(cache.name).thenReturn(cacheNameCaptor.value)
     underTest.stop()
     underTest.destroy()
-    verify(cacheManager).removeCache(cache.name)
+    verify(cacheManager).destroyCache(cacheNameCaptor.value)
   }
 
   /**
@@ -173,10 +167,10 @@ class NegativeCacheFacetImplTest
     underTest.attach(repository)
     underTest.init()
     underTest.start()
-    when(cacheManager.status).thenReturn(STATUS_SHUTDOWN)
+    when(cacheManager.isClosed()).thenReturn(true)
     underTest.stop()
     underTest.destroy()
-    verify(cacheManager, never()).removeCache(any(String))
+    verify(cacheManager, never()).destroyCache(any(String))
   }
 
   /**
@@ -193,10 +187,11 @@ class NegativeCacheFacetImplTest
     underTest.init()
     underTest.start()
     underTest.put(key, status)
-    ArgumentCaptor<Element> elementCaptor = ArgumentCaptor.forClass(Element);
-    verify(cache).put(elementCaptor.capture())
-    assert key == elementCaptor.value.objectKey
-    assert status == elementCaptor.value.objectValue
+    ArgumentCaptor<NegativeCacheKey> keyCaptor = ArgumentCaptor.forClass(NegativeCacheKey);
+    ArgumentCaptor<Status> statusCaptor = ArgumentCaptor.forClass(Status);
+    verify(cache).put(keyCaptor.capture(), statusCaptor.capture())
+    assert key == keyCaptor.value
+    assert status == statusCaptor.value
   }
 
   /**
@@ -213,7 +208,7 @@ class NegativeCacheFacetImplTest
     underTest.attach(repository)
     underTest.init()
     underTest.start()
-    when(cache.get(key)).thenReturn(new Element(key, status))
+    when(cache.get(key)).thenReturn(status)
     Status actualStatus = underTest.get(key)
     assert actualStatus == status
   }
@@ -283,7 +278,11 @@ class NegativeCacheFacetImplTest
   void 'invalidate subset removes key and all child keys'() {
     NegativeCacheKey key1 = mock(NegativeCacheKey)
     NegativeCacheKey key2 = mock(NegativeCacheKey)
-    when(cache.getKeys()).thenReturn(Lists.newArrayList(key1, key2))
+    Cache.Entry<NegativeCacheKey, Status> entry1 = mock(Cache.Entry)
+    Cache.Entry<NegativeCacheKey, Status> entry2 = mock(Cache.Entry)
+    when(entry1.key).thenReturn(key1)
+    when(entry2.key).thenReturn(key2)
+    mockIterable(cache, entry1, entry2)
     when(key.isParentOf(key1)).thenReturn(false)
     when(key.isParentOf(key2)).thenReturn(true)
     config.enabled = true
@@ -294,5 +293,28 @@ class NegativeCacheFacetImplTest
     verify(cache).remove(key)
     verify(cache, never()).remove(key1)
     verify(cache).remove(key2)
+  }
+
+  static void mockIterable(Cache<?,?> iterable, Object... values) {
+    Iterator<?> mockIterator = mock(Iterator)
+    when(iterable.iterator()).thenReturn(mockIterator)
+
+    if (values.length == 0) {
+      when(mockIterator.hasNext()).thenReturn(false)
+    }
+    else if (values.length == 1) {
+      when(mockIterator.hasNext()).thenReturn(true, false)
+      when(mockIterator.next()).thenReturn(values[0])
+    }
+    else {
+      Boolean[] hasNextResponses = new Boolean[values.length]
+      for (int i = 0; i < hasNextResponses.length-1; i++) {
+        hasNextResponses[i] = true
+      }
+      hasNextResponses[hasNextResponses.length - 1] = false
+      when(mockIterator.hasNext()).thenReturn(true, hasNextResponses)
+      Object[] valuesMinusTheFirst = Arrays.copyOfRange(values, 1, values.length)
+      when(mockIterator.next()).thenReturn(values[0], valuesMinusTheFirst)
+    }
   }
 }

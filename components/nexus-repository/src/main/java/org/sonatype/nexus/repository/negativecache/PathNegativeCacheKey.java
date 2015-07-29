@@ -14,6 +14,8 @@ package org.sonatype.nexus.repository.negativecache;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// TODO: implement Externalizable
+
 /**
  * A path based {@link NegativeCacheKey}.
  *

@@ -37,7 +37,7 @@
     <module>nexus-commands</module>
     <module>nexus-common</module>
     <module>nexus-core</module>
-    <module>nexus-ehcache</module>
+    <module>nexus-cache</module>
     <module>nexus-elasticsearch</module>
     <module>nexus-email</module>
     <module>nexus-extender</module>
@@ -72,6 +72,14 @@
       <dependency>
         <groupId>org.sonatype.nexus.buildsupport</groupId>
         <artifactId>nexus-buildsupport-all</artifactId>
+        <type>pom</type>
+        <version>3.0.0-SNAPSHOT</version>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus.bundles</groupId>
+        <artifactId>nexus-thirdparty-bundles</artifactId>
         <type>pom</type>
         <version>3.0.0-SNAPSHOT</version>
         <scope>import</scope>
