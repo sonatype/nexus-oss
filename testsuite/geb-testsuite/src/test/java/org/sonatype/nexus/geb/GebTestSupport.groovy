@@ -69,7 +69,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*
 
 @RunWith(PaxExam.class)
 //class TestSpec extends GebReportingSpec // TODO - KR would need a pax-exam compatible running for Spock Sputnik here
-class BaseTest
+class GebTestSupport
     extends GebReportingTest
 {
 

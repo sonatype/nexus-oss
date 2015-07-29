@@ -17,8 +17,8 @@ import org.sonatype.nexus.geb.pages.HomePage
 import org.junit.Test
 
 
-class SigninSpec
-    extends BaseTest
+class SigninIT
+    extends GebTestSupport
 {
 
   @Test

@@ -173,59 +173,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!--
-            Don't halt on failures, so that the damage control report can pick up the test results.
-            CI builds set this to true so that it can analyze the test results.
-            If you want to use it locally then pass the property maven.test.failure.ignore to the build.
-
-            <testFailureIgnore>true</testFailureIgnore>
-          -->
-          <excludes>
-            <!-- Examples to be run as individual tests from Maven CLI or IDE. -->
-            <exclude>**/example/**</exclude>
-            <exclude>${exclude.tests}</exclude>
-          </excludes>
-          <includes>
-            <include>**/*Spec.*</include>
-          </includes>
-          <systemPropertyVariables>
-            <slowmo.enable>true</slowmo.enable>
-            <!--
-              Defined in GebConfig.groovy so that tests can be executed in Eclipse or from Maven CLI.
-            -->
-            <!-- <geb.build.reportsDir>${project.build.directory}/test-reports/geb</geb.build.reportsDir> -->
-            <!-- <geb.build.baseUrl>http://localhost:8070/</geb.build.baseUrl> -->
-          </systemPropertyVariables>
-          <argLine>-XX:MaxPermSize=144m</argLine>
-          <trimStackTrace>false</trimStackTrace>
-        </configuration>
-      </plugin>
-      <!--
-        A nice report using the Spock blocks
-        https://github.com/damage-control/
-      -->
-      <plugin>
-        <groupId>com.github.damage-control.report</groupId>
-        <artifactId>damage-control-maven-plugin</artifactId>
-        <version>1.1.0</version>
-        <configuration>
-          <skip>${skipTests}</skip>
-          <specDefinitionsFolder>${project.build.testSourceDirectory}</specDefinitionsFolder>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>test</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <!--
       Unpack shared test-data
       -->
