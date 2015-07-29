@@ -2,12 +2,16 @@ package org.sonatype.nexus.test.concurrent;
 
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * A helper class to wrap a {@link ConcurrentTask} and trap any exceptions that it throws. If an exception is thrown, it
+ * A helper class to wrap a {@link ConcurrentTask} and trap any exceptions that it throws. If an exception is thrown,
+ * it
  * trips a flag to force its peers to abort sooner, rather than waiting for the executor service to time out.
  */
 class ConcurrentTestWorker
@@ -24,18 +28,23 @@ class ConcurrentTestWorker
 
   private final ConcurrentTask concurrentTask;
 
-  private final AtomicReference<Exception> exception = new AtomicReference<>();
+  private final AtomicReference<Throwable> exception = new AtomicReference<>();
 
-  public ConcurrentTestWorker(final int workerNumber, final CyclicBarrier iterationStartSignal,
+  private final AtomicInteger runInvocations;
+
+  public ConcurrentTestWorker(final int workerNumber,
+                              final CyclicBarrier iterationStartSignal,
                               final AtomicBoolean failureSignal,
                               final int iterations,
-                              final ConcurrentTask concurrentTask)
+                              final ConcurrentTask concurrentTask,
+                              final AtomicInteger runInvocations)
   {
-    this.concurrentTask = concurrentTask;
-    this.iterationStartSignal = iterationStartSignal;
-    this.failureSignal = failureSignal;
-    this.iterations = iterations;
     this.workerNumber = workerNumber;
+    this.iterationStartSignal = checkNotNull(iterationStartSignal);
+    this.failureSignal = checkNotNull(failureSignal);
+    this.iterations = iterations;
+    this.concurrentTask = checkNotNull(concurrentTask);
+    this.runInvocations = checkNotNull(runInvocations);
   }
 
   @Override
@@ -47,16 +56,19 @@ class ConcurrentTestWorker
           break;
         }
         iterationStartSignal.await();
+
+        runInvocations.incrementAndGet();
+        log.info("Test worker " + workerNumber + " incrementing runInvocations to " + runInvocations.get());
         concurrentTask.run();
         log.info("Test worker " + workerNumber + " completing iteration " + i);
       }
     }
-    catch (Exception e) {
+    catch (Exception | AssertionError e) {
+      log.info("Runnable threw an exception for worker " + workerNumber, e);
       failureSignal.set(true);
       // Dislodge any peers waiting at the barrier; the test has failed, so don't wait for timeout
       iterationStartSignal.reset();
       this.exception.set(e);
-      log.info("Runnable threw an exception for worker " + workerNumber, e);
     }
     finally {
       log.info("Test worker " + workerNumber + " completing.");
@@ -67,7 +79,7 @@ class ConcurrentTestWorker
     return exception.get() != null;
   }
 
-  public Exception getException() {
+  public Throwable getException() {
     return exception.get();
   }
 }

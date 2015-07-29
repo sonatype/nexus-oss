@@ -7,14 +7,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.base.Preconditions;
-import org.junit.Assert;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static org.junit.Assert.fail;
+import com.google.common.base.Throwables;
 
 /**
  * Executes a batch of {@link ConcurrentTask}s concurrently for testing purposes.
@@ -22,7 +20,8 @@ import static org.junit.Assert.fail;
 public class ConcurrentRunner
     extends ComponentSupport
 {
-  List<ConcurrentTestWorker> testWorkers = new ArrayList<>();
+  private List<ConcurrentTask> tasks = new ArrayList<>();
+
 
   // A cyclic barrier ensures that the threads align after each unit of work, to avoid some completing much before
   // the others, thereby increasing contention
@@ -35,6 +34,8 @@ public class ConcurrentRunner
 
   private final int terminationWaitTimeSeconds;
 
+  private AtomicInteger runInvocations = new AtomicInteger(0);
+
   /**
    * @param iterations                 How many times each task should be invoked
    * @param terminationWaitTimeSeconds How long to wait for all iterations to complete
@@ -44,21 +45,43 @@ public class ConcurrentRunner
     this.terminationWaitTimeSeconds = terminationWaitTimeSeconds;
   }
 
+  public void addTask(final ConcurrentTask task) {
+    addTask(1, task);
+  }
+
   /**
    * Adds a task to the runner. The task is executed 'threads' number of times each iteration.
    */
-  public void addTask(int threads, final ConcurrentTask task)
+  public void addTask(final int threads, final ConcurrentTask task)
   {
     Preconditions.checkArgument(threads >= 1);
     for (int i = 0; i < threads; i++) {
-      testWorkers.add(new ConcurrentTestWorker(testWorkers.size(), startingGun, failureHasOccurred, iterations, task));
+      tasks.add(task);
     }
   }
 
   public void go() throws Exception {
-    initStartingGun();
+    runInvocations.set(0);
 
-    ExecutorService service = Executors.newFixedThreadPool(testWorkers.size());
+    startingGun = new CyclicBarrier(tasks.size(), new Runnable()
+    {
+      int iterationCount = 0;
+
+      @Override
+      public void run() {
+        log.debug("Iteration starting: " + iterationCount++);
+      }
+    });
+
+    List<ConcurrentTestWorker> testWorkers = new ArrayList<>();
+
+    ExecutorService service = Executors.newFixedThreadPool(tasks.size());
+
+    for (ConcurrentTask task : tasks) {
+      final ConcurrentTestWorker worker = new ConcurrentTestWorker(testWorkers.size(), startingGun, failureHasOccurred,
+          iterations, task, runInvocations);
+      testWorkers.add(worker);
+    }
 
     for (Runnable r : testWorkers) {
       service.submit(r);
@@ -69,20 +92,16 @@ public class ConcurrentRunner
 
     for (ConcurrentTestWorker testWorker : testWorkers) {
       if (testWorker.experiencedFailure()) {
-        Assert.fail("A test worker experienced a failure.");
+        // Throws any old exception, but also JUnit assertion errors
+        Throwables.propagateIfPossible(testWorker.getException(), Exception.class, AssertionError.class);
       }
     }
   }
 
-  private void initStartingGun() {
-    startingGun = new CyclicBarrier(testWorkers.size(), new Runnable()
-    {
-      int iterationCount = 0;
-
-      @Override
-      public void run() {
-        log.debug("Iteration starting: " + iterationCount++);
-      }
-    });
+  /**
+   * The total number of times a {@link ConcurrentTask}'s {@link ConcurrentTask#run()} method was invoked.
+   */
+  public int getRunInvocations() {
+    return runInvocations.get();
   }
 }

@@ -21,11 +21,11 @@ import org.sonatype.nexus.testsuite.repository.FormatClientSupport;
 import com.google.common.net.HttpHeaders;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.jboss.resteasy.util.DateUtil;
 
 /**
@@ -34,7 +34,7 @@ import org.jboss.resteasy.util.DateUtil;
 public class Maven2Client
     extends FormatClientSupport
 {
-  public Maven2Client(final HttpClient httpClient,
+  public Maven2Client(final CloseableHttpClient httpClient,
                       final HttpClientContext httpClientContext,
                       final URI repositoryBaseUri)
   {

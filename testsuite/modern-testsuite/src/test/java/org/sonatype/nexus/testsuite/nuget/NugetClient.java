@@ -25,12 +25,14 @@ import org.sonatype.nexus.testsuite.repository.FormatClientSupport;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -55,7 +57,7 @@ public class NugetClient
 
   private String apiKey;
 
-  public NugetClient(final HttpClient httpClient,
+  public NugetClient(final CloseableHttpClient httpClient,
                      final HttpClientContext httpClientContext,
                      final URI repositoryBaseUri,
                      @Nullable final String apiKey)
@@ -124,7 +126,7 @@ public class NugetClient
    * @param version
    * @return the nupkg file
    */
-  public HttpResponse packageContent(final String packageId, final String version) throws IOException {
+  public CloseableHttpResponse packageContent(final String packageId, final String version) throws IOException {
     return get(String.format("%s/%s", packageId, version));
   }
 

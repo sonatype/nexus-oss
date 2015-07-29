@@ -99,6 +99,12 @@
       <artifactId>maven-verifier</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-concurrent</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

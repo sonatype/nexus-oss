@@ -20,9 +20,11 @@ import javax.annotation.Nonnull;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
@@ -35,13 +37,13 @@ import static com.google.common.base.Preconditions.checkState;
 public class FormatClientSupport
     extends ComponentSupport
 {
-  protected final HttpClient httpClient;
+  protected final CloseableHttpClient httpClient;
 
   protected final HttpClientContext httpClientContext;
 
   protected final URI repositoryBaseUri;
 
-  public FormatClientSupport(final HttpClient httpClient, final HttpClientContext httpClientContext,
+  public FormatClientSupport(final CloseableHttpClient httpClient, final HttpClientContext httpClientContext,
                              final URI repositoryBaseUri)
   {
     this.httpClient = checkNotNull(httpClient);
@@ -57,16 +59,15 @@ public class FormatClientSupport
   /**
    * GET a response from the repository.
    */
-  public HttpResponse get(final String path) throws IOException {
+  public CloseableHttpResponse get(final String path) throws IOException {
     final URI uri = resolve(path);
     final HttpGet get = new HttpGet(uri);
     return execute(get);
   }
 
-
-  protected HttpResponse execute(final HttpUriRequest request) throws IOException {
+  protected CloseableHttpResponse execute(final HttpUriRequest request) throws IOException {
     log.info("Requesting {}", request);
-    final HttpResponse response = httpClient.execute(request, new BasicHttpContext(httpClientContext));
+    final CloseableHttpResponse response = httpClient.execute(request, new BasicHttpContext(httpClientContext));
     log.info("Received {}", response);
     return response;
   }
