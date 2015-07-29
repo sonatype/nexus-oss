@@ -339,7 +339,6 @@ public class MavenFacetImpl
     Asset asset = null;
     if (content != null) {
       // by EntityId
-      // by EntityId
       asset = Content.findAsset(tx, content);
     }
     if (asset == null) {
