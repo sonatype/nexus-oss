@@ -51,6 +51,7 @@ import org.sonatype.nexus.repository.view.payloads.StringPayload;
 import org.sonatype.nexus.transaction.Transactional;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
@@ -563,13 +564,12 @@ public class DockerFacetImpl
    * @param layerMetadataContent layer metadata content
    * @return parsed layer metadata
    */
-  private Map<String, Object> readLayerMetadata(final Supplier<InputStream> layerMetadataContent) {
+  private Map<String, Object> readLayerMetadata(final Supplier<InputStream> layerMetadataContent) throws IOException {
     TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {}; //NOSONAR
     try {
       return mapper.readValue(layerMetadataContent.get(), typeRef);
     }
-    catch (Exception e) {
-      log.debug("Invalid JSON", e);
+    catch (JsonProcessingException ignored) {
       throw new V1Exception.InvalidJson();
     }
   }
@@ -581,15 +581,12 @@ public class DockerFacetImpl
    * @return parsed images index
    */
   private List<Map<String, Object>> readImagesIndex(final Supplier<InputStream> imagesIndexContent) throws IOException {
-    try (InputStream in = imagesIndexContent.get()) {
-      TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {}; //NOSONAR
-      try {
-        return mapper.readValue(in, typeRef);
-      }
-      catch (Exception e) {
-        log.debug("Invalid JSON", e);
-        throw new V1Exception.InvalidJson();
-      }
+    TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {}; //NOSONAR
+    try {
+      return mapper.readValue(imagesIndexContent.get(), typeRef);
+    }
+    catch (JsonProcessingException ignored) {
+      throw new V1Exception.InvalidJson();
     }
   }
 
