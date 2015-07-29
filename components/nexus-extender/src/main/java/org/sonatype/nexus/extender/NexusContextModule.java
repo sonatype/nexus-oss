@@ -45,7 +45,7 @@ import static org.eclipse.sisu.osgi.ServiceBindings.defaultIgnore;
 public class NexusContextModule
     extends AbstractModule
 {
-  private static final String ALLOW_SERVICES = "org.apache.karaf.*," + defaultAllow();
+  private static final String ALLOW_SERVICES = "org.apache.karaf.*,org.sonatype.nexus.*," + defaultAllow();
 
   private static final String IGNORE_SERVICES = "org.apache.karaf.shell.*," + defaultIgnore();
 
