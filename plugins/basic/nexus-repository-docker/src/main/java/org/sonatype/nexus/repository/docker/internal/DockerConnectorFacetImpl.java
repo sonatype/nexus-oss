@@ -38,7 +38,6 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConfiguration.Customizer;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.ServerConnector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -59,8 +58,6 @@ public class DockerConnectorFacetImpl
   private final ConnectorRegistrar connectorRegistrar;
 
   private Config config;
-
-  private ServerConnector jettyConnector;
 
   private ConnectorConfiguration httpConfig;
 
