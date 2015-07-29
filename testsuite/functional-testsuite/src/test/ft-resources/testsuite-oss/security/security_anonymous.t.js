@@ -19,11 +19,6 @@ StartTest(function(t) {
     t.it('Can navigate to the admin screen', function(t) {
       t.chain(
           t.openPageAsAdmin('admin/security/anonymous'),
-          {
-            waitFor: 'Event', args: ['>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded']
-            , trigger: {click: '>>nx-header-refresh'}
-          },
-
           // bring settings to a known state (enabled checked)
           function(next) {
             var enabled = t.cq1('nx-coreui-security-anonymous-settings checkbox[name=enabled]');
