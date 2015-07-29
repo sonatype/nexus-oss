@@ -339,10 +339,8 @@ public class MavenFacetImpl
     Asset asset = null;
     if (content != null) {
       // by EntityId
-      final Asset contentAsset = content.getAttributes().require(Asset.class);
-      if (contentAsset.getEntityMetadata() != null) {
-        asset = tx.findAsset(contentAsset.getEntityMetadata().getId(), tx.getBucket());
-      }
+      // by EntityId
+      asset = Content.findAsset(tx, content);
     }
     if (asset == null) {
       // by format coordinates
