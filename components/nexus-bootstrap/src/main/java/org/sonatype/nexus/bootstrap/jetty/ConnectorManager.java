@@ -28,7 +28,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import static java.util.Collections.unmodifiableList;
 
 /**
- * Jetty's internal connector manager to manage custom {@link ConnectorConfiguration}s.
+ * {@link JettyServer}'s internal connector manager to manage custom {@link ConnectorConfiguration}s.
  * <p/>
  * Note: This class relies on "id" properties in Jetty XML configuration! Hence, the existing beans in Jetty XML
  * should NOT be renamed, while adding new (with unique, non-clashing) IDs is okay thing to do.

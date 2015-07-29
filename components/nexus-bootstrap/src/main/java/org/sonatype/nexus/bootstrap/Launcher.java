@@ -48,7 +48,8 @@ public class Launcher
     try {
       // check whether we have access to the optional JUL->SLF4J logging bridge
       hasJulBridge = Handler.class.isAssignableFrom(org.slf4j.bridge.SLF4JBridgeHandler.class);
-    } catch (Exception|LinkageError e) {
+    }
+    catch (Exception | LinkageError e) {
       hasJulBridge = false;
     }
     HAS_JUL_BRIDGE = hasJulBridge;
@@ -76,7 +77,7 @@ public class Launcher
   {
     this(null, classLoader, overrides, args);
   }
-  
+
   public Launcher(final @Nullable String basePath,
                   final @Nullable ClassLoader classLoader,
                   final @Nullable Map<String, String> overrides,
@@ -161,6 +162,12 @@ public class Launcher
     start(true, null);
   }
 
+  /**
+   * Starts Jetty without waiting for it to fully start up.
+   *
+   * @param callback optional, callback executed immediately after Jetty is fully started up.
+   * @see JettyServer#start(boolean, Runnable)
+   */
   public void startAsync(@Nullable final Runnable callback) throws Exception {
     start(false, callback);
   }

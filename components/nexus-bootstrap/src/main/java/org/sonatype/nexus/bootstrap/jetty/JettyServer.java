@@ -97,6 +97,13 @@ public class JettyServer
     connectorManager.removeConnector(connectorConfiguration);
   }
 
+  /**
+   * Starts Jetty, in sync or async mode, depending on value of {@code waitForServer} parameter.
+   *
+   * @param waitForServer if {@code true}, method will block until Jetty is fully started, otherwise will
+   *                      return immediately.
+   * @param callback      optional, callback executed immediately after Jetty is fully started up.
+   */
   public synchronized void start(final boolean waitForServer, @Nullable final Runnable callback) throws Exception {
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(classLoader);
