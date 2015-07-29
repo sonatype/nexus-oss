@@ -50,9 +50,8 @@ StartTest(function(t) {
         { waitForRowsVisible: '>>nx-coreui-logger-list' },
         { waitFor: function() { return t.cq1('nx-coreui-logger-list'); } },
         { waitFor: function() { return t.cq1('nx-coreui-logger-list').getStore(); } },
-        clickRow(t, 'nx-coreui-logger-list', 'name', 'ROOT'),
-        { click: 'combobox[dataIndex=level] => .x-form-text' },
-        { click: '.x-boundlist-item:contains(DEBUG)' },
+        clickRow(t, 'nx-coreui-logger-list', 'name', 'ROOT'), 
+        t.comboSelect('combobox[dataIndex=level]', 'DEBUG'),
         { click: '>>button#cancel' },
         // explore reset to default levels
         { click: '>>nx-coreui-logger-list button[action=reset]' },
@@ -88,9 +87,8 @@ StartTest(function(t) {
         t.chain(
           // update logging level for {newLoggerName}
           { waitForRowsVisible: '>>nx-coreui-logger-list' },
-          clickRow(t, 'nx-coreui-logger-list', 'name', newLoggerName),
-          { click: 'combobox[dataIndex=level] => .x-form-text' },
-          { click: '.x-boundlist-item:contains(ERROR)' },
+          clickRow(t, 'nx-coreui-logger-list', 'name', newLoggerName), 
+          t.comboSelect('combobox[dataIndex=level]', 'ERROR'),
           { waitForCQVisible: 'button#update' },
           function(next, components) { t.click(components[0], next); },
           waitForMessageDialogsToClose(),

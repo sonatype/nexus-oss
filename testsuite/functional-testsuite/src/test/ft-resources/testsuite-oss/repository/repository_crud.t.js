@@ -15,12 +15,7 @@
  */
 StartTest(function(t) {
 
-  var name = t.uniqueId(),
-      waitForStoreToLoad = {
-        waitFor: 'storesToLoad', args: function() {
-          return t.cq1('nx-coreui-repository-list').getStore();
-        }
-      };
+  var name = t.uniqueId();
 
   t.describe('Repository administration', function(t) {
     var message = t.spyOn(NX.application.getController('Message'), 'addMessage').and.callThrough();
@@ -65,15 +60,11 @@ StartTest(function(t) {
           {waitForCQ: '>>nx-coreui-repository-add field[name=name]'},
           // fill out the form
           {type: name, target: '>>nx-coreui-repository-add field[name=name]'},
-          {click: '#versionPolicy => .x-form-text'},
-          {click: '#versionPolicy.getPicker() => .x-boundlist-item:contains(Mixed)'},
-          {click: '#blobStoreName => .x-form-text'},
-          {click: '#blobStoreName.getPicker() => .x-boundlist-item:contains(default)'},
-          {click: '#writePolicy => .x-form-text'},
-          {click: '#writePolicy.getPicker() => .x-boundlist-item:contains(Allow redeploy)'},
-
+          t.comboSelect('#versionPolicy', 'Mixed'),
+          t.comboSelect('#blobStoreName', 'default'),
+          t.comboSelect('#writePolicy', 'Allow redeploy'),
           // we are ready to go, so press the "Add" button and wait for grid to refresh
-          Ext.apply(Ext.clone(waitForStoreToLoad),
+          Ext.apply(t.waitForStore('Repository'),
               {trigger: {click: '>>nx-coreui-repository-add button[action=add]'}}
           ),
           {waitForSpyToBeCalled: message},
@@ -128,9 +119,8 @@ StartTest(function(t) {
     t.it('Repository update', function(t) {
       t.chain(
           //update the writePolicy
-          {click: '#writePolicy => .x-form-text'},
-          {click: '#writePolicy.getPicker() => .x-boundlist-item:contains(Disable redeploy)'},
-          Ext.apply(Ext.clone(waitForStoreToLoad),
+          t.comboSelect('#writePolicy', 'Disable redeploy'),
+          Ext.apply(t.waitForStore('Repository'),
               {trigger: {click: '>>nx-coreui-repository-settings button[action=save]'}}
           ),
           {waitForSpyToBeCalled: message},
@@ -147,11 +137,11 @@ StartTest(function(t) {
             next();
           }
       );
-    });
+    }, 60000);
     t.it('Repository delete', function(t) {
       t.chain(
           {click: '>>nx-actions button[text=Delete repository] => .x-btn-inner'},
-          Ext.apply(Ext.clone(waitForStoreToLoad),
+          Ext.apply(t.waitForStore('Repository'),
               {trigger: {click: '>>button[text=Yes]'}}
           ),
           {waitForSpyToBeCalled: message},

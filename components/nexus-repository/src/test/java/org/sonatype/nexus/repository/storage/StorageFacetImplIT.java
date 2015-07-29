@@ -403,6 +403,9 @@ public class StorageFacetImplIT
       tx.deleteAsset(tx.findAsset(asset1Id, bucket));
       tx.deleteComponent(tx.findComponent(componentId, bucket));
 
+      tx.commit();
+      tx.begin();
+
       checkSize(tx.browseAssets(bucket), 0);
       checkSize(tx.browseComponents(bucket), 0);
       assertNull(tx.findAsset(asset1Id, bucket));

@@ -15,12 +15,7 @@
  */
 StartTest(function(t) {
 
-  var // generate a unique pattern
-      id = 'Test-' + new Date().getTime(),
-  // a reusable function to wait for grid to load
-      waitForStoreToLoad = { waitFor: 'storesToLoad', args: function() {
-        return t.cq1('nx-coreui-user-list').getStore();
-      }};
+  var id = t.uniqueId();
 
   t.chain(
       t.openPageAsAdmin('admin/security/users'),
@@ -39,12 +34,11 @@ StartTest(function(t) {
       // and confirm password
       { type: id },
       // set status to active
-      { click: 'nx-coreui-user-add combobox[name=status] => .x-form-text' },
-      { click: '.x-boundlist-item:contains(Active)' },
+      t.comboSelect('nx-coreui-user-add combobox[name=status]', 'Active'),
       // add roles
       { dblclick: 'nx-coreui-user-add nx-itemselector[name=roles] multiselectfield[title=Available] boundlist => .x-boundlist-item:contains(admin)'},
       // we are ready to go, so press the "Add" button and wait for grid to refresh
-      Ext.apply(Ext.clone(waitForStoreToLoad),
+      Ext.apply(t.waitForStore('User'),
           { trigger: { click: '>>nx-coreui-user-add button[action=add]' } }
       ),
       // verify that the user was added
@@ -85,14 +79,13 @@ StartTest(function(t) {
       // change email
       { type: '.com', target: '>>nx-coreui-user-settings field[name=email]' },
       // change status to Disabled
-      { click: 'nx-coreui-user-settings combobox[name=status] => .x-form-text' },
-      { click: 'combobox[name=status].getPicker() => .x-boundlist-item:contains(Disabled)' },
+      t.comboSelect('nx-coreui-user-settings combobox[name=status]', 'Disabled'),
       // change roles
       { dblclick: 'nx-coreui-user-settings multiselectfield[title=Granted] boundlist => .x-boundlist-item:contains(admin)'},
       { dblclick: 'nx-coreui-user-settings multiselectfield[title=Available] boundlist => .x-boundlist-item:contains(anonymous)'},
       
       // save changes and wait for grid to refresh
-      Ext.apply(Ext.clone(waitForStoreToLoad),
+      Ext.apply(t.waitForStore('User'),
           { trigger: { click: '>>nx-coreui-user-settings button[action=save]' } }
       ),
       // and verify that:
@@ -126,7 +119,7 @@ StartTest(function(t) {
       { click: '>>nx-coreui-user-feature button[action=delete]' },
       // and wait for confirmation box
       // then agree with removal and wait for grid to refresh
-      Ext.apply(Ext.clone(waitForStoreToLoad),
+      Ext.apply(t.waitForStore('User'),
           { trigger: { click: '>>button[text=Yes]' } }
       ),
       // then check that deleted rule is no longer available in grid
