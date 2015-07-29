@@ -53,21 +53,23 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
+        <version>1_2</version>
+      </dependency>
+
+      <dependency>
         <groupId>javax.enterprise</groupId>
         <artifactId>cdi-api</artifactId>
-        <version>1.0</version>
+        <version>1.2</version>
         <exclusions>
           <exclusion>
             <groupId>javax.el</groupId>
-            <artifactId>el-api</artifactId>
+            <artifactId>javax.el-api</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.jboss.ejb3</groupId>
-            <artifactId>jboss-ejb3-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jboss.interceptor</groupId>
-            <artifactId>jboss-interceptor-api</artifactId>
+            <groupId>javax.interceptor</groupId>
+            <artifactId>javax.interceptor-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
