@@ -22,6 +22,7 @@ import org.sonatype.nexus.bootstrap.jetty.JettyServerConfiguration;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.launch.Framework;
 import org.slf4j.MDC;
 
@@ -41,6 +42,8 @@ public class LauncherActivator
   private Launcher launcher;
 
   private ConnectorConfigurationTracker connectorConfigurationTracker;
+
+  private ServiceRegistration<JettyServerConfiguration> jettyServerConfigurationRegistration;
 
   public void start(final BundleContext bundleContext) throws Exception {
     framework = (Framework) bundleContext.getBundle(0);
@@ -66,7 +69,7 @@ public class LauncherActivator
     );
 
     final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
-    bundleContext.registerService(
+    jettyServerConfigurationRegistration = bundleContext.registerService(
         JettyServerConfiguration.class,
         new JettyServerConfiguration(launcher.getServer().defaultConnectors()),
         properties
@@ -77,6 +80,9 @@ public class LauncherActivator
     try {
       if (connectorConfigurationTracker != null) {
         connectorConfigurationTracker.close();
+      }
+      if (jettyServerConfigurationRegistration != null) {
+        jettyServerConfigurationRegistration.unregister();
       }
       if (launcher != null) {
         launcher.stop();
