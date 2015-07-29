@@ -76,10 +76,10 @@ public class DockerConnectorFacetImpl
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
     facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
-    Config config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    Config configToValidate = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
     Set<ConstraintViolation<?>> violations = new HashSet<>();
-    maybeAdd(violations, validatePort(pathOf("httpPort"), config.httpPort));
-    maybeAdd(violations, validatePort(pathOf("httpsPort"), config.httpsPort));
+    maybeAdd(violations, validatePort(pathOf("httpPort"), configToValidate.httpPort));
+    maybeAdd(violations, validatePort(pathOf("httpsPort"), configToValidate.httpsPort));
     ConstraintViolations.maybePropagate(violations, log);
   }
 
