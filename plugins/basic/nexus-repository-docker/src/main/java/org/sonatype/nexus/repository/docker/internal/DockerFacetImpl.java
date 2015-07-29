@@ -666,7 +666,9 @@ public class DockerFacetImpl
    * @param layerId layer id
    * @return name
    */
-  private String layerMetadataName(final String layerId) {return layerId + "/json";}
+  private String layerMetadataName(final String layerId) {
+    return layerId + "/json";
+  }
 
   /**
    * Get teh name of images index asset.
@@ -674,6 +676,8 @@ public class DockerFacetImpl
    * @param name image name
    * @return name
    */
-  private String getImagesIndexName(final String name) {return name + "/images";}
+  private String getImagesIndexName(final String name) {
+    return name + "/images";
+  }
 
 }
