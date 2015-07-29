@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.bootstrap.jetty;
 
+import java.util.List;
+
+import org.eclipse.jetty.http.HttpScheme;
+
 /**
  * Connector registrar component.
  *
@@ -20,8 +24,24 @@ package org.sonatype.nexus.bootstrap.jetty;
 public interface ConnectorRegistrar
 {
   /**
+   * Returns the list of available HTTP schemes. This list depends on current Jetty XML configuration (is HTTPS
+   * enabled). If schema is not available, method {@link #addConnector(ConnectorConfiguration)} will reject to add it.
+   */
+  List<HttpScheme> availableSchemes();
+
+  /**
+   * Returns the list of already occupied ports. If configuration port is occupied, method {@link
+   * #addConnector(ConnectorConfiguration)} will reject to add configuration.
+   */
+  List<Integer> unavailablePorts();
+
+  /**
    * Registers a new Jetty {@link ConnectorConfiguration}, that creates a new connector on Jetty based on passed
    * in configuration.
+   *
+   * @throws IllegalArgumentException if requested HTTPS schema is not available, requested port is not available, if
+   *                                  current instance was already added, if current instance is invalid (bad port
+   *                                  number or bad schema).
    */
   void addConnector(ConnectorConfiguration connectorConfiguration);
 

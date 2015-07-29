@@ -12,23 +12,28 @@
  */
 package org.sonatype.nexus.internal.jetty;
 
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
 import org.sonatype.nexus.bootstrap.jetty.ConnectorRegistrar;
+import org.sonatype.nexus.bootstrap.jetty.JettyServerConfiguration;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
+import org.eclipse.jetty.http.HttpScheme;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Connector registrar component.
@@ -41,16 +46,41 @@ public class ConnectorRegistrarImpl
     extends ComponentSupport
     implements ConnectorRegistrar
 {
+  private final JettyServerConfiguration serverConfiguration;
+
   private final IdentityHashMap<ConnectorConfiguration, ServiceRegistration<ConnectorConfiguration>> managedConfigurations;
 
-  public ConnectorRegistrarImpl() {
+  @Inject
+  public ConnectorRegistrarImpl(final JettyServerConfiguration serverConfiguration) {
+    this.serverConfiguration = checkNotNull(serverConfiguration);
     this.managedConfigurations = Maps.newIdentityHashMap();
+  }
+
+  @Override
+  public List<HttpScheme> availableSchemes() {
+    final List<HttpScheme> result = new ArrayList<>();
+    for (ConnectorConfiguration defaultConnector : serverConfiguration.defaultConnectors()) {
+      result.add(defaultConnector.getScheme());
+    }
+    return result;
+  }
+
+  @Override
+  public List<Integer> unavailablePorts() {
+    final List<Integer> result = new ArrayList<>();
+    for (ConnectorConfiguration defaultConnector : serverConfiguration.defaultConnectors()) {
+      result.add(defaultConnector.getPort());
+    }
+    for (ConnectorConfiguration defaultConnector : managedConfigurations.keySet()) {
+      result.add(defaultConnector.getPort());
+    }
+    return result;
   }
 
   @Override
   public void addConnector(final ConnectorConfiguration connectorConfiguration) {
     checkNotNull(connectorConfiguration);
-    checkState(!managedConfigurations.containsKey(connectorConfiguration));
+    validate(connectorConfiguration);
 
     final Bundle bundle = FrameworkUtil.getBundle(connectorConfiguration.getClass());
     if (bundle == null) {
@@ -84,5 +114,18 @@ public class ConnectorRegistrarImpl
         log.debug("Could not unregister connector", e);
       }
     }
+  }
+
+  private void validate(final ConnectorConfiguration connectorConfiguration) {
+    // connector is not already added
+    checkArgument(!managedConfigurations.containsKey(connectorConfiguration));
+
+    // schema is not null and is available
+    final HttpScheme httpScheme = connectorConfiguration.getScheme();
+    checkNotNull(httpScheme);
+    checkArgument(availableSchemes().contains(httpScheme));
+
+    // port is free
+    checkArgument(!unavailablePorts().contains(connectorConfiguration.getPort()));
   }
 }

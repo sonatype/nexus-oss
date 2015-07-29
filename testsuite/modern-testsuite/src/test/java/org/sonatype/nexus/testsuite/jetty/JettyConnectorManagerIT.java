@@ -13,6 +13,7 @@
 package org.sonatype.nexus.testsuite.jetty;
 
 import java.net.URI;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -34,6 +35,7 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -56,6 +58,20 @@ public class JettyConnectorManagerIT
       );
     }
   };
+
+  @Test
+  public void availableSchemes() throws Exception {
+    final List<HttpScheme> schemes = connectorRegistrar.availableSchemes();
+    // This IT enables HTTPS, so must be present
+    assertThat(schemes, contains(HttpScheme.HTTP, HttpScheme.HTTPS));
+  }
+
+  @Test
+  public void unavailablePorts() throws Exception {
+    final List<Integer> ports = connectorRegistrar.unavailablePorts();
+    // This IT enables HTTPS, so must be present
+    assertThat(ports, contains(nexusUrl.getPort(), nexusSecureUrl.getPort()));
+  }
 
   @Test
   public void testHttpConnectorAdd() throws Exception {

@@ -12,7 +12,9 @@
  */
 package org.sonatype.nexus.bootstrap.jetty;
 
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.http.HttpScheme;
@@ -22,6 +24,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+
+import static java.util.Collections.unmodifiableList;
 
 /**
  * Jetty's internal connector manager to manage custom {@link ConnectorConfiguration}s.
@@ -47,12 +51,19 @@ public class ConnectorManager
 
   private final IdentityHashMap<ConnectorConfiguration, ServerConnector> managedConnectors;
 
+  private final List<ConnectorConfiguration> defaultConnectors;
+
   public ConnectorManager(final Server server,
                           final Map<String, Object> namedBeans)
   {
     this.server = server;
     this.namedBeans = namedBeans;
     this.managedConnectors = new IdentityHashMap<>();
+    this.defaultConnectors = unmodifiableList(buildDefaultConnectors());
+  }
+
+  public List<ConnectorConfiguration> defaultConnectors() {
+    return defaultConnectors;
   }
 
   /**
@@ -152,6 +163,59 @@ public class ConnectorManager
     catch (IllegalStateException e) {
       throw new IllegalStateException("Jetty HTTPS is not enabled in Nexus", e);
     }
+  }
+
+  private List<ConnectorConfiguration> buildDefaultConnectors() {
+    final List<ConnectorConfiguration> result = new ArrayList<>();
+    try {
+      verifyConfiguration(HttpScheme.HTTP);
+      final int port = defaultConnector(HttpScheme.HTTP).getPort();
+      result.add(new ConnectorConfiguration()
+      {
+        @Override
+        public HttpScheme getScheme() {
+          return HttpScheme.HTTP;
+        }
+
+        @Override
+        public int getPort() {
+          return port;
+        }
+
+        @Override
+        public HttpConfiguration customize(final HttpConfiguration configuration) {
+          return configuration;
+        }
+      });
+    }
+    catch (IllegalStateException e) {
+      // nop
+    }
+    try {
+      verifyConfiguration(HttpScheme.HTTPS);
+      final int port = defaultConnector(HttpScheme.HTTPS).getPort();
+      result.add(new ConnectorConfiguration()
+      {
+        @Override
+        public HttpScheme getScheme() {
+          return HttpScheme.HTTPS;
+        }
+
+        @Override
+        public int getPort() {
+          return port;
+        }
+
+        @Override
+        public HttpConfiguration customize(final HttpConfiguration configuration) {
+          return configuration;
+        }
+      });
+    }
+    catch (IllegalStateException e) {
+      // nop
+    }
+    return result;
   }
 
   /**

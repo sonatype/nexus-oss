@@ -85,6 +85,10 @@ public class JettyServer
     throw new Error(e);
   }
 
+  public List<ConnectorConfiguration> defaultConnectors() {
+    return connectorManager.defaultConnectors();
+  }
+
   public void addCustomConnector(final ConnectorConfiguration connectorConfiguration) {
     connectorManager.addConnector(connectorConfiguration);
   }

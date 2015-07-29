@@ -12,15 +12,20 @@
  */
 package org.sonatype.nexus.bootstrap.osgi;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.sonatype.nexus.bootstrap.Launcher;
 import org.sonatype.nexus.bootstrap.ShutdownHelper;
 import org.sonatype.nexus.bootstrap.ShutdownHelper.ShutdownDelegate;
+import org.sonatype.nexus.bootstrap.jetty.JettyServerConfiguration;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.launch.Framework;
 import org.slf4j.MDC;
 
+import static java.util.Collections.singletonMap;
 import static org.sonatype.nexus.bootstrap.Launcher.SYSTEM_USERID;
 
 /**
@@ -60,6 +65,12 @@ public class LauncherActivator
         }
     );
 
+    final Dictionary<String, ?> properties = new Hashtable<>(singletonMap("name", "nexus"));
+    bundleContext.registerService(
+        JettyServerConfiguration.class,
+        new JettyServerConfiguration(launcher.getServer().defaultConnectors()),
+        properties
+    );
   }
 
   public void stop(final BundleContext bundleContext) throws Exception {
