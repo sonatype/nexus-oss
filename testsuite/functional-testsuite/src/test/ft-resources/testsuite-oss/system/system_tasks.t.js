@@ -43,9 +43,7 @@ StartTest(function(t) {
           {type: name, target: '>>nx-coreui-task-add field[name=name]'},
           {type: '0', target: '>>nx-coreui-task-add field[name=property_purgeOlderThan]'},
           // set schedule
-          //{ click: '>>tab[text=Schedule]' },
-          {click: 'combobox[name=schedule] => .x-form-text'},
-          {click: '.x-boundlist-item:contains(Manual)'},
+          t.comboSelect('combobox[name=schedule]', 'Manual'),
           // we are ready to go, so press the "Add" button and wait for grid to refresh
           Ext.apply(t.waitForStore('Task'),
               {trigger: {click: '>>nx-coreui-task-add button[action=add]'}}

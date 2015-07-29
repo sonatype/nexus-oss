@@ -34,8 +34,7 @@ StartTest(function(t) {
       // and confirm password
       { type: id },
       // set status to active
-      { click: 'nx-coreui-user-add combobox[name=status] => .x-form-text' },
-      { click: '.x-boundlist-item:contains(Active)' },
+      t.comboSelect('nx-coreui-user-add combobox[name=status]', 'Active'),
       // add roles
       { dblclick: 'nx-coreui-user-add nx-itemselector[name=roles] multiselectfield[title=Available] boundlist => .x-boundlist-item:contains(admin)'},
       // we are ready to go, so press the "Add" button and wait for grid to refresh
@@ -80,8 +79,7 @@ StartTest(function(t) {
       // change email
       { type: '.com', target: '>>nx-coreui-user-settings field[name=email]' },
       // change status to Disabled
-      { click: 'nx-coreui-user-settings combobox[name=status] => .x-form-text' },
-      { click: 'combobox[name=status].getPicker() => .x-boundlist-item:contains(Disabled)' },
+      t.comboSelect('nx-coreui-user-settings combobox[name=status]', 'Disabled'),
       // change roles
       { dblclick: 'nx-coreui-user-settings multiselectfield[title=Granted] boundlist => .x-boundlist-item:contains(admin)'},
       { dblclick: 'nx-coreui-user-settings multiselectfield[title=Available] boundlist => .x-boundlist-item:contains(anonymous)'},
