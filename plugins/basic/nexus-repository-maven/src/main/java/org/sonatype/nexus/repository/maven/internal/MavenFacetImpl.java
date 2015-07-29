@@ -346,7 +346,7 @@ public class MavenFacetImpl
       asset = findAsset(tx, tx.getBucket(), path);
     }
     if (asset == null) {
-      log.debug("Attempting to set last verified date for non-existent maven asset {}", path.getPath());
+      log.debug("Attempting to set cache info for non-existent maven asset {}", path.getPath());
       return false;
     }
 

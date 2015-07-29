@@ -378,7 +378,7 @@ public class NugetGalleryFacetImpl
       asset = findAsset(tx, id, version);
     }
     if (asset == null) {
-      log.debug("Attempting to set last verified date for non-existent nuget asset {} {}", id, version);
+      log.debug("Attempting to set cache info for non-existent nuget asset {} {}", id, version);
       return;
     }
 

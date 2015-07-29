@@ -195,7 +195,8 @@ public abstract class ProxyFacetSupport
   protected Content fetch(String url, Context context, @Nullable Content stale) throws IOException {
     HttpClient client = httpClient.getHttpClient();
 
-    HttpGet request = new HttpGet(config.remoteUrl.resolve(url));
+    URI uri = config.remoteUrl.resolve(url);
+    HttpGet request = new HttpGet(uri);
     if (stale != null) {
       final DateTime lastModified = stale.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
       if (lastModified != null) {
@@ -228,7 +229,7 @@ public abstract class ProxyFacetSupport
       return result;
     }
     if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-      checkState(stale != null); // to receive 304 we must issue condtl GET (bad server?)
+      checkState(stale != null, "Received 304 without conditional GET (bad server?) from %s", uri);
       indicateVerified(context, stale, cacheInfo);
     }
     HttpClientUtils.closeQuietly(response);
