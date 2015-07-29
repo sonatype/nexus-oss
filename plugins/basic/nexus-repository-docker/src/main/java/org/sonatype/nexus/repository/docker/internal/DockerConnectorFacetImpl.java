@@ -28,8 +28,8 @@ import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.docker.DockerConnectorFacet;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.validation.ConstraintViolationFactory;
 import org.sonatype.nexus.validation.ConstraintViolations;
-import org.sonatype.nexus.validation.ManualValidator;
 import org.sonatype.nexus.validation.constraint.PortNumber;
 
 import org.eclipse.jetty.http.HttpScheme;
@@ -53,7 +53,7 @@ public class DockerConnectorFacetImpl
 
   private final RepositoryManager repositoryManager;
 
-  private final ManualValidator manualValidator;
+  private final ConstraintViolationFactory constraintViolationFactory;
 
   private final ConnectorRegistrar connectorRegistrar;
 
@@ -65,11 +65,11 @@ public class DockerConnectorFacetImpl
 
   @Inject
   public DockerConnectorFacetImpl(final RepositoryManager repositoryManager,
-                                  final ManualValidator manualValidator,
+                                  final ConstraintViolationFactory constraintViolationFactory,
                                   final ConnectorRegistrar connectorRegistrar)
   {
     this.repositoryManager = checkNotNull(repositoryManager);
-    this.manualValidator = checkNotNull(manualValidator);
+    this.constraintViolationFactory = checkNotNull(constraintViolationFactory);
     this.connectorRegistrar = checkNotNull(connectorRegistrar);
   }
 
@@ -144,7 +144,7 @@ public class DockerConnectorFacetImpl
           if (DockerFormat.NAME.equals(repository.getFormat().getValue()) && !repository.equals(getRepository())) {
             DockerConnectorFacet connectorFacet = repository.facet(DockerConnectorFacet.class);
             if (port.equals(connectorFacet.getHttpPort()) || port.equals(connectorFacet.getHttpsPort())) {
-              return manualValidator.createViolation(
+              return constraintViolationFactory.createViolation(
                   path, "Port must be unique (conflicts with repository'" + repository.getName() + "')"
               );
             }

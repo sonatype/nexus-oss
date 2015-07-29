@@ -35,19 +35,19 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Utility for creating {@link ConstraintViolation}s.
+ * Factory of {@link ConstraintViolation}s to be used (rarely) for manual validation.
  *
  * @since 3.0
  */
 @Named
 @Singleton
-public class ManualValidator
+public class ConstraintViolationFactory
     extends ComponentSupport
 {
   private final Provider<Validator> validatorProvider;
 
   @Inject
-  public ManualValidator(final Provider<Validator> validatorProvider) {
+  public ConstraintViolationFactory(final Provider<Validator> validatorProvider) {
     this.validatorProvider = checkNotNull(validatorProvider);
   }
 
@@ -61,20 +61,20 @@ public class ManualValidator
   public ConstraintViolation<?> createViolation(final String path, final String message) {
     checkNotNull(path);
     checkNotNull(message);
-    return validatorProvider.get().validate(new ManualValidationBean(path, message)).iterator().next();
+    return validatorProvider.get().validate(new HelperBean(path, message)).iterator().next();
   }
 
   /**
-   * Bean passing path/message for manual validation.
+   * Bean passing path/message.
    */
-  @ManualValidation
-  private static class ManualValidationBean
+  @HelperAnnotation
+  private static class HelperBean
   {
     private final String path;
 
     private final String message;
 
-    public ManualValidationBean(final String path, final String message) {
+    public HelperBean(final String path, final String message) {
       this.path = path;
       this.message = message;
     }
@@ -89,15 +89,15 @@ public class ManualValidator
   }
 
   /**
-   * Annotation to trigger manual validation.
+   * Annotation to trigger validation.
    *
    * @since 3.0
    */
   @Target({TYPE})
   @Retention(RUNTIME)
-  @Constraint(validatedBy = ManualValidationValidator.class)
+  @Constraint(validatedBy = HelperValidator.class)
   @Documented
-  private @interface ManualValidation
+  private @interface HelperAnnotation
   {
     String message() default "";
 
@@ -107,13 +107,13 @@ public class ManualValidator
   }
 
   /**
-   * {@link ManualValidation} validator.
+   * {@link HelperAnnotation} validator.
    */
-  private static class ManualValidationValidator
-      extends ConstraintValidatorSupport<ManualValidation, ManualValidationBean>
+  private static class HelperValidator
+      extends ConstraintValidatorSupport<HelperAnnotation, HelperBean>
   {
     @Override
-    public boolean isValid(final ManualValidationBean bean, final ConstraintValidatorContext context) {
+    public boolean isValid(final HelperBean bean, final ConstraintValidatorContext context) {
       context.disableDefaultConstraintViolation();
 
       // build a custom property path
