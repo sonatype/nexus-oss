@@ -36,7 +36,7 @@ public interface RawContentFacet
 
   Content put(String path, Payload content) throws IOException, InvalidContentException;
 
-  void setCacheInfo(String path, Content content,  CacheInfo cacheInfo) throws IOException;
+  void setCacheInfo(String path, @Nullable Content content,  CacheInfo cacheInfo) throws IOException;
 
   boolean delete(String path) throws IOException;
 }

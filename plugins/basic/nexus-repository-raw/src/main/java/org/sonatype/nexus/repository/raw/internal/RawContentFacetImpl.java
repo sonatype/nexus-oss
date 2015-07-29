@@ -170,7 +170,7 @@ public class RawContentFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void setCacheInfo(final String path, final Content content, final CacheInfo cacheInfo) throws IOException {
+  public void setCacheInfo(final String path, @Nullable final Content content, final CacheInfo cacheInfo) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     Asset asset = null;

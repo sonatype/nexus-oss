@@ -55,5 +55,5 @@ public interface MavenFacet
 
   // proxy operations
 
-  boolean setCacheInfo(MavenPath path, Content content, CacheInfo cacheInfo) throws IOException;
+  boolean setCacheInfo(MavenPath path, @Nullable Content content, CacheInfo cacheInfo) throws IOException;
 }

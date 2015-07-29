@@ -363,7 +363,7 @@ public class NugetGalleryFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void setCacheInfo(final String id, final String version, final Content content, final CacheInfo cacheInfo) {
+  public void setCacheInfo(final String id, final String version, @Nullable final Content content, final CacheInfo cacheInfo) {
     checkNotNull(cacheInfo);
 
     StorageTx tx = UnitOfWork.currentTransaction();
