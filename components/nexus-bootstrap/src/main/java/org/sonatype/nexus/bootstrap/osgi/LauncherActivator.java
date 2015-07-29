@@ -89,6 +89,8 @@ public class LauncherActivator
       }
     }
     finally {
+      connectorConfigurationTracker = null;
+      jettyServerConfigurationRegistration = null;
       launcher = null;
     }
   }
