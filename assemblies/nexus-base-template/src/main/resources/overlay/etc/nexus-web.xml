@@ -13,7 +13,6 @@
   <filter>
     <filter-name>nexusFilter</filter-name>
     <filter-class>org.sonatype.nexus.bootstrap.osgi.DelegatingFilter</filter-class>
-    <async-supported>true</async-supported>
   </filter>
 
   <filter-mapping>
