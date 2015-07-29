@@ -14,25 +14,26 @@
  * Tests system bundles view.
  */
 StartTest(function(t) {
+  var bundleListCQ = '>>nx-coreui-system-bundlelist';
   t.describe('System Bundles', function(t) {
     t.it('Bundles view is populated', function(t) {
       t.chain(
           t.openPageAsAdmin('admin/system/bundles'),
-          {waitForRowsVisible: 'nx-coreui-system-bundlelist'}
+          {waitForRowsVisible: bundleListCQ}
       );
     });
     t.it('Can filter bundles by name', function(t) {
       t.chain(
-        { type: 'nexus-bootstrap', target: '>>nx-coreui-system-bundlelist nx-searchbox' },
+        { type: 'nexus-bootstrap', target: bundleListCQ + ' nx-searchbox' },
         function(next) {
-          var store = t.cq1('nx-coreui-system-bundlelist').getStore();
+          var store = t.cq1(bundleListCQ).getStore();
           t.waitFor(function() {
-            return store.isFiltered();
+            return store.isFiltered() && store.count() === 1;
           }, next)
         },
         function(next) {
-          var store = t.cq1('nx-coreui-system-bundlelist').getStore();
-          t.expect(store.count()).toBe(1);
+          t.matchGridCellContent(t.cq1(bundleListCQ), 0, 4, 'nexus-bootstrap',
+              'nexus-bootstrap is only row');
           next();
         }
       )
@@ -40,7 +41,7 @@ StartTest(function(t) {
     t.it('Can drill-down by bundle', function(t) {
       t.chain(
         function(next) {
-          var grid = t.cq1('nx-coreui-system-bundlelist'),
+          var grid = t.cq1(bundleListCQ),
               name = 'org.sonatype.nexus:nexus-bootstrap',
               bundleRow = t.getRow(grid, grid.getStore().find('name', name));
           t.click(bundleRow, next);
