@@ -25,11 +25,11 @@ public interface DockerConnectorFacet
   /**
    * @return configured reverse proxy HTTP connector port
    */
-  int getHttpPort();
+  Integer getHttpPort();
 
   /**
    * @return configured reverse proxy HTTPS connector port
    */
-  int getHttpsPort();
+  Integer getHttpsPort();
 
 }

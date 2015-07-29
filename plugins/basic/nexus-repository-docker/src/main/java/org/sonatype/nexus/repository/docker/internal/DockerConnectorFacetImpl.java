@@ -12,20 +12,30 @@
  */
 package org.sonatype.nexus.repository.docker.internal;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.ConstraintViolation;
 
 import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
 import org.sonatype.nexus.repository.docker.DockerConnectorFacet;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.validation.ConstraintViolations;
+import org.sonatype.nexus.validation.ManualValidator;
+import org.sonatype.nexus.validation.constraint.PortNumber;
 
 import com.google.common.base.Throwables;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @since 3.0
@@ -37,6 +47,10 @@ public class DockerConnectorFacetImpl
 {
   static final String CONFIG_KEY = "docker";
 
+  private final RepositoryManager repositoryManager;
+
+  private final ManualValidator manualValidator;
+
   private final RepositoryReverseProxyFilter repositoryReverseProxyFilter;
 
   private Config config;
@@ -44,13 +58,23 @@ public class DockerConnectorFacetImpl
   private ServerConnector jettyConnector;
 
   @Inject
-  public DockerConnectorFacetImpl(final RepositoryReverseProxyFilter repositoryReverseProxyFilter) {
+  public DockerConnectorFacetImpl(final RepositoryManager repositoryManager,
+                                  final ManualValidator manualValidator,
+                                  final RepositoryReverseProxyFilter repositoryReverseProxyFilter)
+  {
+    this.repositoryManager = checkNotNull(repositoryManager);
+    this.manualValidator = checkNotNull(manualValidator);
     this.repositoryReverseProxyFilter = repositoryReverseProxyFilter;
   }
 
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
     facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+    Config config = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
+    Set<ConstraintViolation<?>> violations = new HashSet<>();
+    maybeAdd(violations, validatePort(pathOf("httpPort"), config.httpPort));
+    maybeAdd(violations, validatePort(pathOf("httpsPort"), config.httpsPort));
+    ConstraintViolations.maybePropagate(violations, log);
   }
 
   @Override
@@ -92,23 +116,54 @@ public class DockerConnectorFacetImpl
   }
 
   @Override
-  public int getHttpPort() {
+  public Integer getHttpPort() {
     return config.httpPort;
   }
 
   @Override
-  public int getHttpsPort() {
+  public Integer getHttpsPort() {
     return config.httpsPort;
+  }
+
+  private ConstraintViolation<?> validatePort(final String path, final Integer port) {
+    if (port != null) {
+      try {
+        for (Repository repository : repositoryManager.browse()) {
+          if (DockerFormat.NAME.equals(repository.getFormat().getValue()) && !repository.equals(getRepository())) {
+            DockerConnectorFacet connectorFacet = repository.facet(DockerConnectorFacet.class);
+            if (port.equals(connectorFacet.getHttpPort()) || port.equals(connectorFacet.getHttpsPort())) {
+              return manualValidator.createViolation(
+                  path, "Port must be unique (conflicts with repository'" + repository.getName() + "')"
+              );
+            }
+          }
+        }
+      }
+      catch (IllegalStateException ignore) {
+        // this will happen when facet is first validated, before repository manager is yet started
+      }
+    }
+    return null;
+  }
+
+  private static String pathOf(final String fieldName) {
+    return StorageFacet.P_ATTRIBUTES + "." + CONFIG_KEY + "." + fieldName;
+  }
+
+  private static void maybeAdd(final Set<ConstraintViolation<?>> violations,
+                               final ConstraintViolation<?> violation)
+  {
+    if (violation != null) {
+      violations.add(violation);
+    }
   }
 
   static class Config
   {
-    @Min(1L)
-    @Max(65535L)
+    @PortNumber
     public Integer httpPort;
 
-    @Min(1L)
-    @Max(65535L)
+    @PortNumber
     public Integer httpsPort;
 
     @Override
