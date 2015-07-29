@@ -32,18 +32,118 @@ Ext.define('NX.coreui.view.repository.facet.DockerConnectorFacet', {
       {
         xtype: 'fieldset',
         cls: 'nx-form-section',
-        title: 'Connector',
-
-        defaults: {
-          allowBlank: false,
-          itemCls: 'required-field'
-        },
+        title: NX.I18n.get('Repository_Facet_DockerConnectorFacet_Title'),
 
         items: [
           {
-            xtype: 'numberfield',
-            name: 'attributes.connector.port',
-            fieldLabel: 'Port'
+            xtype: 'fieldcontainer',
+            fieldLabel: NX.I18n.get('Repository_Facet_DockerConnectorFacet_HttpPort_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_DockerConnectorFacet_HttpPort_HelpText'),
+            layout: 'hbox',
+            items: [
+              {
+                xtype: 'checkbox',
+                itemId: 'httpEnabled',
+                listeners: {
+                  /**
+                   * Enable/Disable the port.
+                   */
+                  change: function() {
+                    var form = this.up('form'),
+                        port = form.down('#httpPort');
+                    if (this.getValue()) {
+                      port.enable();
+                    }
+                    else {
+                      port.disable();
+                    }
+                    form.isValid();
+                  }
+                }
+              },
+              {
+                xtype: 'numberfield',
+                name: 'attributes.docker.httpPort',
+                itemId: 'httpPort',
+                minValue: 1,
+                maxValue: 65536,
+                allowDecimals: false,
+                allowExponential: false,
+                allowBlank: false,
+                itemCls: 'required-field',
+                disabled: true,
+                width: 585,
+                style: {
+                  marginLeft: '5px'
+                },
+                listeners: {
+                  /**
+                   * Check the checkbox if port has value.
+                   */
+                  change: function() {
+                    var checkbox = this.up('form').down('#httpEnabled');
+                    if (this.getValue() && !checkbox.getValue()) {
+                      checkbox.setValue(true);
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            xtype: 'fieldcontainer',
+            fieldLabel: NX.I18n.get('Repository_Facet_DockerConnectorFacet_HttpsPort_FieldLabel'),
+            helpText: NX.I18n.get('Repository_Facet_DockerConnectorFacet_HttpsPort_HelpText'),
+            layout: 'hbox',
+            items: [
+              {
+                xtype: 'checkbox',
+                itemId: 'httpsEnabled',
+                listeners: {
+                  /**
+                   * Enable/Disable the port.
+                   */
+                  change: function() {
+                    var form = this.up('form'),
+                        port = form.down('#httpsPort');
+                    if (this.getValue()) {
+                      port.enable();
+                    }
+                    else {
+                      port.disable();
+                    }
+                    form.isValid();
+                  }
+                }
+              },
+              {
+                xtype: 'numberfield',
+                name: 'attributes.docker.httpsPort',
+                itemId: 'httpsPort',
+                minValue: 1,
+                maxValue: 65536,
+                allowDecimals: false,
+                allowExponential: false,
+                allowBlank: false,
+                itemCls: 'required-field',
+                disabled: true,
+                width: 585,
+                style: {
+                  marginLeft: '5px'
+                },
+                listeners: {
+                  /**
+                   * Check the checkbox if port has value.
+                   */
+                  change: function() {
+                    var checkbox = this.up('form').down('#httpsEnabled');
+                    if (this.getValue() && !checkbox.getValue()) {
+                      checkbox.setValue(true);
+                    }
+                  }
+                }
+              }
+            ]
           }
         ]
       }

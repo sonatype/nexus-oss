@@ -14,13 +14,14 @@ package org.sonatype.nexus.repository.docker.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.sonatype.nexus.bootstrap.jetty.JettyServer;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.config.ConfigurationFacet;
-import org.sonatype.nexus.repository.docker.RepositoryReverseProxyFacet;
+import org.sonatype.nexus.repository.docker.DockerConnectorFacet;
 
 import com.google.common.base.Throwables;
 import org.eclipse.jetty.server.Server;
@@ -30,11 +31,11 @@ import org.eclipse.jetty.server.ServerConnector;
  * @since 3.0
  */
 @Named
-public class RepositoryReverseProxyFacetImpl
+public class DockerConnectorFacetImpl
     extends FacetSupport
-    implements RepositoryReverseProxyFacet
+    implements DockerConnectorFacet
 {
-  static final String CONFIG_KEY = "connector";
+  static final String CONFIG_KEY = "docker";
 
   private final RepositoryReverseProxyFilter repositoryReverseProxyFilter;
 
@@ -43,7 +44,7 @@ public class RepositoryReverseProxyFacetImpl
   private ServerConnector jettyConnector;
 
   @Inject
-  public RepositoryReverseProxyFacetImpl(final RepositoryReverseProxyFilter repositoryReverseProxyFilter) {
+  public DockerConnectorFacetImpl(final RepositoryReverseProxyFilter repositoryReverseProxyFilter) {
     this.repositoryReverseProxyFilter = repositoryReverseProxyFilter;
   }
 
@@ -68,10 +69,10 @@ public class RepositoryReverseProxyFacetImpl
         try {
           Server server = JettyServer.getServer();
           jettyConnector = new ServerConnector(server);
-          jettyConnector.setPort(config.port);
+          jettyConnector.setPort(config.httpPort);
           server.addConnector(jettyConnector);
           jettyConnector.start();
-          repositoryReverseProxyFilter.addRepository(getPort(), getRepository().getName());
+          repositoryReverseProxyFilter.addRepository(getHttpPort(), getRepository().getName());
         }
         catch (Exception e) {
           throw Throwables.propagate(e);
@@ -83,7 +84,7 @@ public class RepositoryReverseProxyFacetImpl
   @Override
   protected void doStop() throws Exception {
     if (jettyConnector != null) {
-      repositoryReverseProxyFilter.removeRepository(getPort());
+      repositoryReverseProxyFilter.removeRepository(getHttpPort());
       jettyConnector.stop();
       Server server = JettyServer.getServer();
       server.removeConnector(jettyConnector);
@@ -91,19 +92,25 @@ public class RepositoryReverseProxyFacetImpl
   }
 
   @Override
-  public int getPort() {
+  public int getHttpPort() {
     return jettyConnector.getLocalPort();
   }
 
   static class Config
   {
-    @NotNull
-    public int port;
+    @Min(1L)
+    @Max(65535L)
+    public Integer httpPort;
+
+    @Min(1L)
+    @Max(65535L)
+    public Integer httpsPort;
 
     @Override
     public String toString() {
       return getClass().getSimpleName() + "{" +
-          "port=" + port +
+          "httpPort=" + httpPort +
+          ", httpsPort=" + httpsPort +
           '}';
     }
   }

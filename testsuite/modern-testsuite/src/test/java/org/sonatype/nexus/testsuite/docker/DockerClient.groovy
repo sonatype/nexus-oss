@@ -13,7 +13,7 @@
 package org.sonatype.nexus.testsuite.docker
 
 import org.sonatype.nexus.repository.Repository
-import org.sonatype.nexus.repository.docker.RepositoryReverseProxyFacet
+import org.sonatype.nexus.repository.docker.DockerConnectorFacet
 import org.sonatype.nexus.testsuite.repository.FormatClientSupport
 import org.sonatype.sisu.litmus.testsupport.TestData
 
@@ -184,7 +184,7 @@ class DockerClient
   }
 
   private static URI dockerUri(final Repository repository) {
-    def port = repository.facet(RepositoryReverseProxyFacet).getPort()
+    def port = repository.facet(DockerConnectorFacet).getHttpPort()
     return new URI("http://localhost:${port}")
   }
 

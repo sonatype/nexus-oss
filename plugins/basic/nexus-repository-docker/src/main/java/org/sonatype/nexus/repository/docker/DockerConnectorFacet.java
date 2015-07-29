@@ -18,13 +18,13 @@ import org.sonatype.nexus.repository.Facet;
  * @since 3.0
  */
 @Facet.Exposed
-public interface RepositoryReverseProxyFacet
+public interface DockerConnectorFacet
     extends Facet
 {
 
   /**
-   * @return configured reverse proxy connector port
+   * @return configured reverse proxy HTTP connector port
    */
-  int getPort();
+  int getHttpPort();
 
 }

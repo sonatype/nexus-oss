@@ -22,6 +22,7 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.RecipeSupport
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
+import org.sonatype.nexus.repository.docker.DockerConnectorFacet
 import org.sonatype.nexus.repository.docker.DockerFacet
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.partial.PartialFetchHandler
@@ -75,7 +76,7 @@ class DockerHostedRecipe
   Provider<ConfigurableViewFacet> viewFacet
 
   @Inject
-  Provider<RepositoryReverseProxyFacetImpl> repositoryReverseProxyFacet
+  Provider<DockerConnectorFacet> dockerConnectorFacet
 
   @Inject
   Provider<DockerFacet> dockerFacet
@@ -115,7 +116,7 @@ class DockerHostedRecipe
   void apply(@Nonnull final Repository repository) throws Exception {
     repository.attach(securityFacet.get())
     repository.attach(configure(viewFacet.get()))
-    repository.attach(repositoryReverseProxyFacet.get())
+    repository.attach(dockerConnectorFacet.get())
     repository.attach(dockerFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(searchFacet.get())
