@@ -55,7 +55,7 @@ public interface NugetGalleryFacet
   /**
    * Sets when we last checked that the content was up to date relative to the remote server.
    */
-  void setCacheInfo(String id, String version, CacheInfo cacheInfo);
+  void setCacheInfo(String id, String version, Content content, CacheInfo cacheInfo);
 
   /**
    * Delete a package and return whether it existed.

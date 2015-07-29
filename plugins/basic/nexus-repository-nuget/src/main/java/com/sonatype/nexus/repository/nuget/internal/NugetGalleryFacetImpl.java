@@ -84,6 +84,7 @@ import static org.odata4j.producer.resources.OptionsQueryParser.parseSkip;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseTop;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
+import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
 
 /**
  * A group-aware implementation of a hosted {@link} NugetGalleryFacet.
@@ -362,13 +363,27 @@ public class NugetGalleryFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void setCacheInfo(final String id, final String version, final CacheInfo cacheInfo) {
+  public void setCacheInfo(final String id, final String version, final Content content, final CacheInfo cacheInfo) {
     checkNotNull(cacheInfo);
 
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    Asset asset = findAsset(tx, id, version);
-    checkState(asset != null);
+    Asset asset = null;
+    if (content != null) {
+      // by EntityId
+      final Asset contentAsset = content.getAttributes().require(Asset.class);
+      if (contentAsset.getEntityMetadata() != null) {
+        asset = tx.findAsset(contentAsset.getEntityMetadata().getId(), tx.getBucket());
+      }
+    }
+    if (asset == null) {
+      // by format coordinates
+      asset = findAsset(tx, id, version);
+    }
+    if (asset == null) {
+      log.debug("Attempting to set last verified date for non-existent nuget asset {} {}", id, version);
+      return;
+    }
 
     log.debug("Updating cacheInfo of {} {} to {}", id, version, cacheInfo);
     CacheInfo.applyToAsset(asset, cacheInfo);

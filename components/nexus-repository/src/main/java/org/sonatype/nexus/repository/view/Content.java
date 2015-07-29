@@ -154,6 +154,7 @@ public class Content
       hashCodes.put(algorithm, hashCode);
     }
 
+    contentAttributes.set(Asset.class, asset);
     contentAttributes.set(Content.CONTENT_LAST_MODIFIED, lastModified);
     contentAttributes.set(Content.CONTENT_ETAG, etag);
     contentAttributes.set(Content.CONTENT_HASH_CODES_MAP, hashCodes);

@@ -170,20 +170,32 @@ public class RawContentFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void setCacheInfo(final String path, final CacheInfo cacheInfo) throws IOException {
+  public void setCacheInfo(final String path, final Content content, final CacheInfo cacheInfo) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
-
-    if (component == null) {
-      log.debug("Attempting to set last verified date for non-existent raw component {}", path);
+    Asset asset = null;
+    if (content != null) {
+      // by EntityId
+      final Asset contentAsset = content.getAttributes().require(Asset.class);
+      if (contentAsset.getEntityMetadata() != null) {
+        asset = tx.findAsset(contentAsset.getEntityMetadata().getId(), tx.getBucket());
+      }
     }
-
-    final Asset asset = tx.firstAsset(component);
+    if (asset == null) {
+      // by format coordinates
+      Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
+      if (component != null) {
+        asset = tx.firstAsset(component);
+      }
+    }
+    if (asset == null) {
+      log.debug("Attempting to set last verified date for non-existent raw component {}", path);
+      return;
+    }
 
     log.debug("Updating cacheInfo of {} to {}", path, cacheInfo);
     CacheInfo.applyToAsset(asset, cacheInfo);
-    tx.saveAsset(tx.firstAsset(component));
+    tx.saveAsset(asset);
   }
 
   // TODO: Consider a top-level indexed property (e.g. "locator") to make these common lookups fast

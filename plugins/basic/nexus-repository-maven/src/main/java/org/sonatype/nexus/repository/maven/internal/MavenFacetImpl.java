@@ -333,11 +333,23 @@ public class MavenFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public boolean setCacheInfo(final MavenPath path, final CacheInfo cacheInfo) throws IOException {
+  public boolean setCacheInfo(final MavenPath path, final Content content, final CacheInfo cacheInfo) throws IOException {
     final StorageTx tx = UnitOfWork.currentTransaction();
 
-    final Asset asset = findAsset(tx, tx.getBucket(), path);
+    Asset asset = null;
+    if (content != null) {
+      // by EntityId
+      final Asset contentAsset = content.getAttributes().require(Asset.class);
+      if (contentAsset.getEntityMetadata() != null) {
+        asset = tx.findAsset(contentAsset.getEntityMetadata().getId(), tx.getBucket());
+      }
+    }
     if (asset == null) {
+      // by format coordinates
+      asset = findAsset(tx, tx.getBucket(), path);
+    }
+    if (asset == null) {
+      log.debug("Attempting to set last verified date for non-existent maven asset {}", path.getPath());
       return false;
     }
 
