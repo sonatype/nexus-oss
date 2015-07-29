@@ -57,12 +57,11 @@ public class DockerContentValidator
                                      @Nullable String contentName,
                                      @Nullable String declaredContentType) throws IOException
   {
-    if (contentName != null) {
-      if (!contentName.endsWith("/layer")) { // the metadata except layers
-        return defaultContentValidator.determineContentType(
-            strictContentTypeValidation, contentSupplier, mimeRulesSource, contentName + ".json", declaredContentType
-        );
-      }
+    // all asset blobs are json beside layer content
+    if (contentName != null && !contentName.endsWith("/layer")) {
+      return defaultContentValidator.determineContentType(
+          strictContentTypeValidation, contentSupplier, mimeRulesSource, contentName + ".json", declaredContentType
+      );
     }
     // everything else goes to default for now
     return defaultContentValidator.determineContentType(

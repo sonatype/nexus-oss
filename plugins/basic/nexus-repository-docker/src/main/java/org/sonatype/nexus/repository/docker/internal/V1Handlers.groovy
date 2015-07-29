@@ -19,7 +19,6 @@ import javax.inject.Singleton
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.docker.DockerFacet
 import org.sonatype.nexus.repository.http.HttpResponses
-import org.sonatype.nexus.repository.http.HttpStatus
 import org.sonatype.nexus.repository.search.SearchService
 import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.view.Content
@@ -53,11 +52,11 @@ class V1Handlers
     extends ComponentSupport
 {
 
-  def final static USER_AGENT_PATTERN = ~/([^\s\/]+)\/([^\s\/]+)/
+  def static final USER_AGENT_PATTERN = ~/([^\s\/]+)\/([^\s\/]+)/
 
-  private final static ObjectMapper mapper = new ObjectMapper()
+  private static final ObjectMapper mapper = new ObjectMapper()
 
-  private final static sorting = [
+  private static final sorting = [
       SortBuilders.fieldSort(StorageFacet.P_NAME).order(SortOrder.ASC),
       SortBuilders.fieldSort(StorageFacet.P_VERSION).order(SortOrder.ASC)
   ]
@@ -240,9 +239,7 @@ class V1Handlers
   }
 
   Closure oldDocker = {
-    throw new V1Exception(
-        'This endpoint does not support Docker daemons older than 0.10', HttpStatus.PRECONDITION_FAILED
-    )
+    throw new V1Exception.OldDocker()
   }
 
   Closure v1Exception = { Context context ->

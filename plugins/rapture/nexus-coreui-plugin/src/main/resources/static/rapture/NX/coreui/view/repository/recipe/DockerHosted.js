@@ -27,7 +27,7 @@ Ext.define('NX.coreui.view.repository.recipe.DockerHosted', {
     'NX.coreui.view.repository.facet.StorageFacetHosted',
     'NX.coreui.view.repository.facet.DockerConnectorFacet'
   ],
-  
+
   /**
    * @override
    */
@@ -35,9 +35,9 @@ Ext.define('NX.coreui.view.repository.recipe.DockerHosted', {
     var me = this;
 
     me.items = [
-      { xtype: 'nx-coreui-repository-docker-connector-facet'},
-      { xtype: 'nx-coreui-repository-storage-facet'},
-      { xtype: 'nx-coreui-repository-storage-hosted-facet', writePolicy: 'ALLOW'}
+      {xtype: 'nx-coreui-repository-docker-connector-facet'},
+      {xtype: 'nx-coreui-repository-storage-facet'},
+      {xtype: 'nx-coreui-repository-storage-hosted-facet', writePolicy: 'ALLOW'}
     ];
 
     me.callParent(arguments);

@@ -34,9 +34,7 @@ import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.repository.FacetSupport;
-import org.sonatype.nexus.repository.InvalidContentException;
 import org.sonatype.nexus.repository.docker.DockerFacet;
-import org.sonatype.nexus.repository.http.HttpStatus;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
@@ -84,13 +82,13 @@ public class DockerFacetImpl
     implements DockerFacet
 {
 
-  private final static List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(SHA256);
+  private static final List<HashAlgorithm> hashAlgorithms = Lists.newArrayList(SHA256);
 
-  private final static ObjectMapper mapper = new ObjectMapper();
+  private static final ObjectMapper mapper = new ObjectMapper();
 
-  private final static Pattern validLayerId = Pattern.compile("^([a-f0-9]{16}|[a-f0-9]{64})$");
+  private static final Pattern validLayerId = Pattern.compile("^([a-f0-9]{16}|[a-f0-9]{64})$");
 
-  private final static Pattern validTag = Pattern.compile("^[\\w][\\w.-]{0,127}$");
+  private static final Pattern validTag = Pattern.compile("^[\\w][\\w.-]{0,127}$");
 
 
   @Override
@@ -98,12 +96,12 @@ public class DockerFacetImpl
   public Payload getImagesIndex(final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String imagesIndexAssetName = name + "/images";
+    String imagesIndexAssetName = getImagesIndexName(name);
     Bucket bucket = tx.getBucket();
     // check that we have images index asset
     Asset asset = findAsset(tx, bucket, imagesIndexAssetName);
     if (asset == null) {
-      throw new V1Exception("images not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImagesNotFound();
     }
 
     return marshall(asset, tx.requireBlob(asset.requireBlobRef()));
@@ -127,7 +125,7 @@ public class DockerFacetImpl
 
     InputStream indexStream;
 
-    String imagesIndexAssetName = name + "/images";
+    String imagesIndexAssetName = getImagesIndexName(name);
 
     Bucket bucket = tx.getBucket();
     Asset imagesIndexAsset = findAsset(tx, bucket, imagesIndexAssetName);
@@ -175,13 +173,13 @@ public class DockerFacetImpl
     validateLayerId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = layerId + "/json";
+    String metadataAssetName = layerMetadataName(layerId);
 
     Bucket bucket = tx.getBucket();
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     // check that we have the layer and layer content was fully uploaded
     if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1Exception("Image not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImageNotFound();
     }
 
     Content content = marshall(metadataAsset, tx.requireBlob(metadataAsset.requireBlobRef()));
@@ -209,14 +207,14 @@ public class DockerFacetImpl
   {
     Map<String, Object> data = readLayerMetadata(streamSupplier);
     if (!data.containsKey("id")) {
-      throw new V1Exception("Missing key 'id' in JSON");
+      throw new V1Exception.InvalidLayerMetadata("Missing key 'id' in JSON");
     }
     if (!data.get("id").equals(layerId)) {
-      throw new V1Exception("JSON data contains invalid id");
+      throw new V1Exception.InvalidLayerMetadata("JSON data contains invalid id");
     }
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = layerId + "/json";
+    String metadataAssetName = layerMetadataName(layerId);
     String parentId = (String) data.get(DockerAttributes.P_PARENT);
 
     Bucket bucket = tx.getBucket();
@@ -225,9 +223,9 @@ public class DockerFacetImpl
     List<String> ancestry = null;
     if (parentId != null) {
       // check that we have the parent layer and parent layer content was fully uploaded
-      parentAsset = findAsset(tx, bucket, parentId + "/json");
+      parentAsset = findAsset(tx, bucket, layerMetadataName(parentId));
       if (parentAsset == null || Boolean.TRUE.equals(parentAsset.formatAttributes().get(P_IN_PROGRESS))) {
-        throw new V1Exception("Image depends on a non existing parent");
+        throw new V1Exception.InvalidLayerMetadata("Image depends on a non existing parent");
       }
     }
     // TODO check that parent asset is accessible via authorisation once we have per assets auth
@@ -248,7 +246,7 @@ public class DockerFacetImpl
     }
     else {
       if (!Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
-        throw new V1Exception("Image already exists", HttpStatus.CONFLICT);
+        throw new V1Exception.ImageAlreadyExists();
       }
       // cleanup checksums as we have potentially new metadata/layer
       metadataAsset.formatAttributes().remove(P_X_DOCKER_CHECKSUM_PAYLOAD);
@@ -273,26 +271,26 @@ public class DockerFacetImpl
     validateLayerId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = layerId + "/json";
+    String metadataAssetName = layerMetadataName(layerId);
     String layerAssetName = layerId + "/layer";
 
     Bucket bucket = tx.getBucket();
     // check that we have the layer and layer content was fully uploaded
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1Exception("Image not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImageNotFound();
     }
     // check that we have layer content
     Asset layerAsset = findAsset(tx, bucket, layerAssetName);
     if (layerAsset == null) {
-      throw new V1Exception("Image not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImageNotFound();
     }
 
     return marshall(layerAsset, tx.requireBlob(layerAsset.requireBlobRef()));
   }
 
   @Override
-  public void putLayerContent(final String layerId, final Payload content) throws IOException, InvalidContentException {
+  public void putLayerContent(final String layerId, final Payload content) throws IOException {
     validateLayerId(layerId);
     try (TempStreamSupplier streamSupplier = new TempStreamSupplier(content.openInputStream())) {
       doPutLayerContent(layerId, streamSupplier, content);
@@ -307,18 +305,18 @@ public class DockerFacetImpl
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = layerId + "/json";
+    String metadataAssetName = layerMetadataName(layerId);
     String layerAssetName = layerId + "/layer";
 
     Bucket bucket = tx.getBucket();
     // check that layer metadata was previously uploaded
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     if (metadataAsset == null) {
-      throw new V1Exception("Image not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImageNotFound();
     }
     // check that image was not already fully updated
     if (!Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1Exception("Image already exists", HttpStatus.CONFLICT);
+      throw new V1Exception.ImageAlreadyExists();
     }
     Asset layerAsset = findAsset(tx, bucket, layerAssetName);
     if (layerAsset == null) {
@@ -357,19 +355,15 @@ public class DockerFacetImpl
     validateLayerId(layerId);
     // checksum must be specified (cannot be null)
     if (checksum == null) {
-      throw new V1Exception(
-          P_X_DOCKER_CHECKSUM_PAYLOAD +
-              " not set.  If you are using the Docker daemon, you should upgrade to version 0.10 or later",
-          HttpStatus.PRECONDITION_FAILED
-      );
+      throw new V1Exception.OldDocker(P_X_DOCKER_CHECKSUM_PAYLOAD + " not set");
     }
     // checksum must be specified (cannot be blank)
     if (StringUtils.isBlank(checksum)) {
-      throw new V1Exception("Missing Image's checksum");
+      throw new V1Exception.InvalidChecksum("Missing Image's checksum");
     }
     // checksum should be of format <checksum algorithm>:<checksum>
     if (checksum.split(":").length != 2) {
-      throw new V1Exception("Invalid checksum format");
+      throw new V1Exception.InvalidChecksum("Invalid checksum format");
     }
     doPutLayerChecksum(layerId, checksum);
   }
@@ -379,23 +373,23 @@ public class DockerFacetImpl
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = layerId + "/json";
+    String metadataAssetName = layerMetadataName(layerId);
 
     Bucket bucket = tx.getBucket();
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     // check that we have the layer
     if (metadataAsset == null) {
-      throw new V1Exception("Image not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImageNotFound();
     }
     // check that layer content was fully uploaded
     if (!Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1Exception("Cannot set this image checksum", HttpStatus.CONFLICT);
+      throw new V1Exception.ImageAlreadyExists("Cannot set this image checksum");
     }
     // compare checksum with pre-calculated checksum (calculated when layer content was uploaded)
     Object actualChecksum = metadataAsset.formatAttributes().get(P_X_DOCKER_CHECKSUM_PAYLOAD);
     if (!checksum.equals(actualChecksum)) {
       log.error("Wrong checksum. Actual: {}; Expected: {}", actualChecksum, checksum);
-      throw new V1Exception("Checksum mismatch");
+      throw new V1Exception.InvalidChecksum("Checksum mismatch");
     }
     // checksum match, so mark layer as fully uploaded
     metadataAsset.formatAttributes().remove(P_IN_PROGRESS);
@@ -408,13 +402,13 @@ public class DockerFacetImpl
     validateLayerId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String metadataAssetName = layerId + "/json";
+    String metadataAssetName = layerMetadataName(layerId);
 
     Bucket bucket = tx.getBucket();
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     // check that we have the layer and layer content was fully uploaded
     if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1Exception("Image not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImageNotFound();
     }
 
     String ancestry = mapper.writeValueAsString(metadataAsset.formatAttributes().get(P_ANCESTRY));
@@ -432,7 +426,7 @@ public class DockerFacetImpl
       tags.put(tagComponent.version(), tagComponent.formatAttributes().get(P_LAYER_ID, String.class));
     }
     if (tags.isEmpty()) {
-      throw new V1Exception("images not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImagesNotFound();
     }
     return new StringPayload(mapper.writeValueAsString(tags), Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
   }
@@ -444,7 +438,7 @@ public class DockerFacetImpl
 
     Component tagComponent = findComponent(tx, name, tag);
     if (tagComponent == null) {
-      throw new V1Exception("Tag not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.TagNotFound();
     }
     String layerId = tagComponent.formatAttributes().get(P_LAYER_ID, String.class);
     return new StringPayload(mapper.writeValueAsString(layerId), Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
@@ -472,19 +466,19 @@ public class DockerFacetImpl
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    String imageIndexAssetName = name + "/images";
-    String metadataAssetName = layerId + "/json";
+    String imageIndexAssetName = getImagesIndexName(name);
+    String metadataAssetName = layerMetadataName(layerId);
 
     Bucket bucket = tx.getBucket();
     // check that we have an image index
     Asset imageIndexAsset = findAsset(tx, bucket, imageIndexAssetName);
     if (imageIndexAsset == null) {
-      throw new V1Exception("images not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImagesNotFound();
     }
     // check that we have the layer specified by tag and layer content was fully uploaded
     Asset metadataAsset = findAsset(tx, bucket, metadataAssetName);
     if (metadataAsset == null || Boolean.TRUE.equals(metadataAsset.formatAttributes().get(P_IN_PROGRESS))) {
-      throw new V1Exception("Image not found", HttpStatus.NOT_FOUND);
+      throw new V1Exception.ImageNotFound();
     }
 
     // create a component / name / tag (version) if we do not already have one
@@ -570,12 +564,13 @@ public class DockerFacetImpl
    * @return parsed layer metadata
    */
   private Map<String, Object> readLayerMetadata(final Supplier<InputStream> layerMetadataContent) {
-    TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {};
+    TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {}; //CHECKSTYLE:OFF
     try {
       return mapper.readValue(layerMetadataContent.get(), typeRef);
     }
     catch (Exception e) {
-      throw new V1Exception("Invalid JSON");
+      log.debug("Invalid JSON", e);
+      throw new V1Exception.InvalidJson();
     }
   }
 
@@ -587,37 +582,14 @@ public class DockerFacetImpl
    */
   private List<Map<String, Object>> readImagesIndex(final Supplier<InputStream> imagesIndexContent) throws IOException {
     try (InputStream in = imagesIndexContent.get()) {
-      TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {};
+      TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {}; //CHECKSTYLE:OFF
       try {
         return mapper.readValue(in, typeRef);
       }
       catch (Exception e) {
-        throw new V1Exception("Invalid JSON");
+        log.debug("Invalid JSON", e);
+        throw new V1Exception.InvalidJson();
       }
-    }
-  }
-
-  /**
-   * Validate layer id.
-   *
-   * @param layerId to validate
-   * @return validated layer id
-   */
-  private String validateLayerId(final String layerId) {
-    if (!validLayerId.matcher(layerId).matches()) {
-      throw new V1Exception("Invalid image ID", HttpStatus.NOT_FOUND);
-    }
-    return layerId;
-  }
-
-  /**
-   * Validate tag name.
-   *
-   * @param tag to validate
-   */
-  private void validateTagName(final String tag) {
-    if (!validTag.matcher(tag).matches()) {
-      throw new V1Exception("Invalid tag name (must match ${VALID_TAG})");
     }
   }
 
@@ -632,7 +604,32 @@ public class DockerFacetImpl
       return validateLayerId(mapper.readValue(streamSupplier.get(), String.class));
     }
     catch (Exception e) {
-      throw new V1Exception("Invalid data");
+      log.debug("Invalid JSON", e);
+      throw new V1Exception.InvalidJson("Invalid data");
+    }
+  }
+
+  /**
+   * Validate layer id.
+   *
+   * @param layerId to validate
+   * @return validated layer id
+   */
+  private String validateLayerId(final String layerId) {
+    if (!validLayerId.matcher(layerId).matches()) {
+      throw new V1Exception.InvalidImageId();
+    }
+    return layerId;
+  }
+
+  /**
+   * Validate tag name.
+   *
+   * @param tag to validate
+   */
+  private void validateTagName(final String tag) {
+    if (!validTag.matcher(tag).matches()) {
+      throw new V1Exception.InvalidTagName();
     }
   }
 
@@ -665,5 +662,21 @@ public class DockerFacetImpl
       }
     };
   }
+
+  /**
+   * Get the name of layer metadata asset.
+   *
+   * @param layerId layer id
+   * @return name
+   */
+  private String layerMetadataName(final String layerId) {return layerId + "/json";}
+
+  /**
+   * Get teh name of images index asset.
+   *
+   * @param name image name
+   * @return name
+   */
+  private String getImagesIndexName(final String name) {return name + "/images";}
 
 }

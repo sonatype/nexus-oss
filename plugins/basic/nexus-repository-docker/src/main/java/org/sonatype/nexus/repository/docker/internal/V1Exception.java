@@ -24,11 +24,11 @@ public class V1Exception
 {
   private final int httpCode;
 
-  public V1Exception(final String message) {
+  private V1Exception(final String message) {
     this(message, HttpStatus.BAD_REQUEST);
   }
 
-  public V1Exception(final String message, final int httpCode) {
+  private V1Exception(final String message, final int httpCode) {
     super(message);
     this.httpCode = httpCode;
   }
@@ -36,4 +36,100 @@ public class V1Exception
   public int getHttpCode() {
     return httpCode;
   }
+
+  static class ImagesNotFound
+      extends V1Exception
+  {
+    public ImagesNotFound() {
+      super("images not found", HttpStatus.NOT_FOUND);
+    }
+  }
+
+  static class TagNotFound
+      extends V1Exception
+  {
+    public TagNotFound() {
+      super("Tag not found", HttpStatus.NOT_FOUND);
+    }
+  }
+
+  static class ImageNotFound
+      extends V1Exception
+  {
+    public ImageNotFound() {
+      super("Image not found", HttpStatus.NOT_FOUND);
+    }
+  }
+
+  static class ImageAlreadyExists
+      extends V1Exception
+  {
+    public ImageAlreadyExists() {
+      this("Image already exists");
+    }
+
+    public ImageAlreadyExists(final String message) {
+      super(message, HttpStatus.CONFLICT);
+    }
+  }
+
+  static class InvalidLayerMetadata
+      extends V1Exception
+  {
+    public InvalidLayerMetadata(final String message) {
+      super(message);
+    }
+  }
+
+  static class InvalidImageId
+      extends V1Exception
+  {
+    public InvalidImageId() {
+      super("Invalid image ID", HttpStatus.NOT_FOUND);
+    }
+  }
+
+  static class InvalidTagName
+      extends V1Exception
+  {
+    public InvalidTagName() {
+      super("Invalid tag name (must match '^[\\w][\\w.-]{0,127}$')");
+    }
+  }
+
+  static class InvalidChecksum
+      extends V1Exception
+  {
+    public InvalidChecksum(final String message) {
+      super(message);
+    }
+  }
+
+  static class InvalidJson
+      extends V1Exception
+  {
+    public InvalidJson() {
+      super("Invalid JSON");
+    }
+
+    public InvalidJson(final String message) {
+      super(message);
+    }
+  }
+
+  static class OldDocker
+      extends V1Exception
+  {
+    public OldDocker() {
+      super("This endpoint does not support Docker daemons older than 0.10", HttpStatus.PRECONDITION_FAILED);
+    }
+
+    public OldDocker(final String message) {
+      super(
+          message + ". If you are using the Docker daemon, you should upgrade to version 0.10 or later",
+          HttpStatus.PRECONDITION_FAILED
+      );
+    }
+  }
+
 }
