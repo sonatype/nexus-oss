@@ -27,4 +27,9 @@ public interface DockerConnectorFacet
    */
   int getHttpPort();
 
+  /**
+   * @return configured reverse proxy HTTPS connector port
+   */
+  int getHttpsPort();
+
 }

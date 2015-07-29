@@ -93,7 +93,12 @@ public class DockerConnectorFacetImpl
 
   @Override
   public int getHttpPort() {
-    return jettyConnector.getLocalPort();
+    return config.httpPort;
+  }
+
+  @Override
+  public int getHttpsPort() {
+    return config.httpsPort;
   }
 
   static class Config
