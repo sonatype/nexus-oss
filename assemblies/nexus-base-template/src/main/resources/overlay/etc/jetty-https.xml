@@ -4,7 +4,7 @@
 
   <!--
   ==== HTTPS ====
-  Set the following inside nexus.properties:
+  Set the following inside org.sonatype.nexus.cfg:
   application-port-ssl: the port to listen for https connections
   -->
 
