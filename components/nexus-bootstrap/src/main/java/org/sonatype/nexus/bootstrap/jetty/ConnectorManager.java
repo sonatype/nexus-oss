@@ -24,6 +24,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -35,6 +37,8 @@ import static java.util.Collections.unmodifiableList;
  */
 public class ConnectorManager
 {
+  private static final Logger log = LoggerFactory.getLogger(ConnectorManager.class);
+
   private static final String HTTP_CONFIG_ID = "httpConfig";
 
   private static final String HTTP_CONNECTOR_ID = "httpConnector";
@@ -118,6 +122,7 @@ public class ConnectorManager
       serverConnector.start();
     }
     catch (Exception e) {
+      log.warn("Could not start connector: {}", connectorConfiguration, e);
       throw new RuntimeException(e); // NOSONAR: no guava in scope
     }
 
@@ -134,6 +139,7 @@ public class ConnectorManager
         serverConnector.stop();
       }
       catch (Exception e) {
+        log.warn("Could not stop connector: {}", connectorConfiguration, e);
         throw new RuntimeException(e); // NOSONAR: no guava in scope
       }
       server.removeConnector(serverConnector);
@@ -189,7 +195,7 @@ public class ConnectorManager
       });
     }
     catch (IllegalStateException e) {
-      // nop
+      log.debug("No HTTP configuration present", e);
     }
     try {
       verifyConfiguration(HttpScheme.HTTPS);
@@ -213,7 +219,7 @@ public class ConnectorManager
       });
     }
     catch (IllegalStateException e) {
-      // nop
+      log.debug("No HTTPS configuration present", e);
     }
     return result;
   }
