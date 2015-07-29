@@ -162,10 +162,19 @@
         <version>3.0.20</version>
       </dependency>
 
+      <!--
+      NOTE: This has a non-standard license, prefer ASF spec instead.
+      -->
+      <!--<dependency>-->
+        <!--<groupId>javax.cache</groupId>-->
+        <!--<artifactId>cache-api</artifactId>-->
+        <!--<version>1.0.0</version>-->
+      <!--</dependency>-->
+
       <dependency>
-        <groupId>javax.cache</groupId>
-        <artifactId>cache-api</artifactId>
-        <version>1.0.0</version>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jcache_1.0_spec</artifactId>
+        <version>1.0-alpha-1</version>
       </dependency>
 
       <dependency>
@@ -176,6 +185,10 @@
           <exclusion>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
