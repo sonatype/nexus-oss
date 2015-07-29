@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
 import org.sonatype.nexus.bootstrap.jetty.ConnectorRegistrar;
 import org.sonatype.nexus.bootstrap.jetty.JettyServerConfiguration;
+import org.sonatype.nexus.bootstrap.jetty.UnsupportedHttpSchemeException;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
 import com.google.common.collect.Maps;
@@ -123,9 +124,14 @@ public class ConnectorRegistrarImpl
     // schema is not null and is available
     final HttpScheme httpScheme = connectorConfiguration.getScheme();
     checkNotNull(httpScheme);
-    checkArgument(availableSchemes().contains(httpScheme));
+    if (!availableSchemes().contains(httpScheme)) {
+      throw new UnsupportedHttpSchemeException(httpScheme);
+    }
 
-    // port is free
-    checkArgument(!unavailablePorts().contains(connectorConfiguration.getPort()));
+    // port is ok and free
+    final int port = connectorConfiguration.getPort();
+    checkArgument(port > 0);
+    checkArgument(port < 65536);
+    checkArgument(!unavailablePorts().contains(port));
   }
 }

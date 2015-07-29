@@ -19,6 +19,7 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
 import org.sonatype.nexus.bootstrap.jetty.ConnectorRegistrar;
+import org.sonatype.nexus.bootstrap.jetty.UnsupportedHttpSchemeException;
 import org.sonatype.nexus.testsuite.NexusHttpsITSupport;
 import org.sonatype.nexus.testsuite.maven.Maven2Client;
 
@@ -38,6 +39,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.fail;
 
 /**
  * IT for {@link ConnectorConfiguration}.
@@ -66,11 +68,133 @@ public class JettyConnectorManagerIT
     assertThat(schemes, contains(HttpScheme.HTTP, HttpScheme.HTTPS));
   }
 
+  @Test(expected = UnsupportedHttpSchemeException.class)
+  public void unsupportedHttpScheme() throws Exception {
+    connectorRegistrar.addConnector(new ConnectorConfiguration()
+    {
+      @Override
+      public HttpScheme getScheme() {
+        return HttpScheme.WS;
+      }
+
+      @Override
+      public int getPort() {
+        return 1234;
+      }
+
+      @Override
+      public HttpConfiguration customize(final HttpConfiguration configuration) {
+        return configuration;
+      }
+    });
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void nullHttpScheme() throws Exception {
+    connectorRegistrar.addConnector(new ConnectorConfiguration()
+    {
+      @Override
+      public HttpScheme getScheme() {
+        return null;
+      }
+
+      @Override
+      public int getPort() {
+        return 1234;
+      }
+
+      @Override
+      public HttpConfiguration customize(final HttpConfiguration configuration) {
+        return configuration;
+      }
+    });
+  }
+
   @Test
   public void unavailablePorts() throws Exception {
     final List<Integer> ports = connectorRegistrar.unavailablePorts();
     // This IT enables HTTPS, so must be present
     assertThat(ports, contains(nexusUrl.getPort(), nexusSecureUrl.getPort()));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void usedPort() throws Exception {
+    connectorRegistrar.addConnector(new ConnectorConfiguration()
+    {
+      @Override
+      public HttpScheme getScheme() {
+        return HttpScheme.HTTP;
+      }
+
+      @Override
+      public int getPort() {
+        return nexusUrl.getPort();
+      }
+
+      @Override
+      public HttpConfiguration customize(final HttpConfiguration configuration) {
+        return configuration;
+      }
+    });
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void badPort() throws Exception {
+    connectorRegistrar.addConnector(new ConnectorConfiguration()
+    {
+      @Override
+      public HttpScheme getScheme() {
+        return HttpScheme.HTTP;
+      }
+
+      @Override
+      public int getPort() {
+        return -1;
+      }
+
+      @Override
+      public HttpConfiguration customize(final HttpConfiguration configuration) {
+        return configuration;
+      }
+    });
+  }
+
+  @Test
+  public void doubleRegistration() throws Exception {
+    final int port = portRegistry.reservePort();
+    try {
+      final ConnectorConfiguration config = new ConnectorConfiguration()
+      {
+        @Override
+        public HttpScheme getScheme() {
+          return HttpScheme.HTTP;
+        }
+
+        @Override
+        public int getPort() {
+          return port;
+        }
+
+        @Override
+        public HttpConfiguration customize(final HttpConfiguration configuration) {
+          return configuration;
+        }
+      };
+      connectorRegistrar.addConnector(config);
+      try {
+        connectorRegistrar.addConnector(config);
+        fail("Should fail");
+      }
+      catch (IllegalArgumentException e) {
+        // good, is already added
+      }
+      finally {
+        connectorRegistrar.removeConnector(config);
+      }
+    }
+    finally {
+      portRegistry.releasePort(port);
+    }
   }
 
   @Test

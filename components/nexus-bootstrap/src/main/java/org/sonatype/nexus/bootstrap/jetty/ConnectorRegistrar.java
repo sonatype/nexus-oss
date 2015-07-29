@@ -39,9 +39,9 @@ public interface ConnectorRegistrar
    * Registers a new Jetty {@link ConnectorConfiguration}, that creates a new connector on Jetty based on passed
    * in configuration.
    *
-   * @throws IllegalArgumentException if requested HTTPS schema is not available, requested port is not available, if
-   *                                  current instance was already added, if current instance is invalid (bad port
-   *                                  number or bad schema).
+   * @throws UnsupportedHttpSchemeException if requested HTTP schema is not available.
+   * @throws IllegalArgumentException       requested port is not available, if current connectorConfiguration instance
+   *                                        was already added
    */
   void addConnector(ConnectorConfiguration connectorConfiguration);
 
