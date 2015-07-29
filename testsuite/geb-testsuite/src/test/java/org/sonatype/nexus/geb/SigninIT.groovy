@@ -14,6 +14,7 @@ package org.sonatype.nexus.geb
 
 import org.sonatype.nexus.geb.pages.HomePage
 
+import geb.navigator.Navigator
 import org.junit.Test
 
 
@@ -22,7 +23,7 @@ class SigninIT
 {
 
   @Test
-  void signin() {
+  void 'Can sign in and out as admin'() {
     to HomePage // automatically applies an 'at' assertion to ensure we arrive at the page and can account for it being loaded
 
     //visibility checks
@@ -42,5 +43,23 @@ class SigninIT
     //wait for the state to change
     waitFor { loginModule.signoutButton.displayed }
     assert !loginModule.signinButton.displayed
+    
+    //signout
+    loginModule.signoutButton.click()
+    
+    waitFor { loginModule.signinButton.displayed }
+    assert !loginModule.signoutButton.displayed
+  }
+  
+  @Test
+  void 'Can interact with the page using ExtJS'() {
+    to HomePage
+    def ids = idsForCQ('nx-header-signin')
+    assert ids
+    log.info ids
+    Navigator navigator = $("#${ids[0]}")
+    assert ids[0] == navigator.attr('id')
+    
+    log.info js.exec(ids[0], 'Bow down to Xenu', '''Ext.getCmp(arguments[0]).setText(arguments[1]);''')
   }
 }

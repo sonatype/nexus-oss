@@ -23,6 +23,7 @@ import javax.net.ssl.HttpsURLConnection
 
 import org.sonatype.nexus.common.app.ApplicationDirectories
 import org.sonatype.nexus.common.event.EventSubscriberHost
+import org.sonatype.nexus.geb.traits.ExtJS
 import org.sonatype.nexus.scheduling.TaskScheduler
 import org.sonatype.sisu.goodies.common.Loggers
 import org.sonatype.sisu.litmus.testsupport.junit.TestDataRule
@@ -70,7 +71,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*
 @RunWith(PaxExam.class)
 //class TestSpec extends GebReportingSpec // TODO - KR would need a pax-exam compatible running for Spock Sputnik here
 class GebTestSupport
-    extends GebReportingTest
+    extends GebReportingTest implements ExtJS
 {
 
   public static final String BASEDIR = new File(System.getProperty("basedir", "")).getAbsolutePath();
