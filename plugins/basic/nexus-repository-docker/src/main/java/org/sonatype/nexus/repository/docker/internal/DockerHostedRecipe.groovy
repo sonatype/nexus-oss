@@ -58,7 +58,7 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT
  *
  * @since 3.0
  */
-@Named(NAME)
+@Named(DockerHostedRecipe.NAME)
 @Singleton
 class DockerHostedRecipe
     extends RecipeSupport
