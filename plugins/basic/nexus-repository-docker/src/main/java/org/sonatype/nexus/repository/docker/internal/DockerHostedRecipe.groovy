@@ -58,7 +58,7 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT
  *
  * @since 3.0
  */
-@Named(DockerHostedRecipe.NAME)
+@Named(NAME)
 @Singleton
 class DockerHostedRecipe
     extends RecipeSupport
@@ -139,7 +139,7 @@ class DockerHostedRecipe
                 try {
                   return dockerVersion && VERSION_0_10.compareTo(SCHEME.parseVersion(dockerVersion)) > 0
                 }
-                catch (InvalidVersionSpecificationException e) {
+                catch (InvalidVersionSpecificationException ignored) {
                   return true
                 }
               }
