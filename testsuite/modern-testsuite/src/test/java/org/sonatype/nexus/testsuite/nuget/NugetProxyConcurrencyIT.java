@@ -41,8 +41,8 @@ public class NugetProxyConcurrencyIT
   public void concurrentProxyTest() throws Exception {
 
     final int terminationWaitTimeSeconds = 100;
-    final int iterations = 10;
-    final int threads = 1;
+    final int iterations = 5;
+    final int threads = 10;
 
     final ConcurrentRunner runner = new ConcurrentRunner(iterations, terminationWaitTimeSeconds);
 
@@ -54,7 +54,7 @@ public class NugetProxyConcurrencyIT
       @Override
       public void run() throws Exception {
         try (CloseableHttpResponse httpResponse = nuget.packageContent("SONATYPE.TEST", "1.0")) {
-          assertThat(status(httpResponse), is(201));
+          assertThat(status(httpResponse), is(200));
           bytes(httpResponse);
         }
       }
