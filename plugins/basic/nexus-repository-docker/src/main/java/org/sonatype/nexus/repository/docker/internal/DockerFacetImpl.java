@@ -564,7 +564,7 @@ public class DockerFacetImpl
    * @return parsed layer metadata
    */
   private Map<String, Object> readLayerMetadata(final Supplier<InputStream> layerMetadataContent) {
-    TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {}; //CHECKSTYLE:OFF
+    TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {}; //NOSONAR
     try {
       return mapper.readValue(layerMetadataContent.get(), typeRef);
     }
@@ -582,7 +582,7 @@ public class DockerFacetImpl
    */
   private List<Map<String, Object>> readImagesIndex(final Supplier<InputStream> imagesIndexContent) throws IOException {
     try (InputStream in = imagesIndexContent.get()) {
-      TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {}; //CHECKSTYLE:OFF
+      TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {}; //NOSONAR
       try {
         return mapper.readValue(in, typeRef);
       }
