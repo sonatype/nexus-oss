@@ -36,6 +36,7 @@ import geb.ConfigurationLoader
 import geb.junit4.GebReportingTest
 import org.junit.After
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
@@ -68,11 +69,9 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*
 
 @RunWith(PaxExam.class)
 //class TestSpec extends GebReportingSpec // TODO - KR would need a pax-exam compatible running for Spock Sputnik here
-class TestSpec extends GebReportingTest
+class BaseTest
+    extends GebReportingTest
 {
-  //TODO - KR PaxExamServer doesn't appear to 
-//  @Rule
-//  public PaxExamServer exam = new PaxExamServer();
 
   public static final String BASEDIR = new File(System.getProperty("basedir", "")).getAbsolutePath();
 
@@ -120,28 +119,19 @@ class TestSpec extends GebReportingTest
   }
 
   @Before
-  void setupSpec() {
-//    println "exam = $exam"
-    // Use port as reported by service under test since it's not known until runtime.
+  void setup() {
     System.setProperty("geb.build.baseUrl", nexusUrl.toString())
-//    productLicenseManager.reset()
-//    clmLicenseManager.installLicense(null)
-//    BrowserInfo.init(driver)
   }
-
-  @Test
-  void goToLogin() {
-//    when:
-      go '/'
-
-//    then:
-      assert title == 'Welcome - Sonatype Nexus'
+  
+  @BeforeClass
+  static void setupSpec() {
+    System.setProperty('geb.env', System.getProperty('geb.env', 'chrome'))
   }
 
   @Configuration
   public static Option[] configureNexus() {
     return options(
-        nexusDistribution("org.sonatype.nexus.assemblies", "nexus-base-template"),
+        nexusDistribution('org.sonatype.nexus.assemblies', 'nexus-base-template'),
 
         // Add testsuite dependencies as bundles
 
@@ -173,12 +163,22 @@ class TestSpec extends GebReportingTest
             .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
         wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-firefox-driver').versionAsInProject())
             .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-chrome-driver').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('com.codeborne','phantomjsdriver').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
 
         // FIXME: This does not take effect unless you do *NOT* have NEXUS_RESOURCE_DIRS set
         // FIXME: Needs to include more resource-dirs as well to pick up changes
-        editConfigurationFileExtend("etc/system.properties",
-            "nexus.resource.dirs", resolveBaseFile("src/test/ft-resources").getAbsolutePath()
-        )
+        editConfigurationFileExtend('etc/system.properties',
+            'nexus.resource.dirs', resolveBaseFile('src/test/ft-resources').absolutePath
+        ),
+        editConfigurationFileExtend('etc/system.properties',
+            'geb.env', System.getProperty('geb.env', 'phantom')
+        ),
+        editConfigurationFileExtend('etc/system.properties',
+            'geb.workdir', resolveBaseFile('target').absolutePath
+        ),
     );
   }
   // -------------------------------------------------------------------------

@@ -32,7 +32,7 @@ import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.safari.SafariDriver
 
 reportsDir = "target/test-reports/geb"
-// Port is not known until runtime, needs to be set in BaseSpec.groovy
+// Port is not known until runtime, needs to be set in BaseTest.groovy
 //baseUrl = System.getProperty('geb.build.baseUrl', 'http://localhost:9070/')
 
 //enable waitFor behaviour for all 'at' checks
@@ -100,7 +100,7 @@ environments {
   // see https://github.com/detro/ghostdriver
   phantom {
     String phantomJsBinary
-    new File('target/phantomjs-maven-plugin').eachFileRecurse { File file ->
+    new File(System.getProperty('geb.workdir', 'target') + '/phantomjs-maven-plugin').eachFileRecurse { File file ->
       if (file.isFile() && file.name.matches('phantomjs(.exe)?')) {
         phantomJsBinary = file.absolutePath
         return false
@@ -128,5 +128,6 @@ environments {
 
 def configure(final RemoteWebDriver driver) {
   driver.manage().window().setSize(new Dimension(1280, 1024))
+  println "Geb configured with driver: $driver"
   return driver
 }
