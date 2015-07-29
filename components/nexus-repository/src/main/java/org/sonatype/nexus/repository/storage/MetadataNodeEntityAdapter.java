@@ -53,7 +53,6 @@ import static org.sonatype.nexus.repository.storage.StorageFacet.P_REPOSITORY_NA
 public abstract class MetadataNodeEntityAdapter<T extends MetadataNode<?>>
     extends CollectionEntityAdapter<T>
 {
-
   private final BucketEntityAdapter bucketEntityAdapter;
 
   public MetadataNodeEntityAdapter(final String typeName, final BucketEntityAdapter bucketEntityAdapter) {
@@ -102,7 +101,7 @@ public abstract class MetadataNodeEntityAdapter<T extends MetadataNode<?>>
         "bucket", bucketEntityAdapter.recordIdentity(bucket)
     );
     String query = String.format("select from %s where bucket = :bucket", getTypeName());
-    Iterable<ODocument> docs = db.command(new OCommandSQL(query)).execute(parameters);
+    Iterable<ODocument> docs = OrientAsyncHelper.asyncIterable(db, query, parameters);
     return readEntities(docs);
   }
 

@@ -55,11 +55,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.orientechnologies.common.concur.ONeedRetryException;
-import com.orientechnologies.orient.core.command.OCommandResultListener;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLAsynchQuery;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -193,41 +191,25 @@ public class MetadataRebuilder
     public void rebuildMetadata()
     {
       final StorageTx tx = UnitOfWork.currentTransaction();
-      tx.getDb().command(
-          new OSQLAsynchQuery<ODocument>(
-              sql,
-              new OCommandResultListener()
-              {
-                String currentGroupId = null;
+      String currentGroupId = null;
+      for (ODocument doc : tx.browse(sql, sqlParams)) {
+        final String groupId = doc.field("groupId", OType.STRING);
+        final String artifactId = doc.field("artifactId", OType.STRING);
+        final Set<String> baseVersions = doc.field("baseVersions", OType.EMBEDDEDSET);
 
-                @Override
-                public boolean result(Object iRecord) {
-                  final ODocument doc = (ODocument) iRecord;
-                  final String groupId = doc.field("groupId", OType.STRING);
-                  final String artifactId = doc.field("artifactId", OType.STRING);
-                  final Set<String> baseVersions = doc.field("baseVersions", OType.EMBEDDEDSET);
-
-                  final boolean groupChange = !Objects.equals(currentGroupId, groupId);
-                  if (groupChange) {
-                    if (currentGroupId != null) {
-                      rebuildMetadataExitGroup(currentGroupId);
-                    }
-                    currentGroupId = groupId;
-                    metadataBuilder.onEnterGroupId(groupId);
-                  }
-                  rebuildMetadataInner(groupId, artifactId, baseVersions);
-                  return true;
-                }
-
-                @Override
-                public void end() {
-                  if (currentGroupId != null) {
-                    rebuildMetadataExitGroup(currentGroupId);
-                  }
-                }
-              }
-          )
-      ).execute(sqlParams);
+        final boolean groupChange = !Objects.equals(currentGroupId, groupId);
+        if (groupChange) {
+          if (currentGroupId != null) {
+            rebuildMetadataExitGroup(currentGroupId);
+          }
+          currentGroupId = groupId;
+          metadataBuilder.onEnterGroupId(groupId);
+        }
+        rebuildMetadataInner(groupId, artifactId, baseVersions);
+      }
+      if (currentGroupId != null) {
+        rebuildMetadataExitGroup(currentGroupId);
+      }
     }
 
     /**

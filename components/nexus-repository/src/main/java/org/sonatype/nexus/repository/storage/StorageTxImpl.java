@@ -43,6 +43,7 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXTYPE;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -157,6 +158,12 @@ public class StorageTxImpl
   @Guarded(by = {OPEN, ACTIVE})
   public ODatabaseDocumentTx getDb() {
     return db;
+  }
+
+  @Override
+  @Guarded(by = {OPEN, ACTIVE})
+  public Iterable<ODocument> browse(final String selectSql, @Nullable final Map<String, Object> params) {
+    return OrientAsyncHelper.asyncIterable(db, selectSql, params);
   }
 
   @Override
