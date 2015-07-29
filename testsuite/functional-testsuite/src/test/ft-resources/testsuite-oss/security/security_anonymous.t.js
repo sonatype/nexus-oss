@@ -29,16 +29,24 @@ StartTest(function(t) {
               next();
             }
           },
-          {
-            waitFor: 'Event', args: ['>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded'],
-            trigger: {click: '>>nx-coreui-security-anonymous-settings button[action=save]'}
-          },
           function(next) {
-            t.waitForAnimations(next);
-          },
-          function(next) {
-            t.fieldHasValue('nx-coreui-security-anonymous-settings combo[name=realmName]', 'NexusAuthorizingRealm',
-                'The only available realm is selected');
+            var button = t.cq1('nx-coreui-security-anonymous-settings button[action=save]');
+            if (!button.isDisabled()) {
+              t.chain(
+                {
+                  waitFor: 'Event', args: ['>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded'],
+                  trigger: {click: '>>nx-coreui-security-anonymous-settings button[action=save]'}
+                },
+                function(next) {
+                  t.waitForAnimations(next);
+                },
+                function(next) {
+                  t.fieldHasValue('nx-coreui-security-anonymous-settings combo[name=realmName]', 'NexusAuthorizingRealm',
+                    'The only available realm is selected');
+                  next();
+                }
+              );
+            }
             next();
           }
       );
