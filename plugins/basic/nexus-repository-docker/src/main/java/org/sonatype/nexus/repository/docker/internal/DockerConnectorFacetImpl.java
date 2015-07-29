@@ -19,7 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.ConstraintViolation;
 
-import org.sonatype.nexus.bootstrap.jetty.JettyServer;
+import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
+import org.sonatype.nexus.bootstrap.jetty.ConnectorRegistrar;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -31,8 +32,12 @@ import org.sonatype.nexus.validation.ConstraintViolations;
 import org.sonatype.nexus.validation.ManualValidator;
 import org.sonatype.nexus.validation.constraint.PortNumber;
 
-import com.google.common.base.Throwables;
-import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.http.HttpScheme;
+import org.eclipse.jetty.http.HttpURI;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConfiguration.Customizer;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.ServerConnector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -51,20 +56,24 @@ public class DockerConnectorFacetImpl
 
   private final ManualValidator manualValidator;
 
-  private final RepositoryReverseProxyFilter repositoryReverseProxyFilter;
+  private final ConnectorRegistrar connectorRegistrar;
 
   private Config config;
 
   private ServerConnector jettyConnector;
 
+  private ConnectorConfiguration httpConfig;
+
+  private ConnectorConfiguration httpsConfig;
+
   @Inject
   public DockerConnectorFacetImpl(final RepositoryManager repositoryManager,
                                   final ManualValidator manualValidator,
-                                  final RepositoryReverseProxyFilter repositoryReverseProxyFilter)
+                                  final ConnectorRegistrar connectorRegistrar)
   {
     this.repositoryManager = checkNotNull(repositoryManager);
     this.manualValidator = checkNotNull(manualValidator);
-    this.repositoryReverseProxyFilter = repositoryReverseProxyFilter;
+    this.connectorRegistrar = checkNotNull(connectorRegistrar);
   }
 
   @Override
@@ -85,33 +94,39 @@ public class DockerConnectorFacetImpl
 
   @Override
   protected void doStart() throws Exception {
-    // FIXME remove once adding docker connectors properly implemented
-    new Thread(new Runnable()
-    {
-      @Override
-      public void run() {
-        try {
-          Server server = JettyServer.getServer();
-          jettyConnector = new ServerConnector(server);
-          jettyConnector.setPort(config.httpPort);
-          server.addConnector(jettyConnector);
-          jettyConnector.start();
-          repositoryReverseProxyFilter.addRepository(getHttpPort(), getRepository().getName());
-        }
-        catch (Exception e) {
-          throw Throwables.propagate(e);
-        }
+    if (config.httpPort != null) {
+      try {
+        httpConfig = new DockerConnectorConfiguration(getRepository().getName(), HttpScheme.HTTP, config.httpPort);
+        connectorRegistrar.addConnector(httpConfig);
       }
-    }, "start-connector-" + getRepository().getName()).start();
+      catch (Exception e) {
+        log.warn(
+            "Could not configure HTTP connector on port {} for docker repository {}",
+            config.httpPort, getRepository().getName(), e
+        );
+      }
+    }
+    if (config.httpsPort != null) {
+      try {
+        httpsConfig = new DockerConnectorConfiguration(getRepository().getName(), HttpScheme.HTTPS, config.httpsPort);
+        connectorRegistrar.addConnector(httpsConfig);
+      }
+      catch (Exception e) {
+        log.warn(
+            "Could not configure HTTPS connector on port {} for docker repository {}",
+            config.httpsPort, getRepository().getName(), e
+        );
+      }
+    }
   }
 
   @Override
   protected void doStop() throws Exception {
-    if (jettyConnector != null) {
-      repositoryReverseProxyFilter.removeRepository(getHttpPort());
-      jettyConnector.stop();
-      Server server = JettyServer.getServer();
-      server.removeConnector(jettyConnector);
+    if (httpConfig != null) {
+      connectorRegistrar.removeConnector(httpConfig);
+    }
+    if (httpsConfig != null) {
+      connectorRegistrar.removeConnector(httpsConfig);
     }
   }
 
@@ -150,8 +165,7 @@ public class DockerConnectorFacetImpl
     return StorageFacet.P_ATTRIBUTES + "." + CONFIG_KEY + "." + fieldName;
   }
 
-  private static void maybeAdd(final Set<ConstraintViolation<?>> violations,
-                               final ConstraintViolation<?> violation)
+  private static void maybeAdd(final Set<ConstraintViolation<?>> violations, final ConstraintViolation<?> violation)
   {
     if (violation != null) {
       violations.add(violation);
@@ -171,6 +185,60 @@ public class DockerConnectorFacetImpl
       return getClass().getSimpleName() + "{" +
           "httpPort=" + httpPort +
           ", httpsPort=" + httpsPort +
+          '}';
+    }
+  }
+
+  private static class DockerConnectorConfiguration
+      implements ConnectorConfiguration
+  {
+    private final String repositoryName;
+
+    private final HttpScheme scheme;
+
+    private final int port;
+
+    private DockerConnectorConfiguration(final String repositoryName, final HttpScheme scheme, final int port) {
+      this.repositoryName = repositoryName;
+      this.scheme = scheme;
+      this.port = port;
+    }
+
+    @Override
+    public HttpScheme getScheme() {
+      return scheme;
+    }
+
+    @Override
+    public int getPort() {
+      return port;
+    }
+
+    @Override
+    public HttpConfiguration customize(final HttpConfiguration configuration) {
+      configuration.addCustomizer(new Customizer()
+      {
+        @Override
+        public void customize(final Connector connector,
+                              final HttpConfiguration channelConfig,
+                              final Request request)
+        {
+          HttpURI uri = request.getUri();
+          if (uri.getPath().startsWith("/v1")) {
+            request.setUri(new HttpURI(uri.toString().replaceFirst("/v1", "/repository/" + repositoryName + "/v1")));
+            request.setRequestURI(request.getUri().getPathAndParam());
+          }
+        }
+      });
+      return configuration;
+    }
+
+    @Override
+    public String toString() {
+      return getClass().getSimpleName() + "{" +
+          "repositoryName=" + repositoryName +
+          ", scheme=" + scheme +
+          ", port=" + port +
           '}';
     }
   }
