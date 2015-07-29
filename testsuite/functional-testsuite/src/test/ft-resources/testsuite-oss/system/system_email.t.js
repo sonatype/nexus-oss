@@ -57,22 +57,22 @@ StartTest(function(t) {
     t.it('Should be able to enable the server with test values', function(t) {
       t.chain(
           // type in some test strings to empty fields
-          t.selectAndType('_test', smtpSettingsFormCQ + ' field[name=subjectPrefix]'),
-          t.selectAndType('_testUser', smtpSettingsFormCQ + ' field[name=username]'),
-          t.selectAndType('_testPassword', smtpSettingsFormCQ + ' field[name=password]'),
+          t.selectAndType(uniqueId, smtpSettingsFormCQ + ' field[name=subjectPrefix]'),
+          t.selectAndType(uniqueId, smtpSettingsFormCQ + ' field[name=username]'),
+          t.selectAndType(uniqueId, smtpSettingsFormCQ + ' field[name=password]'),
           // press the "Save" button
           {
             waitFor: 'Event', args: [smtpSettingsFormCQ, 'submitted'],
-            trigger: {click: '>>nx-coreui-system-smtp-settings button[action=save]', desc: 'Save new settings'},
+            trigger: {click: '>>nx-coreui-system-smtp-settings button[action=save][disabled=false]', desc: 'Save new settings'}
           },
           {waitFor: waitForUnmasked},
           // verify new values
           function(next) {
             var form = t.cq1(smtpSettingsFormCQ).getForm();
             t.isDeeply(Ext.apply(Ext.clone(originalValues), {
-              subjectPrefix: '_test',
-              username: '_testUser',
-              password: '_testPassword'
+              subjectPrefix: uniqueId,
+              username: uniqueId,
+              password: uniqueId
             }), form.getFieldValues(), 'Form should be updated');
             next();
           }
@@ -88,7 +88,7 @@ StartTest(function(t) {
           // press the "Save" button
           {
             waitFor: 'Event', args: [smtpSettingsFormCQ, 'submitted'],
-            trigger: {click: smtpSettingsCQ + ' button[action=save][enabled=true]', desc: 'Save new settings'},
+            trigger: {click: smtpSettingsCQ + ' button[action=save][disabled=false]', desc: 'Save new settings'},
           },
           {waitFor: waitForUnmasked},
           function(next) {
