@@ -63,7 +63,7 @@
     </dependency>
 
     <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
+      <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-annotation</artifactId>
     </dependency>
 

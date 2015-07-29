@@ -176,7 +176,7 @@
     </dependency>
 
     <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
+      <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-core</artifactId>
     </dependency>
 
@@ -186,17 +186,17 @@
     </dependency>
 
     <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
+      <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-httpclient</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
+      <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-servlets</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
+      <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-servlet</artifactId>
     </dependency>
 

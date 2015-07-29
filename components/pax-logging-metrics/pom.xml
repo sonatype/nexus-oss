@@ -29,7 +29,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
+      <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-logback</artifactId>
     </dependency>
   </dependencies>
