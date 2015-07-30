@@ -81,7 +81,7 @@ public class BootstrapListener
         properties = new ConfigurationBuilder()
             .defaults()
             .set("nexus-base", new File(baseDir).getCanonicalPath())
-            .properties("/nexus.properties", true)
+            .properties("/org.sonatype.nexus.cfg", true)
             .properties("/nexus-test.properties", false)
             .custom(new EnvironmentVariables())
             .override(System.getProperties())
@@ -98,7 +98,7 @@ public class BootstrapListener
       requireProperty(properties, "application-conf");
 
       // pass bootstrap properties to embedded servlet listener
-      servletContext.setAttribute("nexus.properties", properties);
+      servletContext.setAttribute("org.sonatype.nexus.cfg", properties);
 
       File workDir = new File(properties.get("nexus-work")).getCanonicalFile();
       mkdir(workDir.toPath());
