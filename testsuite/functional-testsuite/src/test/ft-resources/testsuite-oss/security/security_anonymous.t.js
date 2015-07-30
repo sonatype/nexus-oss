@@ -28,34 +28,19 @@ StartTest(function(t) {
         // First, enable the anonymous user, if it’s not already enabled
         function(next) {
           if (disabled) {
-            t.click('>>nx-coreui-security-anonymous-settings checkbox[name=enabled]', next);
+            t.click('>>nx-coreui-security-anonymous-settings checkbox[name=enabled]', function() {
+              t.click('>>nx-coreui-security-anonymous-settings button[action=save]', function() {
+                t.waitForEvent('>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded', function() {
+                  t.fieldHasValue('nx-coreui-security-anonymous-settings checkbox[name=enabled]', true,
+                    'Anonymous is enabled');
+                  next();
+                });
+              });
+            });
           }
           else {
             next();
           }
-        },
-        function(next) {
-          if (disabled) {
-            t.click('>>nx-coreui-security-anonymous-settings button[action=save]', next);
-          }
-          else {
-            next();
-          }
-        },
-        function(next) {
-          if (disabled) {
-            t.waitForEvent('>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded', next);
-          }
-          else {
-            next();
-          }
-        },
-        function(next) {
-          if (disabled) {
-            t.fieldHasValue('nx-coreui-security-anonymous-settings checkbox[name=enabled]', true,
-              'Anonymous is enabled');
-          }
-          next();
         }
       )
     });
