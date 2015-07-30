@@ -58,6 +58,7 @@
       <artifactId>jetty-server</artifactId>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-proxy</artifactId>
