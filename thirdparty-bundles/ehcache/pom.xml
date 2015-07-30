@@ -40,6 +40,7 @@
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache</artifactId>
       <version>${ehcache.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
