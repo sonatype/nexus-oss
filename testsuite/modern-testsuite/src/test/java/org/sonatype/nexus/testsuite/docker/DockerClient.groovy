@@ -186,7 +186,7 @@ class DockerClient
   private static URI dockerUri(final Repository repository) {
     def port = repository.facet(DockerConnectorFacet).getHttpsPort()
     assert port
-    return new URI("https://localhost:${port}")
+    return new URI("https://127.0.0.1:${port}")
   }
 
 }

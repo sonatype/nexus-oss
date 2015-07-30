@@ -15,9 +15,12 @@ package org.sonatype.nexus.testsuite.docker
 import org.sonatype.nexus.blobstore.api.BlobStoreManager
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.config.Configuration
+import org.sonatype.nexus.repository.docker.DockerConnectorFacet
 import org.sonatype.nexus.repository.storage.WritePolicy
 import org.sonatype.nexus.testsuite.repository.RepositoryTestSupport
 
+import org.apache.http.HttpHost
+import org.apache.http.impl.auth.BasicScheme
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler
 import org.junit.Rule
 import org.junit.rules.TestName
@@ -30,7 +33,7 @@ class DockerITSupport
 {
 
   @Rule
-  public TestName testName = new TestName();
+  public TestName testName = new TestName()
 
   public DockerITSupport() {
     testData.addDirectory(resolveBaseFile("target/it-resources/docker"))
@@ -55,8 +58,20 @@ class DockerITSupport
 
   DockerClient createDockerClient(final Repository repository) {
     def builder = clientBuilder()
-    builder.setRetryHandler(new StandardHttpRequestRetryHandler(0, false));
-    return new DockerClient(builder.build(), clientContext(), repository, testData)
+    builder.setRetryHandler(new StandardHttpRequestRetryHandler(0, false))
+
+    // add basic auth config for docker connectors
+    def context = clientContext()
+    def hostname = nexusUrl.getHost()
+    def connectorFacet = repository.facet(DockerConnectorFacet)
+    if (connectorFacet.httpPort) {
+      context.authCache.put(new HttpHost(hostname, connectorFacet.httpPort, "http"), new BasicScheme())
+    }
+    if (connectorFacet.httpsPort) {
+      context.authCache.put(new HttpHost(hostname, connectorFacet.httpsPort, "https"), new BasicScheme())
+    }
+
+    return new DockerClient(builder.build(), context, repository, testData)
   }
 
 }
