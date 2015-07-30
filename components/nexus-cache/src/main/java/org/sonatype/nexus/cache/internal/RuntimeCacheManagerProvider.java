@@ -26,7 +26,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Runtime {@link CacheManager} provider using {@code nexus.cache.provider} configuration to select the provider to use.
+ * Runtime {@link CacheManager} provider using {@code nexus.cache.provider}
+ * configuration to select the named cache provider to use.
+ *
+ * Defaults to {@code ehcache}.
  *
  * @since 3.0
  */
