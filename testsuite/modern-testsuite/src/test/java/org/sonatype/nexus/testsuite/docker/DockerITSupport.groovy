@@ -43,7 +43,7 @@ class DockerITSupport
         online: true,
         attributes: [
             docker : [
-                port: portRegistry.reservePort()
+                httpsPort: portRegistry.reservePort()
             ],
             storage: [
                 blobStoreName: BlobStoreManager.DEFAULT_BLOBSTORE_NAME,

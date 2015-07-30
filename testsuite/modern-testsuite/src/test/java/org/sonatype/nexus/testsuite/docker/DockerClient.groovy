@@ -68,7 +68,7 @@ class DockerClient
     assert status(response) == OK
     def endpoint = response.getFirstHeader('X-Docker-Endpoints')?.value
     assert endpoint
-    endpoint = "http://" + endpoint
+    endpoint = repositoryBaseUri.getScheme() + "://" + endpoint
 
     def images = readImages("/v1/repositories/${name}/images/${tag}")
     def imagesToPush = []
@@ -101,7 +101,7 @@ class DockerClient
     assert status(response) == OK
     def endpoint = response.getFirstHeader('X-Docker-Endpoints')?.value
     assert endpoint
-    endpoint = "http://" + endpoint
+    endpoint = repositoryBaseUri.getScheme() + "://" + endpoint
     response = get(endpoint, "/v1/repositories/${name}/tags")
     assert status(response) == OK
     def tags = readTags(response)
@@ -184,8 +184,9 @@ class DockerClient
   }
 
   private static URI dockerUri(final Repository repository) {
-    def port = repository.facet(DockerConnectorFacet).getHttpPort()
-    return new URI("http://localhost:${port}")
+    def port = repository.facet(DockerConnectorFacet).getHttpsPort()
+    assert port
+    return new URI("https://localhost:${port}")
   }
 
 }
