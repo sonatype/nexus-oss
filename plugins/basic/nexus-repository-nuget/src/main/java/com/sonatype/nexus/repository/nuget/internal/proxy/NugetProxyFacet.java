@@ -89,9 +89,9 @@ public class NugetProxyFacet
   }
 
   @Override
-  protected void indicateVerified(final Context context, final CacheInfo cacheInfo) throws IOException {
+  protected void indicateVerified(final Context context, final Content content, final CacheInfo cacheInfo) throws IOException {
     String[] coords = coords(context);
-    gallery().setCacheInfo(coords[0], coords[1], cacheInfo);
+    gallery().setCacheInfo(coords[0], coords[1], content, cacheInfo);
   }
 
   @Override

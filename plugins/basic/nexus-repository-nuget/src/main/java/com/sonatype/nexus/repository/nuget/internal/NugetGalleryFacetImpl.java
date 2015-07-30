@@ -362,13 +362,21 @@ public class NugetGalleryFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void setCacheInfo(final String id, final String version, final CacheInfo cacheInfo) {
+  public void setCacheInfo(final String id, final String version, final Content content, final CacheInfo cacheInfo) {
     checkNotNull(cacheInfo);
 
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    Asset asset = findAsset(tx, id, version);
-    checkState(asset != null);
+    // by EntityId
+    Asset asset = Content.findAsset(tx, content);
+    if (asset == null) {
+      // by format coordinates
+      asset = findAsset(tx, id, version);
+    }
+    if (asset == null) {
+      log.debug("Attempting to set cache info for non-existent nuget asset {} {}", id, version);
+      return;
+    }
 
     log.debug("Updating cacheInfo of {} {} to {}", id, version, cacheInfo);
     CacheInfo.applyToAsset(asset, cacheInfo);

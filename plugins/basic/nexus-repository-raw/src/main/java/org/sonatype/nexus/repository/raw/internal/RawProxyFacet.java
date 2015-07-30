@@ -38,8 +38,8 @@ public class RawProxyFacet
   }
 
   @Override
-  protected void indicateVerified(final Context context, final CacheInfo cacheInfo) throws IOException {
-    content().setCacheInfo(componentPath(context), cacheInfo);
+  protected void indicateVerified(final Context context, final Content content, final CacheInfo cacheInfo) throws IOException {
+    content().setCacheInfo(componentPath(context), content, cacheInfo);
   }
 
   @Override

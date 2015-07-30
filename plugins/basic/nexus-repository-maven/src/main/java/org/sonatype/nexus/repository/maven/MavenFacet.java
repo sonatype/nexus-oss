@@ -18,8 +18,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.repository.cache.CacheInfo;
+import org.sonatype.nexus.repository.maven.policy.VersionPolicy;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
@@ -55,5 +55,10 @@ public interface MavenFacet
 
   // proxy operations
 
-  boolean setCacheInfo(MavenPath path, CacheInfo cacheInfo) throws IOException;
+  /**
+   * Maven proxy facet specific method: invoked when cached content (returned by {@link #get(MavenPath)} method of
+   * this same facet instance) is found to be up to date after remote checks. This method applies the passed in {@link
+   * CacheInfo} to the {@link Content}'s underlying asset.
+   */
+  boolean setCacheInfo(MavenPath path, Content content, CacheInfo cacheInfo) throws IOException;
 }

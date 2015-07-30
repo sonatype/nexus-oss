@@ -53,9 +53,11 @@ public interface NugetGalleryFacet
   Content get(String id, String version) throws IOException;
 
   /**
-   * Sets when we last checked that the content was up to date relative to the remote server.
+   * Nuget proxy facet specific method: invoked when cached content (returned by {@link #get(String, String)}
+   * method of this same facet instance) is found to be up to date after remote checks. This method applies the passed
+   * in {@link CacheInfo} to the {@link Content}'s underlying asset.
    */
-  void setCacheInfo(String id, String version, CacheInfo cacheInfo);
+  void setCacheInfo(String id, String version, Content content, CacheInfo cacheInfo);
 
   /**
    * Delete a package and return whether it existed.

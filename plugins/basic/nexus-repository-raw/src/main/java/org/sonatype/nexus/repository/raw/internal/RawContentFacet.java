@@ -36,7 +36,12 @@ public interface RawContentFacet
 
   Content put(String path, Payload content) throws IOException, InvalidContentException;
 
-  void setCacheInfo(String path, final CacheInfo cacheInfo) throws IOException;
-
   boolean delete(String path) throws IOException;
+
+  /**
+   * Raw proxy facet specific method: invoked when cached content (returned by {@link #get(String)} method of this
+   * same facet instance) is found to be up to date after remote checks. This method applies the passed in {@link
+   * CacheInfo} to the {@link Content}'s underlying asset.
+   */
+  void setCacheInfo(String path, Content content, CacheInfo cacheInfo) throws IOException;
 }

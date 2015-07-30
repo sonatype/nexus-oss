@@ -54,8 +54,8 @@ public class MavenProxyFacet
   }
 
   @Override
-  protected void indicateVerified(final Context context, final CacheInfo cacheInfo) throws IOException {
-    mavenFacet.setCacheInfo(mavenPath(context), cacheInfo);
+  protected void indicateVerified(final Context context, final Content content, final CacheInfo cacheInfo) throws IOException {
+    mavenFacet.setCacheInfo(mavenPath(context), content, cacheInfo);
   }
 
   @Override
