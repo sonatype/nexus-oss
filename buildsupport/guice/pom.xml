@@ -35,15 +35,15 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>javax.inject</groupId>
-        <artifactId>javax.inject</artifactId>
-        <version>1</version>
-      </dependency>
-
-      <dependency>
         <groupId>javax.annotation</groupId>
         <artifactId>javax.annotation-api</artifactId>
         <version>1.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
+        <version>1_2</version>
       </dependency>
 
       <dependency>
@@ -55,19 +55,19 @@
       <dependency>
         <groupId>javax.enterprise</groupId>
         <artifactId>cdi-api</artifactId>
-        <version>1.0</version>
+        <version>1.2</version>
         <exclusions>
           <exclusion>
             <groupId>javax.el</groupId>
-            <artifactId>el-api</artifactId>
+            <artifactId>javax.el-api</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.jboss.ejb3</groupId>
-            <artifactId>jboss-ejb3-api</artifactId>
+            <groupId>javax.interceptor</groupId>
+            <artifactId>javax.interceptor-api</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.jboss.interceptor</groupId>
-            <artifactId>jboss-interceptor-api</artifactId>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -77,6 +77,10 @@
         <artifactId>guice</artifactId>
         <version>${guice.version}</version>
         <exclusions>
+          <exclusion>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+          </exclusion>
           <exclusion>
             <groupId>aopalliance</groupId>
             <artifactId>aopalliance</artifactId>
@@ -100,12 +104,6 @@
         <groupId>com.google.inject.extensions</groupId>
         <artifactId>guice-assistedinject</artifactId>
         <version>${guice.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>aopalliance</groupId>
-        <artifactId>aopalliance</artifactId>
-        <version>1.0</version>
       </dependency>
 
       <dependency>

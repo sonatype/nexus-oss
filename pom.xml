@@ -622,6 +622,9 @@
               <id>activation</id>
               <id>javax.annotation</id>
               <id>javax.annotation-api</id>
+              <id>jboss-annotations-api_1.1_spec</id>
+              <id>javax.inject</id>
+              <id>aopalliance</id>
               <id>javax.ws.rs</id>
               <id>jsr250-api</id>
               <id>jsr305</id>
@@ -637,7 +640,6 @@
               -->
               <id>javax.el</id>
               <id>validation-api</id>
-              <id>cache-api</id>
               <id>paranamer</id>
               <id>httpcore</id>
               <id>httpclient</id>
