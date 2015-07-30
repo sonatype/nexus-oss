@@ -170,7 +170,6 @@ class GebTestSupport
             .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
         wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-chrome-driver').versionAsInProject())
             .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
-        // known issue prevents this from working with latest version, but should work with 2.45.0 https://github.com/SeleniumHQ/selenium/issues/631
         wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-safari-driver').versionAsInProject())
             .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
         wrappedBundle(maven('io.netty','netty').versionAsInProject()) //selenium-safari-driver needs this
