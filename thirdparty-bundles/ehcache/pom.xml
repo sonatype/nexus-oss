@@ -62,10 +62,11 @@
               <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
               <includes>
                 ehcache-failsafe.xml,
-                **/builtin-sizeof.filter,
-                **/sizeof-agent.jar,
-                **/version.properties
+                net/sf/ehcache/**
               </includes>
+              <excludes>
+                **/*.class
+              </excludes>
             </artifactItem>
             <artifactItem>
               <groupId>net.sf.ehcache</groupId>
