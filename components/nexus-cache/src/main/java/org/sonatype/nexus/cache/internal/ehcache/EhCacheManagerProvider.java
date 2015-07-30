@@ -91,14 +91,24 @@ public class EhCacheManagerProvider
       }
     }
 
-    // EHCache bundle has dynamic import, so it's the preferred choice here
-    ClassLoader classLoader = net.sf.ehcache.CacheManager.class.getClassLoader();
+    // Limit class-loader for creation of provider
+    CachingProvider provider = Caching.getCachingProvider(
+        JCacheCachingProvider.class.getName(),
+        JCacheCachingProvider.class.getClassLoader()
+    );
 
-    CachingProvider provider = Caching.getCachingProvider(JCacheCachingProvider.class.getName(), classLoader);
-    log.info("Creating cache-manager with configuration: {}", config);
-    CacheManager manager = provider.getCacheManager(config, classLoader);
-    log.debug("Created cache-manager: {}", manager);
-    return manager;
+    // Widen class-loader for manager creation with TCCL, which could need to load user-classes
+    final ClassLoader pcl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+      log.info("Creating cache-manager with configuration: {}", config);
+      CacheManager manager = provider.getCacheManager(config, null);
+      log.debug("Created cache-manager: {}", manager);
+      return manager;
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(pcl);
+    }
   }
 
   @Override

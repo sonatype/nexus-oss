@@ -49,16 +49,16 @@ public class RuntimeCacheManagerProvider
   {
     this.providers = checkNotNull(providers);
     this.name = checkNotNull(name);
-    log.info("Cache provider: {}", name);
-    checkState(providers.containsKey(name), "Missing cache provider: %s", name);
+    log.info("Cache-provider: {}", name);
+    checkState(providers.containsKey(name), "Missing cache-provider: %s", name);
   }
 
   @Override
   public CacheManager get() {
     Provider<CacheManager> provider = providers.get(name);
-    checkState(provider != null, "Cache provider vanished: %s", name);
+    checkState(provider != null, "Cache-provider vanished: %s", name);
     CacheManager manager = provider.get();
-    log.info("Constructed cache manager: {} -> {}", name, manager);
+    log.debug("Constructed cache-manager: {} -> {}", name, manager);
     return manager;
   }
 }
