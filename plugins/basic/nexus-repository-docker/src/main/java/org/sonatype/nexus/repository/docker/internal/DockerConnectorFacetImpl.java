@@ -80,8 +80,8 @@ public class DockerConnectorFacetImpl
 
     Config configToValidate = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
     Set<ConstraintViolation<?>> violations = new HashSet<>();
-    maybeAdd(violations, validatePort(pathOf("httpPort"), configToValidate.httpPort));
-    maybeAdd(violations, validatePort(pathOf("httpsPort"), configToValidate.httpsPort));
+    maybeAdd(violations, validatePortNotInUse(pathOf("httpPort"), configToValidate.httpPort));
+    maybeAdd(violations, validatePortNotInUse(pathOf("httpsPort"), configToValidate.httpsPort));
     maybeAdd(violations, validateNotSamePort(
         pathOf("httpPort"), configToValidate.httpPort, pathOf("httpsPort"), configToValidate.httpsPort
     ));
@@ -145,7 +145,7 @@ public class DockerConnectorFacetImpl
   /**
    * Validate that port is not used as used as HTTP/HTTPS ports in another repository.
    */
-  private ConstraintViolation<?> validatePort(final String path, final Integer port) {
+  private ConstraintViolation<?> validatePortNotInUse(final String path, final Integer port) {
     if (port != null) {
       try {
         for (Repository repository : repositoryManager.browse()) {
