@@ -12,40 +12,24 @@
  */
 package org.sonatype.nexus.cache.internal;
 
-import javax.cache.spi.CachingProvider;
-import javax.inject.Inject;
+import javax.cache.CacheManager;
 import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 
-import org.sonatype.sisu.goodies.common.ComponentSupport;
+import org.sonatype.nexus.cache.internal.ehcache.EhCacheManagerProvider;
 
-import com.hazelcast.cache.impl.HazelcastServerCachingProvider;
-import com.hazelcast.core.HazelcastInstance;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.inject.AbstractModule;
 
 /**
- * Hazelcast JCache {@link CachingProvider} provider.
+ * Nexus cache module.
  *
  * @since 3.0
  */
-@Named("hazelcast")
-@Singleton
-public class HazelcastCachingProviderProvider
-    extends ComponentSupport
-    implements Provider<CachingProvider>
+@Named
+public class CacheModule
+  extends AbstractModule
 {
-  private final CachingProvider provider;
-
-  @Inject
-  public HazelcastCachingProviderProvider(final HazelcastInstance hazelcastInstance) {
-    checkNotNull(hazelcastInstance);
-    this.provider = HazelcastServerCachingProvider.createCachingProvider(hazelcastInstance);
-  }
-
   @Override
-  public CachingProvider get() {
-    return provider;
+  protected void configure() {
+    bind(CacheManager.class).toProvider(EhCacheManagerProvider.class);
   }
 }

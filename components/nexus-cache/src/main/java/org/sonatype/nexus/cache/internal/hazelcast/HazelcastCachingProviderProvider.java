@@ -10,10 +10,8 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.cache.internal;
+package org.sonatype.nexus.cache.internal.hazelcast;
 
-import javax.annotation.PreDestroy;
-import javax.cache.CacheManager;
 import javax.cache.spi.CachingProvider;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,40 +20,32 @@ import javax.inject.Singleton;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.hazelcast.cache.impl.HazelcastServerCachingProvider;
+import com.hazelcast.core.HazelcastInstance;
+
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Hazelcast JCache {@link CacheManager} provider.
+ * Hazelcast JCache {@link CachingProvider} provider.
  *
  * @since 3.0
  */
 @Named("hazelcast")
 @Singleton
-public class HazelcastCacheManagerProvider
+public class HazelcastCachingProviderProvider
     extends ComponentSupport
-    implements Provider<CacheManager>
+    implements Provider<CachingProvider>
 {
-  private volatile CacheManager cacheManager;
+  private final CachingProvider provider;
 
   @Inject
-  public HazelcastCacheManagerProvider(@Named("hazelcast") final CachingProvider provider) {
-    checkNotNull(provider);
-    this.cacheManager = provider.getCacheManager();
+  public HazelcastCachingProviderProvider(final HazelcastInstance hazelcastInstance) {
+    checkNotNull(hazelcastInstance);
+    this.provider = HazelcastServerCachingProvider.createCachingProvider(hazelcastInstance);
   }
 
   @Override
-  public CacheManager get() {
-    checkState(cacheManager != null, "Cache-manager destroyed");
-    return cacheManager;
-  }
-
-  @PreDestroy
-  public void destroy() {
-    if (cacheManager != null) {
-      cacheManager.close();
-      log.info("Cache-manager closed");
-      cacheManager = null;
-    }
+  public CachingProvider get() {
+    return provider;
   }
 }
