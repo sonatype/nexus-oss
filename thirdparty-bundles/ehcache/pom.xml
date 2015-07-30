@@ -59,7 +59,7 @@
               <groupId>net.sf.ehcache</groupId>
               <artifactId>ehcache</artifactId>
               <version>${ehcache.version}</version>
-              <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
+              <outputDirectory>${project.build.directory}/ehcache-resources</outputDirectory>
               <includes>
                 ehcache-failsafe.xml,
                 net/sf/ehcache/**
@@ -73,7 +73,7 @@
               <artifactId>ehcache</artifactId>
               <version>${ehcache.version}</version>
               <classifier>sources</classifier>
-              <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+              <outputDirectory>${project.build.directory}/ehcache-sources</outputDirectory>
               <includes>
                 net/sf/ehcache/**,
                 org/terracotta/context/**,
@@ -118,11 +118,11 @@
         <configuration>
           <resources>
             <resource>
-              <directory>${project.build.directory}/generated-resources</directory>
+              <directory>${project.build.directory}/ehcache-resources</directory>
             </resource>
           </resources>
           <sources>
-            <source>${project.build.directory}/generated-sources</source>
+            <source>${project.build.directory}/ehcache-sources</source>
           </sources>
         </configuration>
         <executions>
