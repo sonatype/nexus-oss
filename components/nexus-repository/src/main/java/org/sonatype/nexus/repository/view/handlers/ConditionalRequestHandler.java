@@ -14,6 +14,7 @@ package org.sonatype.nexus.repository.view.handlers;
 
 import javax.annotation.Nonnull;
 
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.Request;
@@ -37,8 +38,17 @@ import static org.sonatype.nexus.repository.http.HttpStatus.NOT_MODIFIED;
 import static org.sonatype.nexus.repository.http.HttpStatus.PRECONDITION_FAILED;
 
 /**
- * A format-neutral handler for conditional requests.
+ * A format-neutral handler for conditional requests. It relies on existence of following HTTP entity headers:
+ * <ul>
+ * <li>Last-Modified</li>
+ * <li>ETag</li>
+ * </ul>
+ * There is a handy {@link ContentHeadersHandler} handler that adds these for you, if you are serving up {@link
+ * Content} payloads properly decorated. If not, you should have them somehow (format specific way) set on {@link
+ * Response} instances coming from your {@link Handler}s.
  *
+ * @see ContentHeadersHandler
+ * @see Content
  * @since 3.0
  */
 public class ConditionalRequestHandler
