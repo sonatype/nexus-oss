@@ -12,15 +12,17 @@
  */
 package org.sonatype.nexus.cache.internal;
 
+import java.net.URL;
+
+import javax.cache.Caching;
+import javax.cache.spi.CachingProvider;
+
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.Configuration;
-import net.sf.ehcache.config.ConfigurationFactory;
-import org.junit.After;
-import org.junit.Before;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.CacheManagerBuilder;
+import org.ehcache.config.xml.XmlConfiguration;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -28,47 +30,75 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- * Trials of basic EhCache.
+ * Trails of basic EhCache usage.
  */
 public class EhCacheTrial
     extends TestSupport
 {
-  private CacheManager underTest;
-
-  @Before
-  public void setUp() throws Exception {
-    Configuration configuration = ConfigurationFactory.parseConfiguration(getClass().getResource("ehcache-test.xml"));
-    configuration.setUpdateCheck(false);
-    this.underTest = new CacheManager(configuration);
+  @Test
+  public void plain() throws Exception {
+    CacheManager underTest = CacheManagerBuilder.newCacheManagerBuilder().build();
+    assertThat(underTest, notNullValue());
+    underTest.close();
   }
 
-  @After
-  public void tearDown() throws Exception {
-    if (underTest != null) {
-      underTest.shutdown();
+  @Test
+  public void testXml() throws Exception {
+    URL url = getClass().getResource("ehcache-test.xml");
+    XmlConfiguration xmlConfig = new XmlConfiguration(url, getClass().getClassLoader());
+    CacheManager underTest = CacheManagerBuilder.newCacheManager(xmlConfig);
+    assertThat(underTest, notNullValue());
+
+    try {
+      Cache<Object, Object> cache = underTest.getCache("test", Object.class, Object.class);
+      assertThat(cache, notNullValue());
+    }
+    finally {
+      underTest.close();
     }
   }
 
   @Test
-  public void preconfiguredCacheWithEternal() {
-    Cache cache = underTest.getCache("testEternalCache");
-    log(cache);
-    assertThat(cache, notNullValue());
+  public void testJsr107() throws Exception {
+    URL url = getClass().getResource("ehcache-test.xml");
+    log(url);
 
-    Object key = "foo";
-    Object value = "bar";
-    cache.put(new Element(key, value));
+    CachingProvider provider = Caching.getCachingProvider(org.ehcache.jsr107.EhcacheCachingProvider.class.getName());
+    log(provider);
 
-    Element result = cache.get(key);
-    log(result);
-    assertThat(result.getObjectValue(), is(value));
+    javax.cache.CacheManager manager = provider.getCacheManager(url.toURI(), getClass().getClassLoader());
+    manager.close();
+  }
 
-    result = cache.get(key);
-    log(result);
-    assertThat(result.getObjectValue(), is(value));
+  @Test
+  public void preconfiguredCacheWithEternal() throws Exception {
+    URL url = getClass().getResource("ehcache-test.xml");
+    XmlConfiguration xmlConfig = new XmlConfiguration(url, getClass().getClassLoader());
+    CacheManager underTest = CacheManagerBuilder.newCacheManager(xmlConfig);
 
-    result = cache.get(key);
-    log(result);
-    assertThat(result.getObjectValue(), is(value));
+    try {
+      Cache<Object, Object> cache = underTest.getCache("testEternalCache", Object.class, Object.class);
+      log(cache);
+      assertThat(cache, notNullValue());
+
+      Object key = "foo";
+      Object value = "bar";
+      cache.put(key, value);
+
+      Object result = cache.get(key);
+      log(result);
+      assertThat(result, is(value));
+
+      result = cache.get(key);
+      log(result);
+      assertThat(result, is(value));
+
+      result = cache.get(key);
+      log(result);
+      assertThat(result, is(value));
+    }
+    finally {
+      underTest.close();
+    }
   }
 }
