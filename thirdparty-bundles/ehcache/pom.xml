@@ -37,85 +37,130 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>${ehcache.version}</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>javax.transaction-api</artifactId>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!--
-      NOTE: This may complain about private references to org.terracotta.* junk.
-      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <artifactItems>
+            <artifactItem>
+              <groupId>net.sf.ehcache</groupId>
+              <artifactId>ehcache</artifactId>
+              <version>${ehcache.version}</version>
+              <outputDirectory>${project.build.directory}/ehcache-resources</outputDirectory>
+              <includes>
+                ehcache-failsafe.xml,
+                net/sf/ehcache/**
+              </includes>
+              <excludes>
+                **/*.class
+              </excludes>
+            </artifactItem>
+            <artifactItem>
+              <groupId>net.sf.ehcache</groupId>
+              <artifactId>ehcache</artifactId>
+              <version>${ehcache.version}</version>
+              <classifier>sources</classifier>
+              <outputDirectory>${project.build.directory}/ehcache-sources</outputDirectory>
+              <includes>
+                net/sf/ehcache/**,
+                org/terracotta/context/**,
+                org/terracotta/statistics/**
+              </includes>
+              <excludes>
+                **/*ElementData*,
+                **/scheduledrefresh/**,
+                **/constructs/web/**,
+                **/hibernate/*,
+                **/hibernate/ccs/**,
+                **/hibernate/management/api/**,
+                **/hibernate/management/impl/EhcacheHibernate.*,
+                **/hibernate/management/impl/*HibernateMBean*,
+                **/hibernate/management/impl/Provider*,
+                **/hibernate/management/impl/*Stats*,
+                **/hibernate/nonstop/**,
+                **/hibernate/regions/**,
+                **/hibernate/strategy/**,
+                **/management/AbstractManagementServer*,
+                **/management/ManagementServerImpl*,
+                **/management/resource/**,
+                **/management/service/**,
+                **/terracotta/Standalone*
+              </excludes>
+            </artifactItem>
+          </artifactItems>
+        </configuration>
+        <executions>
+          <execution>
+            <id>unpack-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <configuration>
+          <resources>
+            <resource>
+              <directory>${project.build.directory}/ehcache-resources</directory>
+            </resource>
+          </resources>
+          <sources>
+            <source>${project.build.directory}/ehcache-sources</source>
+          </sources>
+        </configuration>
+        <executions>
+          <execution>
+            <id>add-unpacked-resources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>add-unpacked-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <configuration>
+          <ignores>
+            <ignore>sun.misc.Unsafe</ignore>
+          </ignores>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <unpackBundle>true</unpackBundle>
-          <niceManifest>true</niceManifest>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Bundle-Description>${project.description}</Bundle-Description>
-            <Export-Package>net.sf.ehcache*;version=${ehcache.version};-split-package:=merge-first</Export-Package>
-            <Private-Package>org.terracotta.*</Private-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
-            <Import-Package>
-              javax.management*,
-              javax.naming*,
-              javax.xml.parsers,
-              org.xml.sax*,
-              javax.servlet;resolution:=optional,
-              javax.transaction*;resolution:=optional,
-              org.hibernate*;resolution:=optional,
-              org.slf4j;resolution:=optional,
-              javax.jms;resolution:=optional,
-              sun.misc;resolution:=optional,
-              org.quartz*;resolution:=optional,
-              org.terracotta.quartz.*;resolution:=optional,
-              org.terracotta.toolkit.*;resolution:=optional,
-              com.terracotta*;resolution:=optional,
-              *
-            </Import-Package>
           </instructions>
         </configuration>
-      </plugin>
-
-      <!--
-      NOTE: This will complain about duplicates, due to shade and bundle plugin copying classes from dependencies.
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <createDependencyReducedPom>true</createDependencyReducedPom>
-              <createSourcesJar>true</createSourcesJar>
-              <artifactSet>
-                <includes>
-                  <include>net.sf.ehcache:ehcache</include>
-                </includes>
-              </artifactSet>
-              <filters>
-                <filter>
-                  <artifact>net.sf.ehcache:ehcache</artifact>
-                  <includes>
-                    <include>net/sf/ehcache/**</include>
-                    <include>org/terracotta/context/**</include>
-                    <include>org/terracotta/statistics/**</include>
-                    <include>ehcache-failsafe.xml</include>
-                    <include>META-INF/maven/net.sf.ehcache/**</include>
-                  </includes>
-                </filter>
-              </filters>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
