@@ -49,4 +49,18 @@ public class ConcurrentRunnerTest
 
     runner.go();
   }
+
+  @Test(expected = IllegalStateException.class)
+  public void testTimesOut() throws Exception {
+    // The test will time out unless it ends in 1 second
+    final ConcurrentRunner runner = new ConcurrentRunner(1, 1);
+    runner.addTask(2, new ConcurrentTask()
+    {
+      @Override
+      public void run() throws Exception {
+        Thread.sleep(5000);
+      }
+    });
+    runner.go();
+  }
 }

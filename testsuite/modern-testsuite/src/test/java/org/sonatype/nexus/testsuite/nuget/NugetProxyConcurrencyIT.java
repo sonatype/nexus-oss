@@ -16,7 +16,7 @@ import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.bytes;
 import static org.sonatype.nexus.testsuite.repository.FormatClientSupport.status;
 
 /**
- * @since 3.0
+ * A concurrency test focused on Nuget Proxy repositories. Does not measure throughput, only correctness.
  */
 @Category(Perf.class)
 public class NugetProxyConcurrencyIT
@@ -42,12 +42,12 @@ public class NugetProxyConcurrencyIT
 
     final int terminationWaitTimeSeconds = 100;
     final int iterations = 5;
-    final int threads = 10;
 
     final ConcurrentRunner runner = new ConcurrentRunner(iterations, terminationWaitTimeSeconds);
 
     // Some threads will be requesting a specific package
-    runner.addTask(threads, new ConcurrentTask()
+    final int packageReaderThreads = 10;
+    runner.addTask(packageReaderThreads, new ConcurrentTask()
     {
       private NugetClient nuget = nugetClient(repo);
 
@@ -60,8 +60,20 @@ public class NugetProxyConcurrencyIT
       }
     });
 
+    final int odataReaderThreads = 10;
+    runner.addTask(odataReaderThreads, new ConcurrentTask()
+    {
+      private NugetClient nuget = nugetClient(repo);
+
+      @Override
+      public void run() throws Exception {
+        nuget.feedXml(NugetClient.VS_INITIAL_FEED_QUERY);
+        nuget.vsSearchCount("SONATYPE.TEST");
+      }
+    });
+
     runner.go();
 
-    assertThat(runner.getRunInvocations(), is(iterations * threads));
+    assertThat(runner.getRunInvocations(), is(runner.getTaskCount() * runner.getIterations()));
   }
 }

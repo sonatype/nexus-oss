@@ -1,8 +1,5 @@
 package org.sonatype.nexus.test.concurrent;
 
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -18,56 +15,41 @@ class ConcurrentTestWorker
     extends ComponentSupport
     implements Runnable
 {
-  private final CyclicBarrier iterationStartSignal;
-
-  private final AtomicBoolean failureSignal;
-
-  private final int iterations;
+  private final ConcurrentTask concurrentTask;
 
   private final int workerNumber;
 
-  private final ConcurrentTask concurrentTask;
-
   private final AtomicReference<Throwable> exception = new AtomicReference<>();
 
-  private final AtomicInteger runInvocations;
+  private final ConcurrentTestContext context;
 
   public ConcurrentTestWorker(final int workerNumber,
-                              final CyclicBarrier iterationStartSignal,
-                              final AtomicBoolean failureSignal,
-                              final int iterations,
                               final ConcurrentTask concurrentTask,
-                              final AtomicInteger runInvocations)
+                              final ConcurrentTestContext context)
   {
     this.workerNumber = workerNumber;
-    this.iterationStartSignal = checkNotNull(iterationStartSignal);
-    this.failureSignal = checkNotNull(failureSignal);
-    this.iterations = iterations;
+    this.context = checkNotNull(context);
     this.concurrentTask = checkNotNull(concurrentTask);
-    this.runInvocations = checkNotNull(runInvocations);
   }
 
   @Override
   public void run() {
     try {
-      for (int i = 0; i < iterations; i++) {
-        if (failureSignal.get()) {
+      for (int i = 0; i < context.getIterations(); i++) {
+        if (context.testFailing()) {
           log.info("Test worker " + workerNumber + " aborting before iteration " + i);
           break;
         }
-        iterationStartSignal.await();
+        context.awaitIterationStart();
+        context.recordRunInvocation();
 
-        runInvocations.incrementAndGet();
-        log.info("Test worker " + workerNumber + " incrementing runInvocations to " + runInvocations.get());
         concurrentTask.run();
         log.info("Test worker " + workerNumber + " completing iteration " + i);
       }
     }
     catch (Exception | AssertionError e) {
-      log.info("Runnable threw an exception for worker " + workerNumber, e);
-      failureSignal.set(true);
-      // Dislodge any peers waiting at the barrier; the test has failed, so don't wait for timeout
-      iterationStartSignal.reset();
+      log.info("Test worker " + workerNumber + "'s task threw exception", e);
+      context.indicateFailure();
       this.exception.set(e);
     }
     finally {

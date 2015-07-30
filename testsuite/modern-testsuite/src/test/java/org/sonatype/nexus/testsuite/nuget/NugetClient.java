@@ -106,7 +106,7 @@ public class NugetClient
     return Integer.parseInt(s);
   }
 
-  public HttpResponse entry(final String packageId, final String version) throws IOException {
+  public CloseableHttpResponse entry(final String packageId, final String version) throws IOException {
     return get(String.format("Packages(Id='%s',Version='%s')", packageId, version));
   }
 

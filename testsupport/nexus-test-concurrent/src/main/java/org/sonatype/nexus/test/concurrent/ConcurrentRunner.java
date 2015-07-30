@@ -22,7 +22,6 @@ public class ConcurrentRunner
 {
   private List<ConcurrentTask> tasks = new ArrayList<>();
 
-
   // A cyclic barrier ensures that the threads align after each unit of work, to avoid some completing much before
   // the others, thereby increasing contention
   private CyclicBarrier startingGun;
@@ -32,34 +31,43 @@ public class ConcurrentRunner
 
   private final int iterations;
 
-  private final int terminationWaitTimeSeconds;
+  private final int iterationTimeoutSeconds;
 
   private AtomicInteger runInvocations = new AtomicInteger(0);
 
   /**
-   * @param iterations                 How many times each task should be invoked
-   * @param terminationWaitTimeSeconds How long to wait for all iterations to complete
+   * @param iterations              How many times each task should be invoked
+   * @param iterationTimeoutSeconds How long each iteration is given for all tasks to complete
    */
-  public ConcurrentRunner(int iterations, int terminationWaitTimeSeconds) {
+  public ConcurrentRunner(int iterations, int iterationTimeoutSeconds) {
     this.iterations = iterations;
-    this.terminationWaitTimeSeconds = terminationWaitTimeSeconds;
+    this.iterationTimeoutSeconds = iterationTimeoutSeconds;
   }
 
+  /**
+   * Adds a task to the runner, which will be executed 'iterations' times by a single thread.
+   */
   public void addTask(final ConcurrentTask task) {
     addTask(1, task);
   }
 
   /**
-   * Adds a task to the runner. The task is executed 'threads' number of times each iteration.
+   * Adds one or more instances of a task to the runner. The task isn't cloned but used by multiple threads, and so
+   * tasks provided to this method should be stateless and thread-safe.
    */
-  public void addTask(final int threads, final ConcurrentTask task)
+  public void addTask(final int instances, final ConcurrentTask task)
   {
-    Preconditions.checkArgument(threads >= 1);
-    for (int i = 0; i < threads; i++) {
+    Preconditions.checkArgument(instances >= 1);
+    for (int i = 0; i < instances; i++) {
       tasks.add(task);
     }
   }
 
+  /**
+   * Invokes the tasks 'iteration' times.
+   *
+   * @throws Exception an exception thrown by one of the tasks
+   */
   public void go() throws Exception {
     runInvocations.set(0);
 
@@ -77,9 +85,11 @@ public class ConcurrentRunner
 
     ExecutorService service = Executors.newFixedThreadPool(tasks.size());
 
-    for (ConcurrentTask task : tasks) {
-      final ConcurrentTestWorker worker = new ConcurrentTestWorker(testWorkers.size(), startingGun, failureHasOccurred,
-          iterations, task, runInvocations);
+    final ConcurrentTestContext context = new ConcurrentTestContext(startingGun, failureHasOccurred,
+        iterations, runInvocations, iterationTimeoutSeconds);
+
+    for (int workerNumber = 0; workerNumber < tasks.size(); workerNumber++) {
+      final ConcurrentTestWorker worker = new ConcurrentTestWorker(workerNumber, tasks.get(workerNumber), context);
       testWorkers.add(worker);
     }
 
@@ -88,7 +98,10 @@ public class ConcurrentRunner
     }
 
     service.shutdown();
-    service.awaitTermination(terminationWaitTimeSeconds, TimeUnit.SECONDS);
+    final boolean fullCompletion = service.awaitTermination(iterationTimeoutSeconds * iterations, TimeUnit.SECONDS);
+    if (!fullCompletion) {
+      throw new IllegalStateException("Test timed out with only " + runInvocations.get() + " run invocations.");
+    }
 
     for (ConcurrentTestWorker testWorker : testWorkers) {
       if (testWorker.experiencedFailure()) {
@@ -103,5 +116,19 @@ public class ConcurrentRunner
    */
   public int getRunInvocations() {
     return runInvocations.get();
+  }
+
+  /**
+   * The number of tasks added to the runner, each one invoked by a separate thread.
+   */
+  public int getTaskCount() {
+    return tasks.size();
+  }
+
+  /**
+   * The number of times each task-instance will be invoked.
+   */
+  public int getIterations() {
+    return iterations;
   }
 }
