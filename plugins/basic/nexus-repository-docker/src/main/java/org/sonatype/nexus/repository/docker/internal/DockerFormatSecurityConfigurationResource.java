@@ -30,7 +30,7 @@ public class DockerFormatSecurityConfigurationResource
     extends RepositoryFormatSecurityConfigurationResource
 {
   @Inject
-  public DockerFormatSecurityConfigurationResource(final @Named(DockerFormat.NAME) Format format) {
+  public DockerFormatSecurityConfigurationResource(@Named(DockerFormat.NAME) final Format format) {
     super(format);
   }
 }
