@@ -24,6 +24,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.Nullable;
+
 import org.sonatype.nexus.bootstrap.PropertyMap;
 import org.sonatype.nexus.bootstrap.ShutdownHelper;
 
@@ -36,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Jetty server.
- * 
+ *
  * @since 2.8
  */
 public class JettyServer
@@ -50,6 +52,8 @@ public class JettyServer
   private final String[] args;
 
   private JettyMainThread thread;
+
+  private ConnectorManager connectorManager;
 
   public JettyServer(final ClassLoader classLoader, final Map<String, String> properties, final String[] args) {
     if (classLoader == null) {
@@ -81,7 +85,26 @@ public class JettyServer
     throw new Error(e);
   }
 
-  public synchronized void start(final boolean waitForServer) throws Exception {
+  public List<ConnectorConfiguration> defaultConnectors() {
+    return connectorManager.defaultConnectors();
+  }
+
+  public void addCustomConnector(final ConnectorConfiguration connectorConfiguration) {
+    connectorManager.addConnector(connectorConfiguration);
+  }
+
+  public void removeCustomConnector(final ConnectorConfiguration connectorConfiguration) {
+    connectorManager.removeConnector(connectorConfiguration);
+  }
+
+  /**
+   * Starts Jetty, in sync or async mode, depending on value of {@code waitForServer} parameter.
+   *
+   * @param waitForServer if {@code true}, method will block until Jetty is fully started, otherwise will
+   *                      return immediately.
+   * @param callback      optional, callback executed immediately after Jetty is fully started up.
+   */
+  public synchronized void start(final boolean waitForServer, @Nullable final Runnable callback) throws Exception {
     final ClassLoader cl = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(classLoader);
 
@@ -91,7 +114,7 @@ public class JettyServer
       {
         public Object run() {
           try {
-            doStart(waitForServer);
+            doStart(waitForServer, callback);
           }
           catch (Exception e) {
             exception.set(e);
@@ -111,7 +134,7 @@ public class JettyServer
     }
   }
 
-  private void doStart(boolean waitForServer) throws Exception {
+  private void doStart(boolean waitForServer, @Nullable final Runnable callback) throws Exception {
     if (thread != null) {
       throw new IllegalStateException("Already started");
     }
@@ -156,7 +179,16 @@ public class JettyServer
       throw new Exception("Failed to configure any components");
     }
 
-    thread = new JettyMainThread(components);
+    Server server = null;
+    for (Object object : components) {
+      if (object instanceof Server) {
+        server = (Server) object;
+        break;
+      }
+    }
+    connectorManager = new ConnectorManager(server, last.getIdMap());
+
+    thread = new JettyMainThread(components, callback);
     thread.setContextClassLoader(classLoader);
     thread.startComponents(waitForServer);
   }
@@ -199,6 +231,7 @@ public class JettyServer
     log.info("Stopping");
 
     thread.stopComponents();
+    connectorManager = null;
     thread = null;
 
     log.info("Stopped");
@@ -206,7 +239,7 @@ public class JettyServer
 
   /**
    * Jetty thread used to start components, wait for the server's threads to join and stop components.
-   * 
+   *
    * Needed so that once {@link JettyServer#stop()} returns that we know that the server has actually stopped,
    * which is required for embedding.
    */
@@ -217,15 +250,18 @@ public class JettyServer
 
     private final List<LifeCycle> components;
 
+    private final Runnable callback;
+
     private final CountDownLatch started;
 
     private final CountDownLatch stopped;
 
     private volatile Exception exception;
 
-    public JettyMainThread(final List<LifeCycle> components) {
+    public JettyMainThread(final List<LifeCycle> components, @Nullable final Runnable callback) {
       super("jetty-main-" + INSTANCE_COUNTER.getAndIncrement());
       this.components = components;
+      this.callback = callback;
       this.started = new CountDownLatch(1);
       this.stopped = new CountDownLatch(1);
     }
@@ -256,6 +292,9 @@ public class JettyServer
 
         if (server != null) {
           log.info("Started");
+          if (callback != null) {
+            callback.run();
+          }
           server.join();
         }
         else {

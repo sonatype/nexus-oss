@@ -23,6 +23,10 @@
     <bundle>wrap:${mvn:httpcore}$Bundle-SymbolicName=httpcore</bundle>
     <bundle>wrap:${mvn:httpclient}$Bundle-SymbolicName=httpclient&amp;Fragment-Host=httpcore</bundle>
     <!--
+    Wrappers that need OSGi metadata fixes
+    -->
+    <bundle>wrap:${mvn:cache-api}$overwrite=merge&amp;Export-Package=*;version=1</bundle>
+    <!--
     Give our extender bundle its own start level (distinct from the boot start-level)
     -->
     <bundle start-level="100">${mvn:nexus-extender}</bundle>

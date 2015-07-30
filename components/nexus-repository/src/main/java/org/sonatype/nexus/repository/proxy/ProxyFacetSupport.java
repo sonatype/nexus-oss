@@ -48,6 +48,7 @@ import org.apache.http.client.utils.HttpClientUtils;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A support class which implements basic payload logic; subclasses provide format-specific operations.
@@ -191,10 +192,11 @@ public abstract class ProxyFacetSupport
     return fetch(getUrl(context), context, stale);
   }
 
-  protected Content fetch(String url, Context context, Content stale) throws IOException {
+  protected Content fetch(String url, Context context, @Nullable Content stale) throws IOException {
     HttpClient client = httpClient.getHttpClient();
 
-    HttpGet request = new HttpGet(config.remoteUrl.resolve(url));
+    URI uri = config.remoteUrl.resolve(url);
+    HttpGet request = new HttpGet(uri);
     if (stale != null) {
       final DateTime lastModified = stale.getAttributes().get(Content.CONTENT_LAST_MODIFIED, DateTime.class);
       if (lastModified != null) {
@@ -227,7 +229,8 @@ public abstract class ProxyFacetSupport
       return result;
     }
     if (status.getStatusCode() == HttpStatus.SC_NOT_MODIFIED) {
-      indicateVerified(context, cacheInfo);
+      checkState(stale != null, "Received 304 without conditional GET (bad server?) from %s", uri);
+      indicateVerified(context, stale, cacheInfo);
     }
     HttpClientUtils.closeQuietly(response);
 
@@ -275,7 +278,7 @@ public abstract class ProxyFacetSupport
   /**
    * For whatever component/asset
    */
-  protected abstract void indicateVerified(final Context context, final CacheInfo cacheInfo) throws IOException;
+  protected abstract void indicateVerified(final Context context, final Content content, final CacheInfo cacheInfo) throws IOException;
 
   /**
    * Provide the URL of the content relative to the repository root.

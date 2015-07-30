@@ -370,6 +370,19 @@ Class('NX.TestClass', {
         todo.screenshot('screen');
       });
       console.log('__PHANTOMJS__:screenCapture:phantomjsScreens/'+filename);
+    },
+
+    /**
+     * Helper to select an option from a combo.
+     * @param cq  selector for the combo
+     * @param option the option to select
+     * @returns {*[]} 
+     */
+    comboSelect: function(cq, option) {
+      return [
+        {click: cq + ' => .x-form-trigger'},
+        {click: cq + '.getPicker() => li:contains(' + option + ')'}
+      ]
     }
   }
 });
