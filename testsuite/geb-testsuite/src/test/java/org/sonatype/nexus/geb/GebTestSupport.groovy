@@ -130,7 +130,7 @@ class GebTestSupport
   
   @BeforeClass
   static void setupSpec() {
-    System.setProperty('geb.env', System.getProperty('geb.env', 'chrome'))
+    System.setProperty('geb.env', System.getProperty('geb.env', 'phantom'))
   }
 
   @Configuration
