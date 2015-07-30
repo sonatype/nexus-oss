@@ -80,9 +80,7 @@ StartTest(function(t) {
     });
     t.it('Should accept default values', function(t) {
       t.chain(
-          t.selectAndType(originalValues.host, smtpSettingsFormCQ + ' field[name=host]'),
-          t.selectAndType(originalValues.port, smtpSettingsFormCQ + ' field[name=port]'),
-          t.selectAndType('', smtpSettingsFormCQ + ' field[name=subjectPrefix]'), //value is undefined to start when we dump the fields
+          t.selectAndType(originalValues.subjectPrefix, smtpSettingsFormCQ + ' field[name=subjectPrefix]'), //value is undefined to start when we dump the fields
           t.selectAndType(originalValues.username, smtpSettingsFormCQ + ' field[name=username]'),
           t.selectAndType(originalValues.password, smtpSettingsFormCQ + ' field[name=password]'),
           // press the "Save" button
