@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.docker.internal;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -22,6 +23,7 @@ import javax.validation.ConstraintViolation;
 
 import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
 import org.sonatype.nexus.bootstrap.jetty.ConnectorRegistrar;
+import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -41,6 +43,7 @@ import org.eclipse.jetty.server.HttpConfiguration.Customizer;
 import org.eclipse.jetty.server.Request;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.FacetSupport.State.INITIALISED;
 
 /**
  * @since 3.0
@@ -133,11 +136,13 @@ public class DockerConnectorFacetImpl
   }
 
   @Override
+  @Guarded(by = INITIALISED)
   public Integer getHttpPort() {
     return config.httpPort;
   }
 
   @Override
+  @Guarded(by = INITIALISED)
   public Integer getHttpsPort() {
     return config.httpsPort;
   }
@@ -147,20 +152,24 @@ public class DockerConnectorFacetImpl
    */
   private ConstraintViolation<?> validatePortNotInUse(final String path, final Integer port) {
     if (port != null) {
+      Iterable<Repository> repositories;
       try {
-        for (Repository repository : repositoryManager.browse()) {
-          if (DockerFormat.NAME.equals(repository.getFormat().getValue()) && !repository.equals(getRepository())) {
-            DockerConnectorFacet connectorFacet = repository.facet(DockerConnectorFacet.class);
-            if (port.equals(connectorFacet.getHttpPort()) || port.equals(connectorFacet.getHttpsPort())) {
-              return constraintViolationFactory.createViolation(
-                  path, "Port must be unique (conflicts with repository'" + repository.getName() + "')"
-              );
-            }
-          }
-        }
+        repositories = repositoryManager.browse();
       }
       catch (IllegalStateException ignore) {
-        // this will happen when facet is first validated, before repository manager is yet started
+        // this will happen when facet is validated during startup of repository manager (load from storage)
+        // ignore and consider configurations loaded from storage as valid
+        repositories = Collections.emptyList();
+      }
+      for (Repository repository : repositories) {
+        if (DockerFormat.NAME.equals(repository.getFormat().getValue()) && !repository.equals(getRepository())) {
+          DockerConnectorFacet connectorFacet = repository.facet(DockerConnectorFacet.class);
+          if (port.equals(connectorFacet.getHttpPort()) || port.equals(connectorFacet.getHttpsPort())) {
+            return constraintViolationFactory.createViolation(
+                path, "Port must be unique (conflicts with repository'" + repository.getName() + "')"
+            );
+          }
+        }
       }
     }
     return null;
