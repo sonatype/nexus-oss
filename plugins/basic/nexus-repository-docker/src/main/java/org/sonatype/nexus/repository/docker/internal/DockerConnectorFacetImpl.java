@@ -203,9 +203,11 @@ public class DockerConnectorFacetImpl
 
   private static void maybeAdd(final Set<ConstraintViolation<?>> violations, final ConstraintViolation<?>... toAdd)
   {
-    for (ConstraintViolation<?> violation : toAdd) {
-      if (violation != null) {
-        violations.add(violation);
+    if (toAdd != null) {
+      for (ConstraintViolation<?> violation : toAdd) {
+        if (violation != null) {
+          violations.add(violation);
+        }
       }
     }
   }
