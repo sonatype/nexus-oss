@@ -14,7 +14,6 @@ package org.sonatype.nexus.repository.docker.internal;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -179,7 +178,7 @@ public class DockerConnectorFacetImpl
                                                        final String httpsPortPath,
                                                        final Integer httpsPort)
   {
-    if (httpPort != null && Objects.equals(httpPort, httpsPort)) {
+    if (httpPort != null && httpPort.equals(httpsPort)) {
       return new ConstraintViolation<?>[]{
           constraintViolationFactory.createViolation(
               httpPortPath, "HTTP and HTTPs ports must be different"
@@ -189,7 +188,7 @@ public class DockerConnectorFacetImpl
           )
       };
     }
-    return null;
+    return new ConstraintViolation<?>[]{};
   }
 
 
@@ -199,11 +198,9 @@ public class DockerConnectorFacetImpl
 
   private static void maybeAdd(final Set<ConstraintViolation<?>> violations, final ConstraintViolation<?>... toAdd)
   {
-    if (toAdd != null) {
-      for (ConstraintViolation<?> violation : toAdd) {
-        if (violation != null) {
-          violations.add(violation);
-        }
+    for (ConstraintViolation<?> violation : toAdd) {
+      if (violation != null) {
+        violations.add(violation);
       }
     }
   }

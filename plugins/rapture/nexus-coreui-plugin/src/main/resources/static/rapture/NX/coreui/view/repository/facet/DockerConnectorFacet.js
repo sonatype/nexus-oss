@@ -82,7 +82,7 @@ Ext.define('NX.coreui.view.repository.facet.DockerConnectorFacet', {
           form.isValid();
         }
       }
-    }
+    };
   },
 
   createPort: function(type) {
@@ -112,7 +112,7 @@ Ext.define('NX.coreui.view.repository.facet.DockerConnectorFacet', {
           }
         }
       }
-    }
+    };
   }
 
 });
