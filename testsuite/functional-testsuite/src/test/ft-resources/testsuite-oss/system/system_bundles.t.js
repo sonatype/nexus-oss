@@ -24,7 +24,6 @@ StartTest(function(t) {
     });
     t.it('Can filter bundles by name', function(t) {
       t.chain(
-        function(next) { t.phantomjsScreenshot('beforeexpect.png'); next() },
         { type: 'nexus-bootstrap', target: bundleListCQ + ' nx-searchbox' },
         function(next) {
           var store = t.cq1(bundleListCQ).getStore();
@@ -36,9 +35,7 @@ StartTest(function(t) {
           t.matchGridCellContent(t.cq1(bundleListCQ), 0, 4, 'nexus-bootstrap',
               'nexus-bootstrap is only row');
           next();
-        },
-        function(next) { t.phantomjsScreenshot('afterexpect.png'); next() }
-
+        }
       )
     });
     t.it('Can drill-down by bundle', function(t) {
