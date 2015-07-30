@@ -569,7 +569,7 @@ public class DockerFacetImpl
     try {
       return mapper.readValue(layerMetadataContent.get(), typeRef);
     }
-    catch (JsonProcessingException ignored) {
+    catch (JsonProcessingException ignored) { //NOSONAR
       throw new V1Exception.InvalidJson();
     }
   }
@@ -585,7 +585,7 @@ public class DockerFacetImpl
     try {
       return mapper.readValue(imagesIndexContent.get(), typeRef);
     }
-    catch (JsonProcessingException ignored) {
+    catch (JsonProcessingException ignored) { //NOSONAR
       throw new V1Exception.InvalidJson();
     }
   }

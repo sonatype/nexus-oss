@@ -139,7 +139,7 @@ class DockerHostedRecipe
                 try {
                   return dockerVersion && VERSION_0_10.compareTo(SCHEME.parseVersion(dockerVersion)) > 0
                 }
-                catch (InvalidVersionSpecificationException ignored) {
+                catch (InvalidVersionSpecificationException ignored) { //NOSONAR
                   return true
                 }
               }

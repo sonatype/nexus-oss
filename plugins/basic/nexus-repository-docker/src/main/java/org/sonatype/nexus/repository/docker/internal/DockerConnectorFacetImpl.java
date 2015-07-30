@@ -156,7 +156,7 @@ public class DockerConnectorFacetImpl
       try {
         repositories = repositoryManager.browse();
       }
-      catch (IllegalStateException ignore) {
+      catch (IllegalStateException ignored) { //NOSONAR
         // this will happen when facet is validated during startup of repository manager (load from storage)
         // ignore and consider configurations loaded from storage as valid
         repositories = Collections.emptyList();
