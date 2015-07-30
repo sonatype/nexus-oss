@@ -15,8 +15,6 @@ package org.sonatype.nexus.cache.internal;
 import javax.cache.CacheManager;
 import javax.inject.Named;
 
-import org.sonatype.nexus.cache.internal.ehcache.EhCacheManagerProvider;
-
 import com.google.inject.AbstractModule;
 
 /**
@@ -26,10 +24,10 @@ import com.google.inject.AbstractModule;
  */
 @Named
 public class CacheModule
-  extends AbstractModule
+    extends AbstractModule
 {
   @Override
   protected void configure() {
-    bind(CacheManager.class).toProvider(EhCacheManagerProvider.class);
+    bind(CacheManager.class).toProvider(RuntimeCacheManagerProvider.class);
   }
 }
