@@ -39,6 +39,16 @@
     </dependency>
 
     <dependency>
+      <groupId>javax.interceptor</groupId>
+      <artifactId>javax.interceptor-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>javax.transaction-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus.bundles</groupId>
       <artifactId>org.sonatype.nexus.bundles.ehcache</artifactId>
     </dependency>
