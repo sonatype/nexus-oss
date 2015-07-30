@@ -103,7 +103,7 @@ public class EhCacheManagerProvider
 
   @Override
   public CacheManager get() {
-    checkState(cacheManager != null, "Cache-manger destroyed");
+    checkState(cacheManager != null, "Cache-manager destroyed");
     return cacheManager;
   }
 
