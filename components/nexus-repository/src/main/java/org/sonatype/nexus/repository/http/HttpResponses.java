@@ -105,14 +105,7 @@ public class HttpResponses
   }
 
   public static Response badRequest() {
-    return badRequest((String) null);
-  }
-
-  public static Response badRequest(final Payload payload) {
-    return new Response.Builder()
-        .status(Status.failure(BAD_REQUEST))
-        .payload(payload)
-        .build();
+    return badRequest(null);
   }
 
   // Unauthorized: 401
