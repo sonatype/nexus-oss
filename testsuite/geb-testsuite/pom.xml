@@ -57,16 +57,9 @@
       <artifactId>selenium-support</artifactId>
       <version>${selenium.version}</version>
     </dependency>
-    <!-- Mandatory dependencies for using Spock -->
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <!--<version>2.4.3</version>-->
-    </dependency>
     <dependency>
       <groupId>org.spockframework</groupId>
       <artifactId>spock-core</artifactId>
-      <!--<version>1.0-groovy-2.4</version>-->
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -79,11 +72,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.hamcrest</groupId>-->
-      <!--<artifactId>hamcrest-library</artifactId>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
     <!-- Geb browser automation -->
     <dependency>
       <groupId>org.gebish</groupId>

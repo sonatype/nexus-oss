@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.geb
 
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy
+import org.ops4j.pax.exam.spi.reactors.PerClass
+
 import java.nio.file.Paths
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
@@ -69,6 +72,7 @@ import static org.ops4j.pax.exam.CoreOptions.wrappedBundle
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*
 
 @RunWith(PaxExam.class)
+@ExamReactorStrategy(PerClass.class)
 //class TestSpec extends GebReportingSpec // TODO - KR would need a pax-exam compatible running for Spock Sputnik here
 class GebTestSupport
     extends GebReportingTest implements ExtJS
@@ -165,6 +169,11 @@ class GebTestSupport
         wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-firefox-driver').versionAsInProject())
             .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
         wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-chrome-driver').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        // known issue prevents this from working with latest version, but should work with 2.45.0 https://github.com/SeleniumHQ/selenium/issues/631
+        wrappedBundle(maven('org.seleniumhq.selenium', 'selenium-safari-driver').versionAsInProject())
+            .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
+        wrappedBundle(maven('io.netty','netty').versionAsInProject()) //selenium-safari-driver needs this
             .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
         wrappedBundle(maven('com.codeborne','phantomjsdriver').versionAsInProject())
             .instructions('Fragment-Host=org.sonatype.nexus.pax-exam'),
