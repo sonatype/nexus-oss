@@ -62,10 +62,6 @@
             <artifactId>javax.el-api</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>javax.interceptor</groupId>
-            <artifactId>javax.interceptor-api</artifactId>
-          </exclusion>
-          <exclusion>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
           </exclusion>
