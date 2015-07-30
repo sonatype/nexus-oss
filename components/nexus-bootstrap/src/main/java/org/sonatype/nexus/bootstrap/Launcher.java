@@ -101,12 +101,12 @@ public class Launcher
     builder.set("nexus-base", baseDir.getPath());
     if (basePath != null) {
       // look for configuration relative to the base
-      builder.properties(new File(baseDir, "etc/nexus.properties"), true);
+      builder.properties(new File(baseDir, "etc/org.sonatype.nexus.cfg"), true);
       builder.properties(new File(baseDir, "etc/nexus-test.properties"), false);
     }
     else {
       // search the classpath for the configuration
-      builder.properties("/nexus.properties", true);
+      builder.properties("/org.sonatype.nexus.cfg", true);
       builder.properties("/nexus-test.properties", false);
     }
 
