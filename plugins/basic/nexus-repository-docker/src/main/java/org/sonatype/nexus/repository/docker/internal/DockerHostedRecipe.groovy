@@ -38,6 +38,7 @@ import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
+import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.ActionMatcher
 import org.sonatype.nexus.repository.view.matchers.LiteralMatcher
@@ -100,6 +101,9 @@ class DockerHostedRecipe
   ConditionalRequestHandler conditionalRequestHandler
 
   @Inject
+  ContentHeadersHandler contentHeadersHandler
+
+  @Inject
   UnitOfWorkHandler unitOfWorkHandler
 
   @Inject
@@ -158,6 +162,7 @@ class DockerHostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(v1Handlers.getUsers)
         .create())
 
@@ -202,6 +207,7 @@ class DockerHostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
         .handler(v1Handlers.getImagesIndex)
@@ -248,6 +254,7 @@ class DockerHostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
         .handler(v1Handlers.getTags)
@@ -264,6 +271,7 @@ class DockerHostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
         .handler(v1Handlers.getTag)
@@ -292,6 +300,7 @@ class DockerHostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
         .handler(v1Handlers.getLayerMetadata)
@@ -317,6 +326,7 @@ class DockerHostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(partialFetchHandler)
         .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
@@ -355,6 +365,7 @@ class DockerHostedRecipe
         .handler(timingHandler)
         .handler(securityHandler)
         .handler(conditionalRequestHandler)
+        .handler(contentHeadersHandler)
         .handler(v1Handlers.v1Exception)
         .handler(unitOfWorkHandler)
         .handler(v1Handlers.getLayerAncestry)
