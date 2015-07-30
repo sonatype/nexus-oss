@@ -25,7 +25,6 @@
 
   <artifactId>org.sonatype.nexus.bundles.ehcache</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
-  <packaging>bundle</packaging>
 
   <description>
     Provides stripped down bundle of mvn:net.sf.ehcache:ehcache:${ehcache.version}.
@@ -40,49 +39,58 @@
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache</artifactId>
       <version>${ehcache.version}</version>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <!--
-      NOTE: This may complain about private references to org.terracotta.* junk.
+      Generate OSGi manifest based on expected content
       -->
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
-          <unpackBundle>true</unpackBundle>
-          <niceManifest>true</niceManifest>
+          <rebuildBundle>true</rebuildBundle>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Bundle-Description>${project.description}</Bundle-Description>
-            <Export-Package>net.sf.ehcache*;version=${ehcache.version};-split-package:=merge-first</Export-Package>
-            <Private-Package>org.terracotta.*</Private-Package>
+            <Export-Package>
+              net.sf.ehcache.*,
+              org.terracotta.context,
+              org.terracotta.statistics
+            </Export-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
             <Import-Package>
-              javax.management*,
-              javax.naming*,
-              javax.xml.parsers,
-              org.xml.sax*,
-              javax.servlet;resolution:=optional,
-              javax.transaction*;resolution:=optional,
-              org.hibernate*;resolution:=optional,
-              org.slf4j;resolution:=optional,
-              javax.jms;resolution:=optional,
-              sun.misc;resolution:=optional,
-              org.quartz*;resolution:=optional,
-              org.terracotta.quartz.*;resolution:=optional,
-              org.terracotta.toolkit.*;resolution:=optional,
-              com.terracotta*;resolution:=optional,
-              *
+              *;resolution:=optional
             </Import-Package>
           </instructions>
         </configuration>
       </plugin>
 
       <!--
-      NOTE: This will complain about duplicates, due to shade and bundle plugin copying classes from dependencies.
+      Include generated manifest in initial jar
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!--
+      Finally add expected content from dependencies
       -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -109,7 +117,6 @@
                     <include>org/terracotta/context/**</include>
                     <include>org/terracotta/statistics/**</include>
                     <include>ehcache-failsafe.xml</include>
-                    <include>META-INF/maven/net.sf.ehcache/**</include>
                   </includes>
                 </filter>
               </filters>
