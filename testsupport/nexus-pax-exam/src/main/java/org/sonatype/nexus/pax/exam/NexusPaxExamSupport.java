@@ -370,9 +370,9 @@ public abstract class NexusPaxExamSupport
             replaceConfigurationFile("data/etc/logback-nexus.xml", logbackNexusXml)),
 
         // randomize ports...
-        editConfigurationFilePut("etc/nexus.properties", //
+        editConfigurationFilePut("etc/org.sonatype.nexus.cfg", //
             "application-port", Integer.toString(portRegistry.reservePort())),
-        editConfigurationFilePut("etc/nexus.properties", //
+        editConfigurationFilePut("etc/org.sonatype.nexus.cfg", //
             "application-port-ssl", Integer.toString(portRegistry.reservePort())),
         editConfigurationFilePut("etc/org.apache.karaf.management.cfg", //
             "rmiRegistryPort", Integer.toString(portRegistry.reservePort())),
@@ -386,7 +386,7 @@ public abstract class NexusPaxExamSupport
    * @return Pax-Exam option to change the context path for the Nexus distribution
    */
   public static Option withContextPath(final String contextPath) {
-    return editConfigurationFilePut("etc/nexus.properties", "nexus-context-path", contextPath);
+    return editConfigurationFilePut("etc/org.sonatype.nexus.cfg", "nexus-context-path", contextPath);
   }
 
   /**
@@ -409,7 +409,7 @@ public abstract class NexusPaxExamSupport
    * @return Pax-Exam option to install a Nexus plugin from the given feature XML and name
    */
   public static Option nexusPlugin(final MavenUrlReference featureXml, final String name) {
-    return composite(features(featureXml), editConfigurationFileExtend("etc/nexus.properties", "nexus-features", name));
+    return composite(features(featureXml), editConfigurationFileExtend("etc/org.sonatype.nexus.cfg", "nexus-features", name));
   }
 
   /**
@@ -439,7 +439,7 @@ public abstract class NexusPaxExamSupport
 
     if (nexusFeatures.size() > 0) {
       // combine the nexus-features values into a single request
-      result.add(editConfigurationFileExtend("etc/nexus.properties", //
+      result.add(editConfigurationFileExtend("etc/org.sonatype.nexus.cfg", //
           "nexus-features", Joiner.on(',').join(nexusFeatures)));
     }
 

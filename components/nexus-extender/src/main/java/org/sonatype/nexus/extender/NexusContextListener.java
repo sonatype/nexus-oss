@@ -118,7 +118,7 @@ public class NexusContextListener
     bundleContext = extender.getBundleContext();
 
     servletContext = event.getServletContext();
-    Map<?, ?> nexusProperties = (Map<?, ?>) servletContext.getAttribute("nexus.properties");
+    Map<?, ?> nexusProperties = (Map<?, ?>) servletContext.getAttribute("org.sonatype.nexus.cfg");
     if (nexusProperties == null) {
       nexusProperties = System.getProperties();
     }
