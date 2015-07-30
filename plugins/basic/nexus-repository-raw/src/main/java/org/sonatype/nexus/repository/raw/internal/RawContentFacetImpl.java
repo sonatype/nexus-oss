@@ -170,20 +170,26 @@ public class RawContentFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void setCacheInfo(final String path, final CacheInfo cacheInfo) throws IOException {
+  public void setCacheInfo(final String path, final Content content, final CacheInfo cacheInfo) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
-
-    if (component == null) {
-      log.debug("Attempting to set last verified date for non-existent raw component {}", path);
+    // by EntityId
+    Asset asset = Content.findAsset(tx, content);
+    if (asset == null) {
+      // by format coordinates
+      Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
+      if (component != null) {
+        asset = tx.firstAsset(component);
+      }
     }
-
-    final Asset asset = tx.firstAsset(component);
+    if (asset == null) {
+      log.debug("Attempting to set cache info for non-existent raw component {}", path);
+      return;
+    }
 
     log.debug("Updating cacheInfo of {} to {}", path, cacheInfo);
     CacheInfo.applyToAsset(asset, cacheInfo);
-    tx.saveAsset(tx.firstAsset(component));
+    tx.saveAsset(asset);
   }
 
   // TODO: Consider a top-level indexed property (e.g. "locator") to make these common lookups fast

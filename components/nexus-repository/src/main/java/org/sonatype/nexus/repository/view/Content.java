@@ -26,6 +26,7 @@ import org.sonatype.nexus.common.hash.HashAlgorithm;
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.util.TypeTokens;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -154,6 +155,7 @@ public class Content
       hashCodes.put(algorithm, hashCode);
     }
 
+    contentAttributes.set(Asset.class, asset);
     contentAttributes.set(Content.CONTENT_LAST_MODIFIED, lastModified);
     contentAttributes.set(Content.CONTENT_ETAG, etag);
     contentAttributes.set(Content.CONTENT_HASH_CODES_MAP, hashCodes);
@@ -174,6 +176,22 @@ public class Content
     if (cacheInfo != null) {
       CacheInfo.applyToAsset(asset, cacheInfo);
     }
+  }
+
+  /**
+   * Finds fresh {@link Asset} instance from passed in TX by entity ID of the {@link Asset} used
+   * to create passed in {@link Content} instance. The passed in {@link Content} must have been created with
+   * method {@link #extractFromAsset(Asset, Iterable, AttributesMap)} to have proper attributes set for this operation.
+   *
+   * @see #extractFromAsset(Asset, Iterable, AttributesMap)
+   */
+  @Nullable
+  public static Asset findAsset(final StorageTx tx, Content content) {
+    final Asset contentAsset = content.getAttributes().require(Asset.class);
+    if (contentAsset.getEntityMetadata() != null) {
+      return tx.findAsset(contentAsset.getEntityMetadata().getId(), tx.getBucket());
+    }
+    return null;
   }
 
   /**
