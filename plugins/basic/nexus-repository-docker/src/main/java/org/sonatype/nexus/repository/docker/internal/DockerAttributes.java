@@ -48,4 +48,6 @@ public final class DockerAttributes
   public static final String P_OS = "os";
 
   public static final String P_KERNEL = "kernel";
+
+  private DockerAttributes() {}
 }
