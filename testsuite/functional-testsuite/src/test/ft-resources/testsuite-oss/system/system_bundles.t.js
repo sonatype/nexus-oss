@@ -37,7 +37,7 @@ StartTest(function(t) {
           next();
         }
       )
-    });
+    }, 60000);
     t.it('Can drill-down by bundle', function(t) {
       t.chain(
         function(next) {
