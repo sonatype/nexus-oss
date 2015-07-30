@@ -96,7 +96,7 @@ public class DefaultSecuritySystem
 
   @Inject
   public DefaultSecuritySystem(final EventBus eventBus,
-                               @Named("hazelcast") final Provider<CacheManager> cacheManager,
+                               final Provider<CacheManager> cacheManager,
                                final RealmSecurityManager realmSecurityManager,
                                final RealmManager realmManager,
                                final AnonymousManager anonymousManager,
