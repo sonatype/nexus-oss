@@ -33,7 +33,7 @@
     -->
     <testsuite.basedir>${project.basedir}/..</testsuite.basedir>
     <geb.version>0.12.0</geb.version>
-    <selenium.version>2.46.0</selenium.version>
+    <selenium.version>2.47.0</selenium.version>
     <phantomjs.version>1.9.7</phantomjs.version>
   </properties>
 
