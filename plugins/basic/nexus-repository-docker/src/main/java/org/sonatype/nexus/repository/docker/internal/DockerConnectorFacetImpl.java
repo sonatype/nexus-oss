@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.docker.internal;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -76,10 +77,14 @@ public class DockerConnectorFacetImpl
   @Override
   protected void doValidate(final Configuration configuration) throws Exception {
     facet(ConfigurationFacet.class).validateSection(configuration, CONFIG_KEY, Config.class);
+
     Config configToValidate = facet(ConfigurationFacet.class).readSection(configuration, CONFIG_KEY, Config.class);
     Set<ConstraintViolation<?>> violations = new HashSet<>();
     maybeAdd(violations, validatePort(pathOf("httpPort"), configToValidate.httpPort));
     maybeAdd(violations, validatePort(pathOf("httpsPort"), configToValidate.httpsPort));
+    maybeAdd(violations, validateNotSamePort(
+        pathOf("httpPort"), configToValidate.httpPort, pathOf("httpsPort"), configToValidate.httpsPort
+    ));
     ConstraintViolations.maybePropagate(violations, log);
   }
 
@@ -137,6 +142,9 @@ public class DockerConnectorFacetImpl
     return config.httpsPort;
   }
 
+  /**
+   * Validate that port is not used as used as HTTP/HTTPS ports in another repository.
+   */
   private ConstraintViolation<?> validatePort(final String path, final Integer port) {
     if (port != null) {
       try {
@@ -158,14 +166,38 @@ public class DockerConnectorFacetImpl
     return null;
   }
 
+  /**
+   * Validate that HTTP and HTTPS ports are not equal.
+   */
+  private ConstraintViolation<?>[] validateNotSamePort(final String httpPortPath,
+                                                       final Integer httpPort,
+                                                       final String httpsPortPath,
+                                                       final Integer httpsPort)
+  {
+    if (httpPort != null && Objects.equals(httpPort, httpsPort)) {
+      return new ConstraintViolation<?>[]{
+          constraintViolationFactory.createViolation(
+              httpPortPath, "HTTP and HTTPs ports must be different"
+          ),
+          constraintViolationFactory.createViolation(
+              httpsPortPath, "HTTP and HTTPs ports must be different"
+          )
+      };
+    }
+    return null;
+  }
+
+
   private static String pathOf(final String fieldName) {
     return StorageFacet.P_ATTRIBUTES + "." + CONFIG_KEY + "." + fieldName;
   }
 
-  private static void maybeAdd(final Set<ConstraintViolation<?>> violations, final ConstraintViolation<?> violation)
+  private static void maybeAdd(final Set<ConstraintViolation<?>> violations, final ConstraintViolation<?>... toAdd)
   {
-    if (violation != null) {
-      violations.add(violation);
+    for (ConstraintViolation<?> violation : toAdd) {
+      if (violation != null) {
+        violations.add(violation);
+      }
     }
   }
 
@@ -211,6 +243,9 @@ public class DockerConnectorFacetImpl
       return port;
     }
 
+    /**
+     * Rewrite /v1/* to /repository{repository name}/v1/*.
+     */
     @Override
     public HttpConfiguration customize(final HttpConfiguration configuration) {
       configuration.addCustomizer(new Customizer()
