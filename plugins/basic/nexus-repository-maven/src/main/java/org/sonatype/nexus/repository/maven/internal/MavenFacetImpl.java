@@ -333,14 +333,11 @@ public class MavenFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public boolean setCacheInfo(final MavenPath path, @Nullable final Content content, final CacheInfo cacheInfo) throws IOException {
+  public boolean setCacheInfo(final MavenPath path, final Content content, final CacheInfo cacheInfo) throws IOException {
     final StorageTx tx = UnitOfWork.currentTransaction();
 
-    Asset asset = null;
-    if (content != null) {
-      // by EntityId
-      asset = Content.findAsset(tx, content);
-    }
+    // by EntityId
+    Asset asset = Content.findAsset(tx, content);
     if (asset == null) {
       // by format coordinates
       asset = findAsset(tx, tx.getBucket(), path);

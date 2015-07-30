@@ -84,7 +84,6 @@ import static org.odata4j.producer.resources.OptionsQueryParser.parseSkip;
 import static org.odata4j.producer.resources.OptionsQueryParser.parseTop;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 import static org.sonatype.nexus.repository.storage.StorageFacet.P_NAME;
-import static org.sonatype.nexus.repository.storage.StorageFacet.P_PATH;
 
 /**
  * A group-aware implementation of a hosted {@link} NugetGalleryFacet.
@@ -363,16 +362,13 @@ public class NugetGalleryFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void setCacheInfo(final String id, final String version, @Nullable final Content content, final CacheInfo cacheInfo) {
+  public void setCacheInfo(final String id, final String version, final Content content, final CacheInfo cacheInfo) {
     checkNotNull(cacheInfo);
 
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    Asset asset = null;
-    if (content != null) {
-      // by EntityId
-      asset = Content.findAsset(tx, content);
-    }
+    // by EntityId
+    Asset asset = Content.findAsset(tx, content);
     if (asset == null) {
       // by format coordinates
       asset = findAsset(tx, id, version);

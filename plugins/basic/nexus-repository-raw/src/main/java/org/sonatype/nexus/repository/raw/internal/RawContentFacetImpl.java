@@ -170,14 +170,11 @@ public class RawContentFacetImpl
 
   @Override
   @Transactional(retryOn = ONeedRetryException.class)
-  public void setCacheInfo(final String path, @Nullable final Content content, final CacheInfo cacheInfo) throws IOException {
+  public void setCacheInfo(final String path, final Content content, final CacheInfo cacheInfo) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
-    Asset asset = null;
-    if (content != null) {
-      // by EntityId
-      asset = Content.findAsset(tx, content);
-    }
+    // by EntityId
+    Asset asset = Content.findAsset(tx, content);
     if (asset == null) {
       // by format coordinates
       Component component = tx.findComponentWithProperty(P_PATH, path, tx.getBucket());
