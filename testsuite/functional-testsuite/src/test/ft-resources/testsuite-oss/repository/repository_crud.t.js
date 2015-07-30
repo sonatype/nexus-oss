@@ -120,6 +120,7 @@ StartTest(function(t) {
     t.it('Repository update', function(t) {
       t.chain(
           //update the writePolicy
+          function(next) { t.phantomjsScreenshot('beforewritepolicy.png'); next() },
           t.comboSelect('#writePolicy', 'Disable redeploy'),
           Ext.apply(t.waitForStore('Repository'),
               {trigger: {click: '>>nx-coreui-repository-settings button[action=save]'}}
