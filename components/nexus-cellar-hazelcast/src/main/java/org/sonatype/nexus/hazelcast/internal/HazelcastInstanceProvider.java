@@ -10,13 +10,15 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.hazelcast;
+package org.sonatype.nexus.hazelcast.internal;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -24,9 +26,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.sonatype.nexus.common.app.ApplicationDirectories;
-import org.sonatype.nexus.common.node.LocalNodeAccess;
+import org.sonatype.nexus.hazelcast.HazelcastMemberAttributesCustomizer;
 import org.sonatype.sisu.goodies.common.ComponentSupport;
 
+import com.google.common.base.Throwables;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MemberAttributeConfig;
 import com.hazelcast.config.XmlConfigBuilder;
@@ -39,7 +42,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Expose the shared {@link HazelcastInstance}.
@@ -55,14 +57,15 @@ public class HazelcastInstanceProvider
   public static final String INSTANCE_NAME = "nexus";
 
   static {
-    ExceptionUtil.class.toString(); // workaround https://github.com/orientechnologies/orientdb/pull/4609
+    // HACK: workaround https://github.com/orientechnologies/orientdb/pull/4609
+    ExceptionUtil.class.toString();
   }
 
   private final BundleContext bundleContext;
 
   private final ApplicationDirectories directories;
 
-  private final LocalNodeAccess localNodeAccess;
+  private final List<HazelcastMemberAttributesCustomizer> memberAttributesCustomizers;
 
   private final CombinedClassLoader combinedClassLoader;
 
@@ -73,13 +76,12 @@ public class HazelcastInstanceProvider
   @Inject
   public HazelcastInstanceProvider(final BundleContext bundleContext,
                                    final ApplicationDirectories directories,
-                                   final LocalNodeAccess localNodeAccess)
+                                   final List<HazelcastMemberAttributesCustomizer> memberAttributesCustomizers)
   {
     this.bundleContext = checkNotNull(bundleContext);
     this.directories = checkNotNull(directories);
-    this.localNodeAccess = checkNotNull(localNodeAccess);
-
-    combinedClassLoader = new CombinedClassLoader();
+    this.memberAttributesCustomizers = checkNotNull(memberAttributesCustomizers);
+    this.combinedClassLoader = new CombinedClassLoader();
 
     // start tracking bundles whose packages should be distributed
     new HazelcastBundleTracker(bundleContext, combinedClassLoader);
@@ -88,7 +90,6 @@ public class HazelcastInstanceProvider
   @Override
   public HazelcastInstance get() {
     instance = Hazelcast.newHazelcastInstance(getHazelcastConfig());
-    checkState(instance != null, "Missing instance named: %s", INSTANCE_NAME);
     log.info("Instance: {}", instance);
 
     // expose hazelcast instance as service so cellar's blueprint components can consume it
@@ -115,27 +116,56 @@ public class HazelcastInstanceProvider
     }
   }
 
+  /**
+   * Load the application Hazelcast configuration if present, or fallback to defaults if the file is missing.
+   */
   private Config getHazelcastConfig() {
     Config config;
-    File hazelcastXml = new File(new File(directories.getInstallDirectory(), "etc"), "hazelcast.xml");
-    try (InputStream in = new BufferedInputStream(new FileInputStream(hazelcastXml))) {
-      config = new XmlConfigBuilder(in).build();
+
+    // attempt to load default configuration
+    File file = new File(new File(directories.getInstallDirectory(), "etc"), "hazelcast.xml");
+    if (file.exists()) {
+      try (InputStream in = new BufferedInputStream(new FileInputStream(file))) {
+        config = new XmlConfigBuilder(in).build();
+      }
+      catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
     }
-    catch (IOException e) {
-      log.warn("No configuration found; using defaults");
+    else {
+      // else fallback if for some reason it was missing
+      log.warn("Missing configuration: {}; using defaults", file.getAbsolutePath());
       config = new XmlConfigBuilder().build();
     }
 
+    // Customize configuration
+    customize(config);
+
+    // Always set the instance-name and CL for sanity
     config.setInstanceName(INSTANCE_NAME);
     config.setClassLoader(combinedClassLoader);
 
-    // Customize member attributes
-    // FIXME: Change to contributor model, to make this easier to extend with components
-    MemberAttributeConfig attributes = new MemberAttributeConfig();
-    attributes.setStringAttribute("node.identity", localNodeAccess.getId());
-    config.setMemberAttributeConfig(attributes);
-
     log.debug("Config: {}", config);
     return config;
+  }
+
+  /**
+   * Customize the configuration.
+   */
+  private void customize(final Config config) {
+    // customize member attributes
+    MemberAttributeConfig attributes = new MemberAttributeConfig();
+    for (HazelcastMemberAttributesCustomizer customizer : memberAttributesCustomizers) {
+      customizer.apply(attributes);
+    }
+
+    if (log.isDebugEnabled()) {
+      log.debug("Customized member attributes:");
+      for (Map.Entry<String, Object> entry : attributes.getAttributes().entrySet()) {
+        log.debug("  {}={}", entry.getKey(), entry.getValue());
+      }
+    }
+
+    config.setMemberAttributeConfig(attributes);
   }
 }
