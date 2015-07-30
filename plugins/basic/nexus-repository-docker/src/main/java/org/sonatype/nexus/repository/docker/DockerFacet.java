@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
 /**
@@ -33,7 +34,7 @@ public interface DockerFacet
    * @param name docker repository name
    * @return image index JSON
    */
-  Payload getImagesIndex(String name) throws IOException;
+  Content getImagesIndex(String name) throws IOException;
 
   /**
    * Store images index.
@@ -49,7 +50,7 @@ public interface DockerFacet
    * @param layerId layer id
    * @return layer metadata (JSON)
    */
-  Payload getLayerMetadata(String layerId) throws IOException;
+  Content getLayerMetadata(String layerId) throws IOException;
 
   /**
    * Store layer metadata.
@@ -65,7 +66,7 @@ public interface DockerFacet
    * @param layerId layer id
    * @return layer content
    */
-  Payload getLayerContent(String layerId) throws IOException;
+  Content getLayerContent(String layerId) throws IOException;
 
   /**
    * Store layer content.
@@ -89,7 +90,7 @@ public interface DockerFacet
    * @param layerId layer id
    * @return layer ancestry (JSON)
    */
-  Payload getLayerAncestry(String layerId) throws IOException;
+  Content getLayerAncestry(String layerId) throws IOException;
 
   /**
    * Retrieve ilayer id corresponding to an image.
@@ -98,7 +99,7 @@ public interface DockerFacet
    * @param tag  image tag
    * @return layer id (JSON)
    */
-  Payload getTag(String name, String tag) throws IOException;
+  Content getTag(String name, String tag) throws IOException;
 
   /**
    * Retrieve mapping between all known tags and corresponding layer ids.
@@ -106,7 +107,7 @@ public interface DockerFacet
    * @param name image name
    * @return mapping (JSON)
    */
-  Payload getTags(String name) throws IOException;
+  Content getTags(String name) throws IOException;
 
   /**
    * Stores mapping between a tag and its layer id.

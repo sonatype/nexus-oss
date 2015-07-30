@@ -94,7 +94,7 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getImagesIndex(final String name) throws IOException {
+  public Content getImagesIndex(final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     String imagesIndexAssetName = getImagesIndexName(name);
@@ -170,7 +170,7 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getLayerMetadata(final String layerId) throws IOException {
+  public Content getLayerMetadata(final String layerId) throws IOException {
     validateLayerId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
@@ -268,7 +268,7 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getLayerContent(final String layerId) throws IOException {
+  public Content getLayerContent(final String layerId) throws IOException {
     validateLayerId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
@@ -399,7 +399,7 @@ public class DockerFacetImpl
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getLayerAncestry(final String layerId) throws IOException {
+  public Content getLayerAncestry(final String layerId) throws IOException {
     validateLayerId(layerId);
     StorageTx tx = UnitOfWork.currentTransaction();
 
@@ -413,12 +413,12 @@ public class DockerFacetImpl
     }
 
     String ancestry = mapper.writeValueAsString(metadataAsset.formatAttributes().get(P_ANCESTRY));
-    return new StringPayload(ancestry, Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
+    return new Content(new StringPayload(ancestry, Charsets.UTF_8, ContentTypes.APPLICATION_JSON));
   }
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getTags(final String name) throws IOException {
+  public Content getTags(final String name) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     Iterable<Component> tagComponents = findComponents(tx, name);
@@ -429,12 +429,14 @@ public class DockerFacetImpl
     if (tags.isEmpty()) {
       throw new V1Exception.ImagesNotFound();
     }
-    return new StringPayload(mapper.writeValueAsString(tags), Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
+    return new Content(
+        new StringPayload(mapper.writeValueAsString(tags), Charsets.UTF_8, ContentTypes.APPLICATION_JSON)
+    );
   }
 
   @Override
   @Transactional(retryOn = IllegalStateException.class)
-  public Payload getTag(final String name, final String tag) throws IOException {
+  public Content getTag(final String name, final String tag) throws IOException {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     Component tagComponent = findComponent(tx, name, tag);
@@ -442,7 +444,9 @@ public class DockerFacetImpl
       throw new V1Exception.TagNotFound();
     }
     String layerId = tagComponent.formatAttributes().get(P_LAYER_ID, String.class);
-    return new StringPayload(mapper.writeValueAsString(layerId), Charsets.UTF_8, ContentTypes.APPLICATION_JSON);
+    return new Content(
+        new StringPayload(mapper.writeValueAsString(layerId), Charsets.UTF_8, ContentTypes.APPLICATION_JSON)
+    );
   }
 
   @Override
