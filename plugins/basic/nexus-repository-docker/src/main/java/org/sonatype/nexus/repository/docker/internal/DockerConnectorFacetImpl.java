@@ -23,7 +23,6 @@ import javax.validation.ConstraintViolation;
 
 import org.sonatype.nexus.bootstrap.jetty.ConnectorConfiguration;
 import org.sonatype.nexus.bootstrap.jetty.ConnectorRegistrar;
-import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.config.Configuration;
@@ -43,7 +42,6 @@ import org.eclipse.jetty.server.HttpConfiguration.Customizer;
 import org.eclipse.jetty.server.Request;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.FacetSupport.State.INITIALISED;
 
 /**
  * @since 3.0
@@ -136,13 +134,11 @@ public class DockerConnectorFacetImpl
   }
 
   @Override
-  @Guarded(by = INITIALISED)
   public Integer getHttpPort() {
     return config.httpPort;
   }
 
   @Override
-  @Guarded(by = INITIALISED)
   public Integer getHttpsPort() {
     return config.httpsPort;
   }
