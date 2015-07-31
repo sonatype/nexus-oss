@@ -174,7 +174,7 @@ extends TestSupport
     when(asset.blobRef()).thenReturn(blobRef)
     def underTest = new StorageTxImpl('test', blobTx, db, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, MimeRulesSource.NOOP, hooks)
     try {
-      underTest.setBlob(asset, 'testBlob.txt', inputStream, hashAlgorithms, headers, 'text/plain')
+      underTest.setBlob(asset, 'testBlob.txt', NO_DEFAULT_VALUE, hashAlgorithms, headers, 'text/plain')
       assertThat 'Expected IllegalOperationException', false
     }
     catch (IllegalOperationException e) {}
@@ -198,7 +198,7 @@ extends TestSupport
   void 'setting blob fails on asset without blob when DENY write policy'() {
     def underTest = new StorageTxImpl('test', blobTx, db, bucket, WritePolicy.DENY, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, MimeRulesSource.NOOP, hooks)
     try {
-      underTest.setBlob(asset, 'testBlob.txt', inputStream, hashAlgorithms, headers, 'text/plain')
+      underTest.setBlob(asset, 'testBlob.txt', NO_DEFAULT_VALUE, hashAlgorithms, headers, 'text/plain')
       assertThat 'Expected IllegalOperationException', false
     }
     catch (IllegalOperationException e) {}
@@ -229,7 +229,7 @@ extends TestSupport
     when(blobTx.create(any(InputStream), any(Map), any(Iterable), anyString())).thenReturn(assetBlob)
     def underTest = new StorageTxImpl('test', blobTx, db, bucket, WritePolicy.ALLOW_ONCE, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, MimeRulesSource.NOOP, hooks)
     try {
-      underTest.setBlob(asset, 'testBlob.txt', inputStream, hashAlgorithms, headers, 'text/plain')
+      underTest.setBlob(asset, 'testBlob.txt', NO_DEFAULT_VALUE, hashAlgorithms, headers, 'text/plain')
       assertThat 'Expected IllegalOperationException', false
     }
     catch (IllegalOperationException e) {}
@@ -257,7 +257,7 @@ extends TestSupport
     when(bucket.repositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map), any(Iterable), anyString())).thenReturn(assetBlob)
     def underTest = new StorageTxImpl('test', blobTx, db, bucket, WritePolicy.ALLOW_ONCE, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, MimeRulesSource.NOOP, hooks)
-    underTest.setBlob(asset, 'testBlob.txt', inputStream, hashAlgorithms, headers, "text/plain")
+    underTest.setBlob(asset, 'testBlob.txt', NO_DEFAULT_VALUE, hashAlgorithms, headers, "text/plain")
     verify(blobTx, times(1)).create(any(InputStream), eq(expectedHeaders), eq(hashAlgorithms), eq('text/plain'))
     verify(asset, times(1)).blobRef(newBlobRef)
   }
@@ -286,7 +286,7 @@ extends TestSupport
     when(bucket.repositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map), any(Iterable), eq(ContentTypes.TEXT_PLAIN))).thenReturn(newAssetBlob)
     def underTest = new StorageTxImpl('test', blobTx, db, bucket, WritePolicy.ALLOW, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, MimeRulesSource.NOOP, hooks)
-    underTest.setBlob(asset, 'testBlob.txt', inputStream, hashAlgorithms, headers, 'text/plain')
+    underTest.setBlob(asset, 'testBlob.txt', NO_DEFAULT_VALUE, hashAlgorithms, headers, 'text/plain')
     verify(blobTx, times(1)).delete(blobRef)
     verify(blobTx, times(1)).create(any(InputStream), eq(expectedHeaders), any(Iterable), eq(ContentTypes.TEXT_PLAIN))
     verify(asset, times(1)).blobRef(newBlobRef)
@@ -311,7 +311,7 @@ extends TestSupport
     when(bucket.repositoryName()).thenReturn('testRepo')
     when(blobTx.create(any(InputStream), any(Map), any(Iterable), anyString())).thenReturn(assetBlob)
     def underTest = new StorageTxImpl('test', blobTx, db, bucket, WritePolicy.ALLOW, WritePolicySelector.DEFAULT, bucketEntityAdapter, componentEntityAdapter, assetEntityAdapter, false, defaultContentValidator, MimeRulesSource.NOOP, hooks)
-    underTest.setBlob(asset, 'testBlob.txt', inputStream, hashAlgorithms, headers, 'text/plain')
+    underTest.setBlob(asset, 'testBlob.txt', NO_DEFAULT_VALUE, hashAlgorithms, headers, 'text/plain')
     verify(blobTx, times(1)).create(any(InputStream), eq(expectedHeaders), eq(hashAlgorithms), eq('text/plain'))
     verify(asset, times(1)).blobRef(newBlobRef)
   }

@@ -539,7 +539,6 @@ public class NugetGalleryFacetImpl
 
   private Content createOrUpdateAssetAndContents(final StorageTx tx,
                                                  final Component component,
-                                                 // TOOD: Delete param
                                                  final Supplier<InputStream> packageStreamSupplier,
                                                  final Map<String, String> data,
                                                  @Nullable final AttributesMap contentAttributes)
@@ -551,7 +550,7 @@ public class NugetGalleryFacetImpl
 
       // TODO: Pass in the supplier, not just an inputstream.
       final AssetBlob assetBlob = tx
-          .setBlob(asset, blobName(component), packageStreamSupplier.get(), singletonList(HashAlgorithm.SHA512), null, "application/zip");
+          .setBlob(asset, blobName(component), packageStreamSupplier, singletonList(HashAlgorithm.SHA512), null, "application/zip");
       tx.saveAsset(asset);
 
       return toContent(asset, assetBlob.getBlob());

@@ -195,7 +195,7 @@ public class MavenFacetImpl
 
     final AssetBlob assetBlob = tx.createBlob(
         path.getPath(),
-        streamSupplier.get(),
+        streamSupplier,
         HashType.ALGORITHMS,
         null,
         payload.getContentType()

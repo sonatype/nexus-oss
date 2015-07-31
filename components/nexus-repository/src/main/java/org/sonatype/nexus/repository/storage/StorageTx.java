@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.Format;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.transaction.Transaction;
 
+import com.google.common.base.Supplier;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
@@ -221,7 +222,7 @@ public interface StorageTx
    * @param asset               the {@link Asset} that should reference newly created blob.
    * @param blobName            blob name (must not be unique), but it will be used also in content validation. See
    *                            {@link ContentValidator}.
-   * @param inputStream         the content to be streamed into blob store.
+   * @param streamSupplier      the content being stored as a blob
    * @param hashAlgorithms      {@link HashAlgorithm}s to be applied while streaming to blob store, will be set
    *                            in {@link Asset} attributes.
    * @param headers             optional, custom headers for blob, if any.
@@ -231,7 +232,7 @@ public interface StorageTx
    */
   AssetBlob setBlob(Asset asset,
                     String blobName,
-                    InputStream inputStream,
+                    final Supplier<InputStream> streamSupplier,
                     Iterable<HashAlgorithm> hashAlgorithms,
                     @Nullable Map<String, String> headers,
                     @Nullable String declaredContentType) throws IOException;
@@ -242,7 +243,7 @@ public interface StorageTx
    *
    * @param blobName            blob name (must not be unique), but it will be used also in content validation. See
    *                            {@link ContentValidator}.
-   * @param inputStream         the content to be streamed into blob store.
+   * @param streamSupplier      the content to be streamed into blob store.
    * @param hashAlgorithms      {@link HashAlgorithm}s to be applied while streaming to blob store, returned in {@link
    *                            AssetBlob}.
    * @param headers             optional, custom headers for blob, if any.
@@ -251,7 +252,7 @@ public interface StorageTx
    * transaction using {@link #attachBlob(Asset, AssetBlob)} method.
    */
   AssetBlob createBlob(String blobName,
-                       InputStream inputStream,
+                       final Supplier<InputStream> streamSupplier,
                        Iterable<HashAlgorithm> hashAlgorithms,
                        @Nullable Map<String, String> headers,
                        @Nullable String declaredContentType) throws IOException;
