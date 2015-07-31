@@ -25,14 +25,12 @@ StartTest(function(t) {
     t.it('Can filter bundles by name', function(t) {
       t.chain(
         { type: 'nexus-bootstrap', target: bundleListCQ + ' nx-searchbox' },
-        function(next) { t.phantomjsScreenshot('beforewait.png'); next() },
         function(next) {
           var store = t.cq1(bundleListCQ).getStore();
           t.waitFor(function() {
             return store.isFiltered() && store.count() === 1;
           }, next)
         },
-        function(next) { t.phantomjsScreenshot('afterwait.png'); next() },
         function(next) {
           t.matchGridCellContent(t.cq1(bundleListCQ), 0, 4, 'nexus-bootstrap',
               'nexus-bootstrap is only row');
