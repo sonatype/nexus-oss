@@ -71,9 +71,7 @@ class V1Handlers
 
     return addHeaders(
         repository,
-        HttpResponses.ok(repository.facet(DockerFacet).getImagesIndex(
-            (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository']
-        ))
+        HttpResponses.ok(repository.facet(DockerFacet).getImagesIndex(name(state)))
     )
   }
 
@@ -82,9 +80,7 @@ class V1Handlers
     def repository = context.repository
     log.debug '[putImagesIndex] repository: {} tokens: {}', repository.name, state.tokens
 
-    repository.facet(DockerFacet).putImagesIndex(
-        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], context.request.payload
-    )
+    repository.facet(DockerFacet).putImagesIndex(name(state), context.request.payload)
 
     return addHeaders(
         repository,
@@ -108,9 +104,7 @@ class V1Handlers
     def repository = context.repository
     log.debug '[getTag] repository: {} tokens: {}', repository.name, state.tokens
 
-    return HttpResponses.ok(repository.facet(DockerFacet).getTag(
-        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], state.tokens['tag']
-    ))
+    return HttpResponses.ok(repository.facet(DockerFacet).getTag(name(state), state.tokens['tag']))
   }
 
   Closure putTag = { Context context ->
@@ -119,9 +113,7 @@ class V1Handlers
     log.debug '[putTag] repository: {} tokens: {}', repository.name, state.tokens
 
     repository.facet(DockerFacet).putTag(
-        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository'], state.tokens['tag'],
-        parseUserAgent(context),
-        context.request.payload
+        name(state), state.tokens['tag'], parseUserAgent(context), context.request.payload
     )
 
     return HttpResponses.ok()
@@ -132,9 +124,7 @@ class V1Handlers
     def repository = context.repository
     log.debug '[getTags] repository: {} tokens: {}', repository.name, state.tokens
 
-    return HttpResponses.ok(repository.facet(DockerFacet).getTags(
-        (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository']
-    ))
+    return HttpResponses.ok(repository.facet(DockerFacet).getTags(name(state)))
   }
 
   Closure getLayerMetadata = { Context context ->
@@ -267,28 +257,8 @@ class V1Handlers
     }
   }
 
-  private static class SearchResults
-  {
-    String query
-
-    int num_results
-
-    List<SearchResult> results
-  }
-
-  private static class SearchResult
-  {
-    int star_count
-
-    boolean is_official
-
-    String name
-
-    boolean is_trusted
-
-    boolean is_automated
-
-    String description
+  private String name(TokenMatcher.State state) {
+    (state.tokens['namespace'] ?: 'library') + '/' + state.tokens['repository']
   }
 
   protected static Map<String, String> parseUserAgent(Context context) {
@@ -311,6 +281,30 @@ class V1Handlers
       }
     }
     return userAgent
+  }
+
+  private static class SearchResults
+  {
+    String query
+
+    int num_results
+
+    List<SearchResult> results
+  }
+
+  private static class SearchResult
+  {
+    int star_count
+
+    boolean is_official
+
+    String name
+
+    boolean is_trusted
+
+    boolean is_automated
+
+    String description
   }
 
 }
