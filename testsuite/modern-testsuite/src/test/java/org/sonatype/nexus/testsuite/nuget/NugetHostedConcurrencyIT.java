@@ -37,8 +37,8 @@ public class NugetHostedConcurrencyIT
 
   @Test
   public void hostedConcurrentPuts() throws Exception {
-    final ConcurrentRunner runner = new ConcurrentRunner(3, 60);
-    runner.addTask(2, new ConcurrentTask()
+    final ConcurrentRunner runner = new ConcurrentRunner(5, 60);
+    runner.addTask(8, new ConcurrentTask()
     {
       @Override
       public void run() throws Exception {
