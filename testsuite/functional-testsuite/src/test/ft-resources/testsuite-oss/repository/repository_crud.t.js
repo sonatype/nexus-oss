@@ -111,6 +111,7 @@ StartTest(function(t) {
             t.is(form.down('#strictContentTypeValidation').getValue(), true);
             t.is(form.down('#writePolicy').readOnly, false);
             t.is(form.down('#writePolicy').getValue(), 'ALLOW');
+            t.is(form.down('button[action=save]').isDisabled(), true);
 
             next();
           }
@@ -119,6 +120,7 @@ StartTest(function(t) {
     t.it('Repository update', function(t) {
       t.chain(
           //update the writePolicy
+          function(next) { t.phantomjsScreenshot('beforewritepolicy.png'); next() },
           t.comboSelect('#writePolicy', 'Disable redeploy'),
           Ext.apply(t.waitForStore('Repository'),
               {trigger: {click: '>>nx-coreui-repository-settings button[action=save]'}}

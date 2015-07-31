@@ -220,11 +220,13 @@ Class('NX.TestClass', {
 
     selectAndType: function(text, target) {
       return [
+        { click: target },
         function(next) {
           this.selectText(target);
           next();
         },
-        { type: text, target: target },
+        text === '' ? { type: '[BACKSPACE]', target: target } : null,
+        text !== '' ? { type: text, target: target } : null,
       ];
     },
 

@@ -33,9 +33,17 @@
       <artifactId>nexus-common</artifactId>
     </dependency>
 
+    <!--
+    NOTE: This has a non-standard license, prefer ASF spec instead.
+    -->
+    <!--<dependency>-->
+      <!--<groupId>javax.cache</groupId>-->
+      <!--<artifactId>cache-api</artifactId>-->
+    <!--</dependency>-->
+
     <dependency>
-      <groupId>javax.cache</groupId>
-      <artifactId>cache-api</artifactId>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jcache_1.0_spec</artifactId>
     </dependency>
 
     <dependency>
