@@ -11,7 +11,8 @@
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
 NX.TestHarness.configure({
-  title: 'Nexus FT: OSS'
+  title: 'Nexus FT: OSS',
+  itTimeout: 60000
 });
 
 NX.TestHarness.start(
@@ -118,6 +119,7 @@ NX.TestHarness.start(
 
     {
       group: 'System',
+      waitForTimeout: 60000,
       items: [
         {
           group: 'FT',

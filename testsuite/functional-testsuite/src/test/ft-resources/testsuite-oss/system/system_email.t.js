@@ -18,7 +18,8 @@ StartTest(function(t) {
           ' nx-settingsform',
       waitForUnmasked = function() {
         return !t.cq1(smtpSettingsFormCQ).el.isMasked();
-      };
+      },
+      uniqueId = t.uniqueId();
 
   t.describe('Given an admin administering Email Server', function(t) {
     t.it('Should be able to view the configuration', function(t) {
@@ -37,9 +38,9 @@ StartTest(function(t) {
     t.it('Should be able to discard settings on the form', function(t) {
       t.chain(
           // type in some test strings to empty fields
-          t.selectAndType('_test', smtpSettingsCQ + ' field[name=subjectPrefix]'),
-          t.selectAndType('_testUser', smtpSettingsCQ + ' field[name=username]'),
-          t.selectAndType('_testPassword', smtpSettingsCQ + ' field[name=password]'),
+          t.selectAndType(uniqueId, smtpSettingsCQ + ' field[name=subjectPrefix]'),
+          t.selectAndType(uniqueId, smtpSettingsCQ + ' field[name=username]'),
+          t.selectAndType(uniqueId, smtpSettingsCQ + ' field[name=password]'),
           {
             waitFor: 'Event', args: [smtpSettingsFormCQ, 'load'],
             trigger: {click: smtpSettingsCQ + ' button[action=discard]', desc: 'Discard all changes'}
@@ -56,22 +57,22 @@ StartTest(function(t) {
     t.it('Should be able to enable the server with test values', function(t) {
       t.chain(
           // type in some test strings to empty fields
-          t.selectAndType('_test', smtpSettingsFormCQ + ' field[name=subjectPrefix]'),
-          t.selectAndType('_testUser', smtpSettingsFormCQ + ' field[name=username]'),
-          t.selectAndType('_testPassword', smtpSettingsFormCQ + ' field[name=password]'),
+          t.selectAndType(uniqueId, smtpSettingsFormCQ + ' field[name=subjectPrefix]'),
+          t.selectAndType(uniqueId, smtpSettingsFormCQ + ' field[name=username]'),
+          t.selectAndType(uniqueId, smtpSettingsFormCQ + ' field[name=password]'),
           // press the "Save" button
           {
             waitFor: 'Event', args: [smtpSettingsFormCQ, 'submitted'],
-            trigger: {click: '>>nx-coreui-system-smtp-settings button[action=save]', desc: 'Save new settings'},
+            trigger: {click: '>>nx-coreui-system-smtp-settings button[action=save][disabled=false]', desc: 'Save new settings'}
           },
           {waitFor: waitForUnmasked},
           // verify new values
           function(next) {
             var form = t.cq1(smtpSettingsFormCQ).getForm();
             t.isDeeply(Ext.apply(Ext.clone(originalValues), {
-              subjectPrefix: '_test',
-              username: '_testUser',
-              password: '_testPassword'
+              subjectPrefix: uniqueId,
+              username: uniqueId,
+              password: uniqueId
             }), form.getFieldValues(), 'Form should be updated');
             next();
           }
@@ -79,16 +80,16 @@ StartTest(function(t) {
     });
     t.it('Should accept default values', function(t) {
       t.chain(
-          t.selectAndType(originalValues.host, smtpSettingsFormCQ + ' field[name=host]'),
-          t.selectAndType(originalValues.port, smtpSettingsFormCQ + ' field[name=port]'),
-          t.selectAndType('', smtpSettingsFormCQ + ' field[name=subjectPrefix]'), //value is undefined to start when we dump the fields
+          t.selectAndType(originalValues.subjectPrefix, smtpSettingsFormCQ + ' field[name=subjectPrefix]'), //value is undefined to start when we dump the fields
           t.selectAndType(originalValues.username, smtpSettingsFormCQ + ' field[name=username]'),
           t.selectAndType(originalValues.password, smtpSettingsFormCQ + ' field[name=password]'),
           // press the "Save" button
+          function(next) { t.phantomjsScreenshot('beforewait1.png'); next() },
           {
             waitFor: 'Event', args: [smtpSettingsFormCQ, 'submitted'],
-            trigger: {click: smtpSettingsCQ + ' button[action=save]', desc: 'Save new settings'},
+            trigger: {click: smtpSettingsCQ + ' button[action=save][disabled=false]', desc: 'Save new settings'},
           },
+          function(next) { t.phantomjsScreenshot('beforewait2.png'); next() },
           {waitFor: waitForUnmasked},
           function(next) {
             var form = t.cq1(smtpSettingsFormCQ).getForm();

@@ -15,69 +15,62 @@
  */
 StartTest(function(t) {
 
+  var disabled = null;
+
   t.describe('Anonymous user administration', function(t) {
     t.it('Can navigate to the admin screen', function(t) {
       t.chain(
-          t.openPageAsAdmin('admin/security/anonymous'),
-          {
-            waitFor: 'Event', args: ['>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded']
-            , trigger: {click: '>>nx-header-refresh'}
-          },
-
-          // bring settings to a known state (enabled checked)
-          function(next) {
-            var enabled = t.cq1('nx-coreui-security-anonymous-settings checkbox[name=enabled]');
-            if (!enabled.getValue()) {
-              t.click('>>nx-coreui-security-anonymous-settings checkbox[name=enabled]', next);
-            }
-            else {
-              next();
-            }
-          },
-          {
-            waitFor: 'Event', args: ['>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded'],
-            trigger: {click: '>>nx-coreui-security-anonymous-settings button[action=save]'}
-          },
-          function(next) {
-            t.waitForAnimations(next);
-          },
-          function(next) {
-            t.fieldHasValue('nx-coreui-security-anonymous-settings combo[name=realmName]', 'NexusAuthorizingRealm',
-                'The only available realm is selected');
+        t.openPageAsAdmin('admin/security/anonymous'),
+        function(next) {
+          disabled = !t.cq1('nx-coreui-security-anonymous-settings checkbox[name=enabled]').getValue();
+          next();
+        },
+        // First, enable the anonymous user, if it’s not already enabled
+        function(next) {
+          if (disabled) {
+            t.click('>>nx-coreui-security-anonymous-settings checkbox[name=enabled]', function() {
+              t.click('>>nx-coreui-security-anonymous-settings button[action=save]', function() {
+                t.waitForEvent('>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded', function() {
+                  t.fieldHasValue('nx-coreui-security-anonymous-settings checkbox[name=enabled]', true,
+                    'Anonymous is enabled');
+                  next();
+                });
+              });
+            });
+          }
+          else {
             next();
           }
-      );
+        }
+      )
     });
     t.it('Can disable anonymous user', function(t) {
       t.chain(
-          {click: '>>nx-coreui-security-anonymous-settings checkbox[name=enabled]'},
-          // and we should be able to save the form
-          {
-            waitFor: 'Event', args: ['>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded'],
-            trigger: {click: '>>nx-coreui-security-anonymous-settings button[action=save]'}
-          },
-          function(next) {
-            t.fieldHasValue('nx-coreui-security-anonymous-settings checkbox[name=enabled]', false,
-                'Anonymous is disabled');
-            next();
-          }
-      );
+        t.click('>>nx-coreui-security-anonymous-settings checkbox[name=enabled]'),
+        {
+          waitFor: 'Event', args: ['>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded'],
+          trigger: {click: '>>nx-coreui-security-anonymous-settings button[action=save]'}
+        },
+        function(next) {
+          t.fieldHasValue('nx-coreui-security-anonymous-settings checkbox[name=enabled]', false,
+              'Anonymous is disabled');
+          next();
+        }
+      )
     });
     t.it('Can enable anonymous user', function(t) {
       t.chain(
-          // enable anonymous user
-          {click: '>>nx-coreui-security-anonymous-settings checkbox[name=enabled]'},
-          // and we should be able to save the form
-          {
-            waitFor: 'Event', args: ['>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded'],
-            trigger: {click: '>>nx-coreui-security-anonymous-settings button[action=save]'}
-          },
-          function(next) {
-            t.fieldHasValue('nx-coreui-security-anonymous-settings checkbox[name=enabled]', true,
-                'Anonymous is enabled');
-            next();
-          }
-      );
+        t.click('>>nx-coreui-security-anonymous-settings checkbox[name=enabled]'),
+        {
+          waitFor: 'Event', args: ['>>nx-coreui-security-anonymous-settings nx-settingsform', 'loaded'],
+          trigger: {click: '>>nx-coreui-security-anonymous-settings button[action=save]'}
+        },
+        function(next) {
+          t.fieldHasValue('nx-coreui-security-anonymous-settings checkbox[name=enabled]', true,
+            'Anonymous is enabled');
+          next();
+        }
+      )
     });
   });
 });

@@ -49,8 +49,8 @@ StartTest(function(t) {
           t.isDeeply(Ext.Array.difference(checkboxNames, expectedCheckboxes), [], "Check for unexpected checkboxes");
           next();
         },
-        { waitFor: 'CQVisible', args: 'nx-coreui-support-supportzip button[action=save]' },
-        { click: '>>nx-coreui-support-supportzip button[action=save]' },
+        { waitFor: 'CQVisible', args: 'nx-coreui-support-supportzip button[action=submit]' },
+        { click: '>>nx-coreui-support-supportzip button[action=submit]' },
         { waitFor: 'CQVisible', args: 'nx-coreui-support-supportzipcreated' },
         { waitFor: 'CQNotFound', args: 'nx-message-notification' },
         { waitFor: 'CQVisible', args: 'nx-coreui-support-supportzipcreated button[action=download]' },

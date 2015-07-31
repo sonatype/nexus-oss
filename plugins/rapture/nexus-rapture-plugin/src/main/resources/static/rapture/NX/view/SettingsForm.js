@@ -93,31 +93,14 @@ Ext.define('NX.view.SettingsForm', {
 
   buttons: [
     { 
-      text: NX.I18n.get('SettingsForm_Save_Button'), 
-      formBind: true, 
-      action: 'save', 
+      text: NX.I18n.get('SettingsForm_Save_Button'),
+      action: 'save',
       ui: 'nx-primary', 
       bindToEnter: false 
     },
     { 
       text: NX.I18n.get('SettingsForm_Discard_Button'), 
-      action: 'discard',
-      handler: function () {
-        var form = this.up('form'),
-            record = form.getRecord();
-
-        if (record) {
-          form.loadRecord(record);
-          form.isValid();
-        }
-        else if (form.api && form.api.load) {
-          form.fireEvent('load', form);
-        }
-        else {
-          form.getForm().reset();
-          form.isValid();
-        }
-      }
+      action: 'discard'
     }
   ],
 
@@ -134,6 +117,12 @@ Ext.define('NX.view.SettingsForm', {
     me.on('recordloaded', me.resetDirtyState);
     me.on('loaded', me.resetDirtyState);
     me.on('submitted', me.resetDirtyState);
+    me.on('dirtychange', function() {
+      me.updateButtonState(me);
+    });
+    me.on('validitychange', function() {
+      me.updateButtonState(me);
+    });
 
     me.callParent(arguments);
 
@@ -187,6 +176,26 @@ Ext.define('NX.view.SettingsForm', {
   resetDirtyState: function (form) {
     var realform = form.getForm();
     realform.setValues(realform.getValues());
+    form.updateButtonState(form);
+  },
+
+  /**
+   * Update the state of the save and discard buttons
+   *
+   * @private
+   */
+  updateButtonState: function (form) {
+    var dirty = form.isDirty(),
+        valid = form.isValid(),
+        saveButton = form.down('button[action=save]'),
+        discardButton = form.down('button[action=discard]');
+
+    if (saveButton) {
+      saveButton.setDisabled(!valid || !dirty);
+    }
+    if (discardButton) {
+      discardButton.setDisabled(!dirty);
+    }
   },
 
   /**
