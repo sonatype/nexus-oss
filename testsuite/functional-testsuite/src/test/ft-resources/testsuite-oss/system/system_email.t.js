@@ -84,12 +84,10 @@ StartTest(function(t) {
           t.selectAndType(originalValues.username, smtpSettingsFormCQ + ' field[name=username]'),
           t.selectAndType(originalValues.password, smtpSettingsFormCQ + ' field[name=password]'),
           // press the "Save" button
-          function(next) { t.phantomjsScreenshot('beforewait1.png'); next() },
           {
             waitFor: 'Event', args: [smtpSettingsFormCQ, 'submitted'],
             trigger: {click: smtpSettingsCQ + ' button[action=save][disabled=false]', desc: 'Save new settings'},
           },
-          function(next) { t.phantomjsScreenshot('beforewait2.png'); next() },
           {waitFor: waitForUnmasked},
           function(next) {
             var form = t.cq1(smtpSettingsFormCQ).getForm();

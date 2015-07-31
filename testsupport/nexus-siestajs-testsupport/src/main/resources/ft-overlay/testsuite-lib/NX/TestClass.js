@@ -242,6 +242,10 @@ Class('NX.TestClass', {
       ];
     },
 
+    getBookmark: function () {
+      return this.global.NX.Bookmarks.getBookmark().getToken();
+    },
+
     navigateTo: function (bookmark) {
       var NX = this.global.NX;
 

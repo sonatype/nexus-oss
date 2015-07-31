@@ -75,9 +75,6 @@ Ext.define('NX.coreui.controller.Assets', {
         'nx-coreui-component-asset-list': {
           updated: me.loadAssets
         },
-        'grid[assetContainerSource=true]': {
-          cellclick: me.updateAssetContainer
-        },
         'nx-coreui-component-assetinfo button[action=deleteAsset]': {
           click: me.deleteAsset
         }
@@ -177,7 +174,7 @@ Ext.define('NX.coreui.controller.Assets', {
   /**
    * Update asset shown in asset container.
    *
-   * @private
+   * @public
    */
   updateAssetContainer: function(gridView, td, cellIndex, assetModel) {
     this.getAssetContainer().refreshInfo(assetModel);

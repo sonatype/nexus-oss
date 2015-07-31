@@ -95,6 +95,9 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
         }
       },
       component: {
+        'nx-coreui-browsecomponentfeature nx-coreui-browse-repository-list': {
+          beforerender: me.onBeforeRender
+        },
         'nx-coreui-browsecomponentfeature nx-coreui-browse-component-list #filter': {
           search: me.onSearch,
           searchcleared: me.onSearchCleared
@@ -126,6 +129,9 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
     }
     else if (modelType === "Component") {
       me.onComponentSelection(model);
+    }
+    else if (modelType === "Asset") {
+      me.onAssetSelection(model);
     }
   },
 
@@ -169,6 +175,16 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
   },
 
   /**
+   * Load asset container for selected asset
+   *
+   * @private
+   * @param {NX.coreui.model.Asset} model selected asset
+   */
+  onAssetSelection: function(model) {
+    this.getController('NX.coreui.controller.Assets').updateAssetContainer(null, null, null, model);
+  },
+
+  /**
    * @override
    * Load all of the stores associated with this controller.
    */
@@ -184,6 +200,50 @@ Ext.define('NX.coreui.controller.BrowseComponents', {
         this.getAssetList().getStore().load();
       }
     }
+  },
+
+  /**
+   * @private
+   * Load stores based on the bookmarked URL
+   */
+  onBeforeRender: function() {
+    var me = this,
+        bookmark = NX.Bookmarks.getBookmark(),
+        list_ids = bookmark.getSegments().slice(1),
+        repoStore = me.getRepositoryList().getStore(),
+        repoModel,
+        componentStore = me.getComponentList().getStore(),
+        componentModel;
+
+    repoStore.load(function() {
+      // Load the asset detail view
+      if (list_ids[2]) {
+        repoModel = repoStore.getById(decodeURIComponent(list_ids[0]));
+        me.onModelChanged(0, repoModel);
+        me.onRepositorySelection(repoModel);
+        componentStore.load(function() {
+          componentModel = me.getComponentList().getStore().getById(decodeURIComponent(list_ids[1]));
+          me.onModelChanged(1, componentModel);
+          me.onComponentSelection(componentModel);
+          me.getAssetList().getStore().load(function() {
+            me.reselect();
+          });
+        });
+      }
+      // Load the asset list view
+      else if (list_ids[1]) {
+        repoModel = repoStore.getById(decodeURIComponent(list_ids[0]));
+        me.onModelChanged(0, repoModel);
+        me.onRepositorySelection(repoModel);
+        componentStore.load(function() {
+          me.reselect();
+        });
+      }
+      // Load the component list view
+      else if (list_ids[0]) {
+        me.reselect();
+      }
+    });
   },
 
   /**

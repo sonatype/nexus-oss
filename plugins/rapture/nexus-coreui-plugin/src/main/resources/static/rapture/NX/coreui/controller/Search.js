@@ -129,6 +129,9 @@ Ext.define('NX.coreui.controller.Search', {
         }
       },
       component: {
+        'nx-coreui-searchfeature nx-coreui-search-result-list': {
+          beforerender: me.onBeforeRender
+        },
         'nx-coreui-searchfeature': {
           afterrender: me.initCriterias
         },
@@ -226,14 +229,6 @@ Ext.define('NX.coreui.controller.Search', {
         }
       }, owner);
     }
-  },
-
-  /**
-   * @private
-   * Avoid store load; manage load of search results by ourselves.
-   */
-  loadStore: function() {
-    // do nothing for now
   },
 
   /**
@@ -428,6 +423,39 @@ Ext.define('NX.coreui.controller.Search', {
 
   /**
    * @private
+   * Load stores based on the bookmarked URL
+   */
+  onBeforeRender: function() {
+    var me = this,
+        bookmark = NX.Bookmarks.getBookmark(),
+        list_ids = bookmark.getSegments().slice(1),
+        searchResultStore = me.getSearchResult().getStore(),
+        componentModel;
+
+    // If no search filter has been specified, don't load any stores
+    if (!me.getStore('SearchResult').filters.length) {
+      return;
+    }
+
+    searchResultStore.load(function() {
+      // Load the asset detail view
+      if (list_ids[1]) {
+        componentModel = searchResultStore.getById(decodeURIComponent(list_ids[0]));
+        me.onModelChanged(0, componentModel);
+        me.onSearchResultSelection(componentModel);
+        me.getAssetList().getStore().load(function () {
+          me.reselect();
+        });
+      }
+      // Load the asset list view
+      else if (list_ids[0]) {
+        me.reselect();
+      }
+    });
+  },
+
+  /**
+   * @private
    * Synchronize store filters with search criteria.
    * @param searchCriteria criteria to be synced
    * @param apply if filter should be applied on store ( = remote call)
@@ -476,8 +504,11 @@ Ext.define('NX.coreui.controller.Search', {
     // Figure out what kind of list we’re dealing with
     modelType = model.id.replace(/^.*?model\./, '').replace(/\-.*$/, '');
 
-    if (modelType == "Component") {
+    if (modelType === "Component") {
       this.onSearchResultSelection(model);
+    }
+    else if (modelType === "Asset") {
+      this.onAssetSelection(model);
     }
   },
 
@@ -491,6 +522,16 @@ Ext.define('NX.coreui.controller.Search', {
 
     me.getComponentDetails().setComponentModel(model);
     me.getAssetList().setComponentModel(model);
+  },
+
+  /**
+   * Load asset container for selected asset
+   *
+   * @private
+   * @param {NX.coreui.model.Asset} model selected asset
+   */
+  onAssetSelection: function(model) {
+    this.getController('NX.coreui.controller.Assets').updateAssetContainer(null, null, null, model);
   },
 
   /**

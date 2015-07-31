@@ -122,7 +122,12 @@ Ext.define('NX.controller.Drilldown', {
     };
 
     me.listen({
-      component: componentListener
+      component: componentListener,
+      controller: {
+        '#Bookmarking': {
+          navigate: me.reselect
+        }
+      }
     });
 
     if (me.icons) {
@@ -189,14 +194,14 @@ Ext.define('NX.controller.Drilldown', {
     var index = Ext.ComponentQuery.query('nx-drilldown-master').indexOf(view.up('grid'));
 
     //if the cell target is a link, let it do it's thing
-    if(e.getTarget('a')) {
+    if(e && e.getTarget('a')) {
       return false;
     }
     this.loadView(index + 1, true, model);
   },
 
   /**
-   * @private
+   * @public
    * A model changed, focus on the new row and update the name of the related drilldown
    */
   onModelChanged: function (index, model) {
@@ -204,11 +209,11 @@ Ext.define('NX.controller.Drilldown', {
         lists = Ext.ComponentQuery.query('nx-drilldown-master'),
         view = lists[index].getView(),
         firstCell = view.getCellByPosition({row:view.getRowId(model), column:0}),
-        firstCellImgs = firstCell.dom.getElementsByTagName('img');
+        firstCellImgs = firstCell ? firstCell.dom.getElementsByTagName('img') : null;
 
     lists[index].getSelectionModel().select([model], false, true);
     me.setItemName(index + 1, me.getDescription(model));
-    if (firstCellImgs.length) {
+    if (firstCellImgs && firstCellImgs.length) {
       this.setItemClass(index + 1, firstCellImgs[0].className);
     }
   },
@@ -242,7 +247,7 @@ Ext.define('NX.controller.Drilldown', {
 
     // Show the next view in line
     me.showChild(index, animate);
-    me.bookmark(model);
+    me.bookmark(index, model);
   },
 
   /**
@@ -267,21 +272,21 @@ Ext.define('NX.controller.Drilldown', {
 
   /**
    * @private
-   * Bookmark specified model / selected tab.
+   * Bookmark specified model
    */
-  bookmark: function (model) {
+  bookmark: function (index, model) {
     var lists = Ext.ComponentQuery.query('nx-drilldown-master'),
         bookmark = NX.Bookmarks.getBookmark().getSegments(),
         segments = [],
-        index = 0;
+        i = 0;
 
     // Add the root element of the bookmark
     segments.push(bookmark.shift());
 
     // Find all parent models and add them to the bookmark array
-    while (index < lists.length && model && !lists[index].getView().getNode(model)) {
+    while (i < lists.length && i < index - 1) {
       segments.push(bookmark.shift());
-      ++index;
+      ++i;
     }
 
     // Add the currently selected model to the bookmark array
@@ -344,14 +349,37 @@ Ext.define('NX.controller.Drilldown', {
 
     // getById() throws an error if a model ID is found, but not cached, check for content first
     if (store.getCount()) {
-      model = store.getById(modelId);
+      model = me.getById(store, modelId);
       if (model === null) {
-        model = store.getById(parseInt(modelId)); // check for integer model id
+        model = me.getById(store, parseInt(modelId)); // check for integer model id
+      }
+      if (model === null) {
+        NX.Messages.add({
+          text: "TODO: model not in local cache",
+          type: 'warning'
+        });
+        return;
       }
       lists[index].fireEvent('selection', lists[index], model);
-      me.onModelChanged(index, model);
       me.loadView(index + 1, false, model);
     }
+  },
+
+  /**
+   * @private
+   * Get a model from the specified store with the specified ID. Avoids exceptions
+   * that arise from using Ext.data.Store.getById() with buffered stores.
+   */
+  getById: function (store, modelId) {
+    var index = store.findBy(function(record) {
+      return record.getId() === modelId;
+    });
+
+    if (index !== -1) {
+      return store.getAt(index);
+    }
+
+    return null;
   },
 
   /**

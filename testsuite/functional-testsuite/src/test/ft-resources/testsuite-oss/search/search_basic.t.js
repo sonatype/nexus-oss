@@ -15,6 +15,9 @@
  */
 StartTest(function(t) {
 
+  var assetListToken = null;
+  var assetDetailToken = null;
+
   t.describe('Basic Indexing and Searching', function(t) {
     t.it('Keyword search finds maven components', function(t) {
       t.chain(
@@ -37,6 +40,63 @@ StartTest(function(t) {
             next();
           }
       )
+    }, 60000);
+    t.it('Can view asset details', function(t) {
+      t.chain(
+        function(next) {
+          var grid = t.cq1('nx-coreui-search-result-list'),
+              store = grid.getStore(),
+              model = store.getAt(0),
+              row = t.getRow(grid, grid.getView().indexOf(model));
+
+          t.click(row, next);
+        },
+        // and wait for the asset list to load
+        function(next) {
+          t.waitForAnimations(next);
+        },
+        // and save the asset list URL for future use
+        function(next) {
+          assetListToken = t.getBookmark();
+          next();
+        },
+        function(next) {
+          var grid = t.cq1('nx-coreui-component-asset-list'),
+              store = grid.getStore(),
+              model = store.getAt(0),
+              row = t.getRow(grid, grid.getView().indexOf(model));
+
+          t.click(row, next);
+        },
+        // and wait for the asset details to load
+        function(next) {
+          t.waitForAnimations(next);
+        },
+        {waitFor: 'CQ', args: 'nx-coreui-component-assetcontainer'},
+        // and save the asset URL for future use
+        function(next) {
+          assetDetailToken = t.getBookmark();
+          next();
+        }
+      )
+    });
+    t.it('Navigate to search feature via the URL', function(t) {
+      t.chain(
+        t.navigateTo('browse/search'),
+        {waitFor: 'CQVisible', args: 'nx-coreui-search-result-list'}
+      );
+    });
+    t.it('Navigate to asset list via the URL', function(t) {
+      t.chain(
+        t.navigateTo(assetListToken),
+        {waitFor: 'CQVisible', args: 'nx-coreui-component-asset-list'}
+      );
+    });
+    t.it('Navigate to asset details via the URL', function(t) {
+      t.chain(
+        t.navigateTo(assetDetailToken),
+        {waitFor: 'CQVisible', args: 'nx-coreui-component-assetcontainer'}
+      );
     });
     t.it('Maven search finds maven components', function(t) {
       t.chain(
