@@ -248,7 +248,7 @@ public class DockerConnectorFacetImpl
     }
 
     /**
-     * Rewrite /v1/* to /repository{repository name}/v1/*.
+     * Rewrite /v1/* to /repository/{repository name}/v1/*.
      */
     @Override
     public HttpConfiguration customize(final HttpConfiguration configuration) {
