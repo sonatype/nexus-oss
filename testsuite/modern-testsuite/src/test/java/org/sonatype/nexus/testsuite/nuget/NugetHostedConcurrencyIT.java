@@ -99,7 +99,7 @@ public class NugetHostedConcurrencyIT
       }
     });
 
-    runner.addTask(1, new ConcurrentTask()
+    runner.addTask(2, new ConcurrentTask()
     {
       @Override
       public void run() throws Exception {
@@ -109,7 +109,7 @@ public class NugetHostedConcurrencyIT
       }
     });
 
-    runner.addTask(1, new ConcurrentTask()
+    runner.addTask(2, new ConcurrentTask()
     {
       @Override
       public void run() throws Exception {
