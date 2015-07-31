@@ -27,16 +27,16 @@
   <name>${project.groupId}:${project.artifactId}</name>
 
   <description>
-    Provides stripped down bundle of mvn:net.sf.ehcache:ehcache:${ehcache.version}.
+    Provides bundle of mvn:org.ehcache:ehcache:${ehcache.version}.
   </description>
 
   <properties>
-    <ehcache.version>2.10.0</ehcache.version>
+    <ehcache.version>3.0.0.m1</ehcache.version>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>net.sf.ehcache</groupId>
+      <groupId>org.ehcache</groupId>
       <artifactId>ehcache</artifactId>
       <version>${ehcache.version}</version>
       <optional>true</optional>
@@ -64,7 +64,7 @@
           <rebuildBundle>true</rebuildBundle>
           <instructions>
             <Export-Package>
-              net.sf.ehcache.*,
+              org.ehcache.*,
               org.terracotta.context,
               org.terracotta.statistics
             </Export-Package>
@@ -106,17 +106,14 @@
               <createSourcesJar>true</createSourcesJar>
               <artifactSet>
                 <includes>
-                  <include>net.sf.ehcache:ehcache</include>
+                  <include>org.ehcache:ehcache</include>
                 </includes>
               </artifactSet>
               <filters>
                 <filter>
-                  <artifact>net.sf.ehcache:ehcache</artifact>
+                  <artifact>org.ehcache:ehcache</artifact>
                   <includes>
-                    <include>net/sf/ehcache/**</include>
-                    <include>org/terracotta/context/**</include>
-                    <include>org/terracotta/statistics/**</include>
-                    <include>ehcache-failsafe.xml</include>
+                    <include>**</include>
                   </includes>
                 </filter>
               </filters>
