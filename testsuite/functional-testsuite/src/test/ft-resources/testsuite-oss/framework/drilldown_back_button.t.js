@@ -28,6 +28,7 @@ StartTest(function(t) {
           function(next) {
             t.waitForAnimations(next);
           },
+          {waitFor: 'CQ', args: ">>nx-feature-content button[text=Repositories]"},
           {click : "nx-feature-menu => .x-tree-node-text:contains('Repositories')"},
           {waitForRowsVisible: 'nx-coreui-repository-list'}
       )
