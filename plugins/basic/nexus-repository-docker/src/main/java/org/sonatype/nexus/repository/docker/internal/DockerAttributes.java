@@ -49,5 +49,5 @@ public final class DockerAttributes
 
   public static final String P_KERNEL = "kernel";
 
-  private DockerAttributes() {}
+  private DockerAttributes() {} //NOSONAR
 }
