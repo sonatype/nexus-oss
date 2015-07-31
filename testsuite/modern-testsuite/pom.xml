@@ -83,6 +83,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-repository-docker</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
       <scope>test</scope>
@@ -113,6 +119,10 @@
           <outputDirectory>${project.build.directory}/it-resources</outputDirectory>
           <excludes>META-INF/**</excludes>
           <artifactItems>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-docker-test-data</artifactId>
+            </item>
             <item>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-maven-test-data</artifactId>

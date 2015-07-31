@@ -70,6 +70,7 @@ Ext.define('NX.coreui.app.PluginStrings', {
     SearchCriteria_Format_FieldLabel: 'Format',
     SearchCriteria_Group_FieldLabel: 'Group',
     SearchCriteria_Checksum_Group: 'Checksum',
+    SearchDocker_Group: 'Docker Repositories',
     SearchMaven_Group: 'Maven Repositories',
     SearchNuget_Group: 'NuGet Repositories',
     SearchRaw_Group: 'Raw Repositories',
@@ -78,6 +79,9 @@ Ext.define('NX.coreui.app.PluginStrings', {
     SearchCriteria_SHA2_FieldLabel: 'SHA-512',
     SearchCriteria_Version_FieldLabel: 'Version',
     Search_TextSearchCriteria_Filter_EmptyText: 'Any',
+    SearchDocker_Image_Name_FieldLabel: 'Image Name',
+    SearchDocker_Image_Tag_FieldLabel: 'Image Tag',
+    SearchDocker_LayerId_FieldLabel: 'Layer Id',
     SearchMaven_ArtifactID_FieldLabel: 'Artifact Id',
     SearchMaven_BaseVersion_FieldLabel: 'Base Version',
     SearchMaven_Extension_FieldLabel: 'Extension',
@@ -110,6 +114,10 @@ Ext.define('NX.coreui.app.PluginStrings', {
     HealthCheckSearch_Quota_Tooltip: 'The query limit for age and popularity data has been reached. Contact Sonatype support to extend current quota limits.',
     HealthCheckSearch_Unavailable_Tooltip: 'No data available for this component',
     Component_AssetInfo_Info_Title: 'Info',
+
+    // Browse -> Search -> Docker
+    SearchDocker_Text: 'Docker',
+    SearchDocker_Description: 'Search for components in Docker repositories',
 
     // Browse -> Search -> Raw
     SearchRaw_Text: 'Raw',
@@ -172,6 +180,11 @@ Ext.define('NX.coreui.app.PluginStrings', {
     Repository_RepositoryFeature_InvalidateProxyCache_Button: 'Invalidate proxy cache',
     Repository_RepositoryFeature_InvalidateNegativeCache_Button: 'Invalidate negative cache',
     Repository_RepositorySettings_Title: 'Settings',
+    Repository_Facet_DockerConnectorFacet_Title: 'Docker',
+    Repository_Facet_DockerConnectorFacet_HttpPort_FieldLabel: 'HTTP',
+    Repository_Facet_DockerConnectorFacet_HttpPort_HelpText: 'Create an HTTP connector at specified port',
+    Repository_Facet_DockerConnectorFacet_HttpsPort_FieldLabel: 'HTTPS',
+    Repository_Facet_DockerConnectorFacet_HttpsPort_HelpText: 'Create an HTTPS connector at specified port',
     Repository_Facet_GroupFacet_Title: 'Group',
     Repository_Facet_HttpClientFacet_Title: 'HTTP',
     Repository_Facet_Maven2Facet_Title: 'Maven 2',

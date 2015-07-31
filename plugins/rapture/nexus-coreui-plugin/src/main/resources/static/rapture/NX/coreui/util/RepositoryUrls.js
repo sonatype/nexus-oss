@@ -51,6 +51,13 @@ Ext.define('NX.coreui.util.RepositoryUrls', {
       var repositoryName = assetModel.get('repositoryName'),
           assetName = assetModel.get('name');
       return NX.util.Url.asLink(NX.util.Url.baseUrl + '/repository/' + repositoryName + '/' + assetName, assetName);
+    },
+    docker: function(assetModel) {
+      var repositoryName = assetModel.get('repositoryName'),
+          assetName = assetModel.get('name'),
+          attributes = assetModel.get('attributes'),
+          path = attributes['docker']['path'];
+      return NX.util.Url.asLink(NX.util.Url.baseUrl + '/repository/' + repositoryName + path, assetName);
     }
   },
 
