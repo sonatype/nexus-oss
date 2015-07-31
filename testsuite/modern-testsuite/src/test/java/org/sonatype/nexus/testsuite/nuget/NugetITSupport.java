@@ -112,7 +112,7 @@ public abstract class NugetITSupport
   }
 
   @Nonnull
-  private String prepareApiKey(final PrincipalCollection admin) {
+  private synchronized String prepareApiKey(final PrincipalCollection admin) {
     char[] apiKey = keyStore.getApiKey(admin);
     log.info("Existing nuget api key for {} is {}", admin, apiKey);
     if (apiKey == null) {

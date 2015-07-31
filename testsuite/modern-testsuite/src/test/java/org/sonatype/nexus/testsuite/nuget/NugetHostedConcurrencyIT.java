@@ -7,7 +7,6 @@ import org.sonatype.nexus.test.concurrent.ConcurrentRunner;
 import org.sonatype.nexus.test.concurrent.ConcurrentTask;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,79 +26,98 @@ public class NugetHostedConcurrencyIT
 {
   private static final String HOSTED_REPO = "nuget-test-hosted";
 
-  private NugetClient nuget;
+  private Repository repository;
 
   @Before
   public void createHostedRepository() throws Exception {
     final Configuration config = hostedConfig(HOSTED_REPO);
 
-    final Repository repository = createRepository(config);
+    repository = createRepository(config);
+  }
 
-    nuget = nugetClient(repository);
+  @Test
+  public void hostedConcurrentPuts() throws Exception {
+    final ConcurrentRunner runner = new ConcurrentRunner(3, 60);
+    runner.addTask(8, new ConcurrentTask()
+    {
+      @Override
+      public void run() throws Exception {
+        NugetClient nuget = nugetClient(repository);
+        final int status = nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
+        assertThat(status, is(HttpStatus.CREATED));
+      }
+    });
+    runner.go();
   }
 
   @Test
   public void hostedConcurrency() throws Exception {
 
-    final ConcurrentRunner runner = new ConcurrentRunner(10, 15);
+    final ConcurrentRunner runner = new ConcurrentRunner(5, 300);
 
-    runner.addTask(1, new ConcurrentTask()
+    runner.addTask(2, new ConcurrentTask()
     {
       @Override
       public void run() throws Exception {
+        NugetClient nuget = nugetClient(repository);
         try (CloseableHttpResponse response = nuget.packageContent("SONATYPE.TEST", "1.0")) {
           assertThat(status(response), anyOf(is(HttpStatus.OK), is(HttpStatus.NOT_FOUND)));
         }
       }
     });
 
-    //runner.addTask(1, new ConcurrentTask()
-    //{
-    //  @Override
-    //  public void run() throws Exception {
-    //    try (CloseableHttpResponse response = nuget.packageContent("SONATYPE.TEST", "1.1")) {
-    //      assertThat(status(response), anyOf(is(HttpStatus.OK), is(HttpStatus.NOT_FOUND)));
-    //    }
-    //  }
-    //});
-    //
-    //runner.addTask(1, new ConcurrentTask()
-    //{
-    //  @Override
-    //  public void run() throws Exception {
-    //    final int status = nuget.vsSearchCount("SONATYPE.TEST");
-    //    // There should be between 0 and 2 such packages, depending on whether it's been uploaded yet
-    //    assertThat(status, allOf(
-    //        is(greaterThanOrEqualTo(0)),
-    //        lessThanOrEqualTo(2)));
-    //  }
-    //});
-    //
-    //runner.addTask(1, new ConcurrentTask()
-    //{
-    //  @Override
-    //  public void run() throws Exception {
-    //    nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY);
-    //  }
-    //});
-    //
-    //runner.addTask(1, new ConcurrentTask()
-    //{
-    //  @Override
-    //  public void run() throws Exception {
-    //    final int status = nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
-    //    assertThat(status, is(HttpStatus.CREATED));
-    //  }
-    //});
+    runner.addTask(2, new ConcurrentTask()
+    {
+      @Override
+      public void run() throws Exception {
+        NugetClient nuget = nugetClient(repository);
+        try (CloseableHttpResponse response = nuget.packageContent("SONATYPE.TEST", "1.1")) {
+          assertThat(status(response), anyOf(is(HttpStatus.OK), is(HttpStatus.NOT_FOUND)));
+        }
+      }
+    });
 
-    //runner.addTask(1, new ConcurrentTask()
-    //{
-    //  @Override
-    //  public void run() throws Exception {
-    //    final int status = nuget.publish(resolveTestFile("SONATYPE.TEST.1.1.nupkg"));
-    //    assertThat(status, is(HttpStatus.CREATED));
-    //  }
-    //});
+    runner.addTask(2, new ConcurrentTask()
+    {
+      @Override
+      public void run() throws Exception {
+        NugetClient nuget = nugetClient(repository);
+        final int status = nuget.vsSearchCount("SONATYPE.TEST");
+        // There should be between 0 and 2 such packages, depending on whether it's been uploaded yet
+        assertThat(status, allOf(
+            is(greaterThanOrEqualTo(0)),
+            lessThanOrEqualTo(2)));
+      }
+    });
+
+    runner.addTask(2, new ConcurrentTask()
+    {
+      @Override
+      public void run() throws Exception {
+        NugetClient nuget = nugetClient(repository);
+        nuget.feedXml(VISUAL_STUDIO_INITIAL_FEED_QUERY);
+      }
+    });
+
+    runner.addTask(1, new ConcurrentTask()
+    {
+      @Override
+      public void run() throws Exception {
+        NugetClient nuget = nugetClient(repository);
+        final int status = nuget.publish(resolveTestFile("SONATYPE.TEST.1.0.nupkg"));
+        assertThat(status, is(HttpStatus.CREATED));
+      }
+    });
+
+    runner.addTask(1, new ConcurrentTask()
+    {
+      @Override
+      public void run() throws Exception {
+        NugetClient nuget = nugetClient(repository);
+        final int status = nuget.publish(resolveTestFile("SONATYPE.TEST.1.1.nupkg"));
+        assertThat(status, is(HttpStatus.CREATED));
+      }
+    });
 
     runner.go();
 

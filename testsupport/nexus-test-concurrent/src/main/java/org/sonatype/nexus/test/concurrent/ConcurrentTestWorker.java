@@ -1,5 +1,6 @@
 package org.sonatype.nexus.test.concurrent;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.sonatype.sisu.goodies.common.ComponentSupport;
@@ -13,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 class ConcurrentTestWorker
     extends ComponentSupport
-    implements Runnable
+    implements Callable<Void>
 {
   private final ConcurrentTask concurrentTask;
 
@@ -33,8 +34,8 @@ class ConcurrentTestWorker
   }
 
   @Override
-  public void run() {
-    try {
+  public Void call() throws Exception {
+      try {
       for (int i = 0; i < context.getIterations(); i++) {
         if (context.testFailing()) {
           log.info("Test worker " + workerNumber + " aborting before iteration " + i);
@@ -53,8 +54,9 @@ class ConcurrentTestWorker
       this.exception.set(e);
     }
     finally {
-      log.info("Test worker " + workerNumber + " completing.");
+      log.info("Test worker " + workerNumber + " done.");
     }
+    return null;
   }
 
   public boolean experiencedFailure() {

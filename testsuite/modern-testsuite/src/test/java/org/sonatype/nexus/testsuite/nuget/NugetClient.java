@@ -13,6 +13,7 @@
 package org.sonatype.nexus.testsuite.nuget;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 
@@ -22,16 +23,16 @@ import com.sonatype.nexus.repository.nuget.security.NugetApiKey;
 
 import org.sonatype.nexus.testsuite.repository.FormatClientSupport;
 
+import com.google.common.io.CountingInputStream;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
 
@@ -83,12 +84,20 @@ public class NugetClient
 
     MultipartEntityBuilder reqEntity = MultipartEntityBuilder.create();
     reqEntity.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-    reqEntity.addPart("package", new FileBody(file));
+
+    final FileInputStream fileInputStream = new FileInputStream(file);
+    final CountingInputStream count = new CountingInputStream(fileInputStream);
+
+    reqEntity.addPart("package", new InputStreamBody(count, file.getName()));
+
 
     put.setEntity(reqEntity.build());
 
     addNugetApiKey(put);
-    return status(httpClient.execute(put, httpClientContext));
+    final CloseableHttpResponse execute = httpClient.execute(put, httpClientContext);
+
+    log.info("Published {} {} bytes", file.getName(), count.getCount());
+    return status(execute);
   }
 
   public String feedXml(final String query) throws IOException {
@@ -112,8 +121,7 @@ public class NugetClient
 
   /**
    * Get feed xml for given component
-   * @param packageId
-   * @param version
+   *
    * @return feed entry for given component
    */
   public String entryXml(final String packageId, final String version) throws IOException {
@@ -122,8 +130,7 @@ public class NugetClient
 
   /**
    * Download component binary
-   * @param packageId
-   * @param version
+   *
    * @return the nupkg file
    */
   public CloseableHttpResponse packageContent(final String packageId, final String version) throws IOException {
@@ -132,6 +139,7 @@ public class NugetClient
 
   /**
    * Exercise Search() with no searchTerm
+   *
    * @return feed with matching records
    */
   public String vsSearchFeedXml() throws IOException {
@@ -140,6 +148,7 @@ public class NugetClient
 
   /**
    * Exercise Search() with no searchTerm and including inlinecount
+   *
    * @return feed with matching records and inlinecount
    */
   public String vsSearchFeedXmlInlineCount() throws IOException {
@@ -148,7 +157,7 @@ public class NugetClient
 
   /**
    * Exercise Search() for given searchTerm
-   * @param searchTerm
+   *
    * @return feed with matching records
    */
   public String vsSearchFeedXml(final String searchTerm) throws IOException {
@@ -157,6 +166,7 @@ public class NugetClient
 
   /**
    * Exercise a Search/$count query with no search term
+   *
    * @return the count of all records
    */
   public int vsCount() throws IOException {
@@ -165,7 +175,7 @@ public class NugetClient
 
   /**
    * Exercise a Search/$count query with the given search term
-   * @param searchTerm
+   *
    * @return the count of matching records
    */
   public int vsSearchCount(final String searchTerm) throws IOException {
@@ -174,6 +184,7 @@ public class NugetClient
 
   /**
    * Exercise a Package/$count query for all packages
+   *
    * @return the count of all packages
    */
   public int vsPackageCount() throws IOException {

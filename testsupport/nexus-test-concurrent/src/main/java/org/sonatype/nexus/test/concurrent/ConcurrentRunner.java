@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -81,9 +82,17 @@ public class ConcurrentRunner
       }
     });
 
-    List<ConcurrentTestWorker> testWorkers = new ArrayList<>();
+    List<ConcurrentTestWorker> testWorkers = buildTaskWorkers();
 
-    ExecutorService service = Executors.newFixedThreadPool(tasks.size());
+    final List<Future<Void>> taskResults = executeTasksConcurrently(testWorkers);
+
+    failIfTasksWereCancelled(taskResults);
+
+    failIfTasksCaughtExceptions(testWorkers);
+  }
+
+  private List<ConcurrentTestWorker> buildTaskWorkers() {
+    List<ConcurrentTestWorker> testWorkers = new ArrayList<>();
 
     final ConcurrentTestContext context = new ConcurrentTestContext(startingGun, failureHasOccurred,
         iterations, runInvocations, iterationTimeoutSeconds);
@@ -92,20 +101,37 @@ public class ConcurrentRunner
       final ConcurrentTestWorker worker = new ConcurrentTestWorker(workerNumber, tasks.get(workerNumber), context);
       testWorkers.add(worker);
     }
+    return testWorkers;
+  }
 
-    for (Runnable r : testWorkers) {
-      service.submit(r);
-    }
-
+  private List<Future<Void>> executeTasksConcurrently(final List<ConcurrentTestWorker> testWorkers)
+      throws InterruptedException
+  {
+    ExecutorService service = Executors.newFixedThreadPool(tasks.size());
+    final List<Future<Void>> futures = service
+        .invokeAll(testWorkers, iterationTimeoutSeconds * iterations, TimeUnit.SECONDS);
     service.shutdown();
-    final boolean fullCompletion = service.awaitTermination(iterationTimeoutSeconds * iterations, TimeUnit.SECONDS);
-    if (!fullCompletion) {
-      throw new IllegalStateException("Test timed out with only " + runInvocations.get() + " run invocations.");
-    }
+    return futures;
+  }
 
+
+  private void failIfTasksWereCancelled(final List<Future<Void>> taskResults) {
+    int cancelledCount = 0;
+    for (Future<Void> taskResult : taskResults) {
+      if (taskResult.isCancelled()) {
+        cancelledCount++;
+      }
+    }
+    if (cancelledCount > 0) {
+      throw new IllegalStateException(cancelledCount + " test workers cancelled due to timeout");
+    }
+  }
+
+  private void failIfTasksCaughtExceptions(final List<ConcurrentTestWorker> testWorkers) throws Exception {
     for (ConcurrentTestWorker testWorker : testWorkers) {
       if (testWorker.experiencedFailure()) {
         // Throws any old exception, but also JUnit assertion errors
+        log.info("Attempting to throw ", testWorker.getException());
         Throwables.propagateIfPossible(testWorker.getException(), Exception.class, AssertionError.class);
       }
     }
