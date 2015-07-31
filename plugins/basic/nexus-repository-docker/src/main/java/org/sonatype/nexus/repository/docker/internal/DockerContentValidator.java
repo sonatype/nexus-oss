@@ -51,21 +51,19 @@ public class DockerContentValidator
 
   @Nonnull
   @Override
-  public String determineContentType(boolean strictContentTypeValidation,
-                                     Supplier<InputStream> contentSupplier,
-                                     @Nullable MimeRulesSource mimeRulesSource,
-                                     @Nullable String contentName,
-                                     @Nullable String declaredContentType) throws IOException
+  public String determineContentType(final boolean strictContentTypeValidation,
+                                     final Supplier<InputStream> contentSupplier,
+                                     @Nullable final MimeRulesSource mimeRulesSource,
+                                     @Nullable final String contentName,
+                                     @Nullable final String declaredContentType) throws IOException
   {
-    // all asset blobs are json beside layer content
-    if (contentName != null && !contentName.endsWith("/layer")) {
-      return defaultContentValidator.determineContentType(
-          strictContentTypeValidation, contentSupplier, mimeRulesSource, contentName + ".json", declaredContentType
-      );
+    String name = contentName;
+    // all asset blobs are json beside layer content, everything else goes to default for now
+    if (name != null && !name.endsWith("/layer")) {
+      name += ".json";
     }
-    // everything else goes to default for now
     return defaultContentValidator.determineContentType(
-        strictContentTypeValidation, contentSupplier, mimeRulesSource, contentName, declaredContentType
+        strictContentTypeValidation, contentSupplier, mimeRulesSource, name, declaredContentType
     );
   }
 }
