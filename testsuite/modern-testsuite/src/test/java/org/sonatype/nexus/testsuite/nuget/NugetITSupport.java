@@ -46,6 +46,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Before;
 import org.junit.experimental.categories.Category;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.options.WrappedUrlProvisionOption.OverwriteMode;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
@@ -76,7 +77,9 @@ public abstract class NugetITSupport
   public static Option[] configureNexus() {
     return options(NexusHttpsITSupport.configureNexus(),
         wrappedBundle(maven("org.apache.httpcomponents", "httpmime").versionAsInProject()),
-        mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject()
+        mavenBundle("org.sonatype.http-testing-harness", "server-provider").versionAsInProject(),
+        wrappedBundle(maven("org.sonatype.nexus", "nexus-test-concurrent").versionAsInProject())
+            .overwriteManifest(OverwriteMode.FULL).instructions("DynamicImport-Package=*")
     );
   }
 
@@ -109,12 +112,12 @@ public abstract class NugetITSupport
   }
 
   @Nonnull
-  private String prepareApiKey(final PrincipalCollection admin) {
-    char[] apiKey = keyStore.getApiKey(admin);
-    log.info("Existing nuget api key for {} is {}", admin, apiKey);
+  private synchronized String prepareApiKey(final PrincipalCollection principal) {
+    char[] apiKey = keyStore.getApiKey(principal);
+    log.info("Existing nuget api key for {} is {}", principal, apiKey);
     if (apiKey == null) {
-      log.info("Creating new API key for {}", admin);
-      apiKey = keyStore.createApiKey(admin);
+      log.info("Creating new API key for {}", principal);
+      apiKey = keyStore.createApiKey(principal);
     }
     return new String(apiKey);
   }

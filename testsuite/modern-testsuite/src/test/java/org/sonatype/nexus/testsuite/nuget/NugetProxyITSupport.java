@@ -32,7 +32,6 @@ import org.sonatype.tests.http.server.jetty.behaviour.Content;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-
 import org.eclipse.jetty.http.PathMap;
 import org.junit.After;
 import org.junit.Before;
@@ -158,11 +157,17 @@ public abstract class NugetProxyITSupport
     dispatch.serve(forOperation("Search").hasParam("$top", "80"),
         remoteFeed("proxy-search-jquery-top-80.xml"));
 
+
+    // Serve two versions of SONATYPE.TEST
     dispatch.serve(forOperation("Packages(Id='SONATYPE.TEST',Version='1.0')"),
-        remoteFeed("sonatype-test-entry.xml"));
+        remoteFeed("sonatype-test-1.0-entry.xml"));
+    dispatch.serve(forOperation("Packages(Id='SONATYPE.TEST',Version='1.1')"),
+        remoteFeed("sonatype-test-1.1-entry.xml"));
 
     dispatch.serve(forOperation("/SONATYPE.TEST/1.0"),
         file(resolveTestFile("SONATYPE.TEST.1.0.nupkg")));
+    dispatch.serve(forOperation("/SONATYPE.TEST/1.1"),
+        file(resolveTestFile("SONATYPE.TEST.1.1.nupkg")));
   }
 
 

@@ -244,7 +244,7 @@ public class NugetGalleryFacetImpl
         component != null && tx.browseAssets(component).iterator().hasNext(),
         "Component metadata does not exist yet"
     );
-    return createOrUpdateAssetAndContents(tx, component, streamSupplier.get(), null, contentAttributes);
+    return createOrUpdateAssetAndContents(tx, component, streamSupplier, null, contentAttributes);
   }
 
   @VisibleForTesting
@@ -319,7 +319,7 @@ public class NugetGalleryFacetImpl
       recordMetadata.put(PUBLISHED, creationTime);
 
       try (InputStream in = streamSupplier.get()) {
-        createOrUpdatePackageAndContents(recordMetadata, in);
+        createOrUpdatePackageAndContents(recordMetadata, streamSupplier);
       }
 
       componentId = recordMetadata.get(ID);
@@ -403,12 +403,12 @@ public class NugetGalleryFacetImpl
   @VisibleForTesting
   @Transactional(retryOn = {ONeedRetryException.class, ORecordDuplicatedException.class})
   protected Component createOrUpdatePackageAndContents(final Map<String, String> recordMetadata,
-                                                       final InputStream packageStream)
+                                                       final Supplier<InputStream> packageStreamSupplier)
   {
     StorageTx tx = UnitOfWork.currentTransaction();
 
     final Component component = createOrUpdateComponent(tx, recordMetadata);
-    createOrUpdateAssetAndContents(tx, component, packageStream, recordMetadata, null);
+    createOrUpdateAssetAndContents(tx, component, packageStreamSupplier, recordMetadata, null);
     return component;
   }
 
@@ -547,7 +547,7 @@ public class NugetGalleryFacetImpl
 
   private Content createOrUpdateAssetAndContents(final StorageTx tx,
                                                  final Component component,
-                                                 final InputStream in,
+                                                 final Supplier<InputStream> packageStreamSupplier,
                                                  final Map<String, String> data,
                                                  @Nullable final AttributesMap contentAttributes)
   {
@@ -555,8 +555,10 @@ public class NugetGalleryFacetImpl
       Asset asset = findOrCreateAsset(tx, component);
       updateAssetMetadata(asset, data, component.isNew());
       Content.applyToAsset(asset, Content.maintainLastModified(asset, contentAttributes));
+
+      // TODO: Pass in the supplier, not just an inputstream.
       final AssetBlob assetBlob = tx
-          .setBlob(asset, blobName(component), in, singletonList(HashAlgorithm.SHA512), null, "application/zip");
+          .setBlob(asset, blobName(component), packageStreamSupplier, singletonList(HashAlgorithm.SHA512), null, "application/zip");
       tx.saveAsset(asset);
 
       return toContent(asset, assetBlob.getBlob());

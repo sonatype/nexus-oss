@@ -27,7 +27,6 @@ import org.sonatype.nexus.blobstore.api.BlobStore;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.common.hash.HashAlgorithm;
-import org.sonatype.nexus.common.io.TempStreamSupplier;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.common.stateguard.StateGuard;
 import org.sonatype.nexus.common.stateguard.StateGuardAware;
@@ -468,32 +467,30 @@ public class StorageTxImpl
   @Override
   @Guarded(by = ACTIVE)
   public AssetBlob createBlob(final String blobName,
-                              final InputStream inputStream,
+                              final Supplier<InputStream> streamSupplier,
                               final Iterable<HashAlgorithm> hashAlgorithms,
                               @Nullable final Map<String, String> headers,
                               @Nullable final String declaredContentType) throws IOException
   {
     checkNotNull(blobName);
-    checkNotNull(inputStream);
+    checkNotNull(streamSupplier);
     checkNotNull(hashAlgorithms);
 
     if (!writePolicy.checkCreateAllowed()) {
       throw new IllegalOperationException("Repository is read only: " + getBucket().repositoryName());
     }
 
-    try (TempStreamSupplier supplier = new TempStreamSupplier(inputStream)) {
-      final String contentType = determineContentType(supplier, blobName, declaredContentType);
+    final String contentType = determineContentType(streamSupplier, blobName, declaredContentType);
 
-      ImmutableMap.Builder<String, String> storageHeaders = ImmutableMap.builder();
-      storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
-      storageHeaders.put(BlobStore.BLOB_NAME_HEADER, blobName);
-      storageHeaders.put(BlobStore.CREATED_BY_HEADER, createdBy);
-      storageHeaders.put(BlobStore.CONTENT_TYPE_HEADER, contentType);
-      if (headers != null) {
-        storageHeaders.putAll(headers);
-      }
-      return blobTx.create(supplier.get(), storageHeaders.build(), hashAlgorithms, contentType);
+    ImmutableMap.Builder<String, String> storageHeaders = ImmutableMap.builder();
+    storageHeaders.put(Bucket.REPO_NAME_HEADER, bucket.repositoryName());
+    storageHeaders.put(BlobStore.BLOB_NAME_HEADER, blobName);
+    storageHeaders.put(BlobStore.CREATED_BY_HEADER, createdBy);
+    storageHeaders.put(BlobStore.CONTENT_TYPE_HEADER, contentType);
+    if (headers != null) {
+      storageHeaders.putAll(headers);
     }
+    return blobTx.create(streamSupplier.get(), storageHeaders.build(), hashAlgorithms, contentType);
   }
 
   @Override
@@ -535,7 +532,7 @@ public class StorageTxImpl
   @Override
   public AssetBlob setBlob(final Asset asset,
                            final String blobName,
-                           final InputStream inputStream,
+                           final Supplier<InputStream> streamSupplier,
                            final Iterable<HashAlgorithm> hashAlgorithms,
                            @Nullable final Map<String, String> headers,
                            @Nullable final String declaredContentType) throws IOException
@@ -550,7 +547,7 @@ public class StorageTxImpl
             "Repository does not allow updating assets: " + getBucket().repositoryName());
       }
     }
-    final AssetBlob assetBlob = createBlob(blobName, inputStream, hashAlgorithms, headers, declaredContentType);
+    final AssetBlob assetBlob = createBlob(blobName, streamSupplier, hashAlgorithms, headers, declaredContentType);
     attachBlob(asset, assetBlob);
     return assetBlob;
   }

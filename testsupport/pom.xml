@@ -33,6 +33,7 @@
     <module>nexus-raw-test-data</module>
     <module>nexus-ssl-test-data</module>
     <module>nexus-test-common</module>
+    <module>nexus-test-concurrent</module>
     <module>nexus-pax-exam</module>
   </modules>
 

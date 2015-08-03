@@ -31,6 +31,7 @@ import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 
+import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -95,7 +96,8 @@ public class NugetGalleryFacetImplPutTest
 
     Component component = mock(Component.class);
     ORID orid = mock(ORID.class);
-    doReturn(component).when(galleryFacet).createOrUpdatePackageAndContents(any(Map.class), any(InputStream.class));
+    doReturn(component).when(galleryFacet).createOrUpdatePackageAndContents(any(Map.class),
+        any(Supplier.class));
     when(component.isNew()).thenReturn(isNew);
 
     galleryFacet.put(packageStream);
