@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <orientdb.version>2.1-rc6</orientdb.version>
+    <orientdb.version>2.1.SONATYPE-SNAPSHOT</orientdb.version>
   </properties>
 
   <dependencyManagement>
@@ -93,6 +93,18 @@
         <groupId>com.orientechnologies</groupId>
         <artifactId>orientdb-server</artifactId>
         <version>${orientdb.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.orientechnologies</groupId>
+        <artifactId>orientdb-distributed</artifactId>
+        <version>${orientdb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-all</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

@@ -33,6 +33,7 @@
     <module>nexus-blobstore-file</module>
     <module>nexus-bootstrap</module>
     <module>nexus-capability</module>
+    <module>nexus-cellar-hazelcast</module>
     <module>nexus-client</module>
     <module>nexus-commands</module>
     <module>nexus-common</module>

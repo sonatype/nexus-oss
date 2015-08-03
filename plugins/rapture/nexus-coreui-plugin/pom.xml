@@ -75,6 +75,16 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--
+    HACK: For 'Nodes' feature
+    -->
+    <dependency>
+      <groupId>com.hazelcast</groupId>
+      <artifactId>hazelcast</artifactId>
+      <optional>true</optional>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.sonatype.sisu.goodies</groupId>
       <artifactId>goodies-testsupport</artifactId>

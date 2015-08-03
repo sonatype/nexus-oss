@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.cache.internal;
+package org.sonatype.nexus.cache.internal.ehcache;
 
 import java.io.File;
 import java.net.URI;
@@ -91,19 +91,29 @@ public class EhCacheManagerProvider
       }
     }
 
-    // EHCache bundle has dynamic import, so it's the preferred choice here
-    ClassLoader classLoader = net.sf.ehcache.CacheManager.class.getClassLoader();
+    // Limit class-loader for creation of provider
+    CachingProvider provider = Caching.getCachingProvider(
+        JCacheCachingProvider.class.getName(),
+        JCacheCachingProvider.class.getClassLoader()
+    );
 
-    CachingProvider provider = Caching.getCachingProvider(JCacheCachingProvider.class.getName(), classLoader);
-    log.info("Creating cache-manager with configuration: {}", config);
-    CacheManager manager = provider.getCacheManager(config, classLoader);
-    log.debug("Created cache-manager: {}", manager);
-    return manager;
+    // Widen class-loader for manager creation with TCCL, which could need to load user-classes
+    final ClassLoader pcl = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+      log.info("Creating cache-manager with configuration: {}", config);
+      CacheManager manager = provider.getCacheManager(config, null);
+      log.debug("Created cache-manager: {}", manager);
+      return manager;
+    }
+    finally {
+      Thread.currentThread().setContextClassLoader(pcl);
+    }
   }
 
   @Override
   public CacheManager get() {
-    checkState(cacheManager != null, "Cache-manger destroyed");
+    checkState(cacheManager != null, "Cache-manager destroyed");
     return cacheManager;
   }
 

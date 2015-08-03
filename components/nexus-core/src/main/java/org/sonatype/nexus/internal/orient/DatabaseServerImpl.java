@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.app.ApplicationDirectories;
+import org.sonatype.nexus.common.node.LocalNodeAccess;
 import org.sonatype.nexus.jmx.reflect.ManagedAttribute;
 import org.sonatype.nexus.jmx.reflect.ManagedObject;
 import org.sonatype.nexus.orient.DatabaseServer;
@@ -65,6 +66,8 @@ public class DatabaseServerImpl
 {
   private final ApplicationDirectories applicationDirectories;
 
+  private final LocalNodeAccess localNodeAccess;
+
   private final boolean binaryListenerEnabled;
 
   private final boolean httpListenerEnabled;
@@ -75,11 +78,13 @@ public class DatabaseServerImpl
 
   @Inject
   public DatabaseServerImpl(final ApplicationDirectories applicationDirectories,
+                            final LocalNodeAccess localNodeAccess,
                             @Named("${nexus.orient.binaryListenerEnabled:-false}") final boolean binaryListenerEnabled,
                             @Named("${nexus.orient.httpListenerEnabled:-false}") final boolean httpListenerEnabled,
                             @Named("${nexus.orient.dynamicPlugins:-false}") final boolean dynamicPlugins)
   {
     this.applicationDirectories = checkNotNull(applicationDirectories);
+    this.localNodeAccess = checkNotNull(localNodeAccess);
     this.binaryListenerEnabled = binaryListenerEnabled;
     this.httpListenerEnabled = httpListenerEnabled;
     this.dynamicPlugins = dynamicPlugins;
@@ -109,6 +114,7 @@ public class DatabaseServerImpl
 
     // instance startup
     OServer server = new OServer();
+    server.setExtensionClassLoader(getClass().getClassLoader());
     OServerConfiguration config = createConfiguration();
     server.startup(config);
 
@@ -129,7 +135,7 @@ public class DatabaseServerImpl
     this.server = server;
   }
 
-  private OServerConfiguration createConfiguration() {
+  private OServerConfiguration createConfiguration() throws Exception {
     // FIXME: Unsure what this directory us used for
     File homeDir = applicationDirectories.getWorkDirectory("orient");
     System.setProperty("orient.home", homeDir.getPath());
@@ -146,6 +152,26 @@ public class DatabaseServerImpl
     };
 
     config.handlers = new ArrayList<>();
+
+    try {
+      // is hazelcast available? use reflection to avoid caching negative result
+      getClass().getClassLoader().loadClass("com.hazelcast.core.Hazelcast");
+
+      // configure Hazelcast handler if we are currently running in distributed mode
+      File etcDir = new File(applicationDirectories.getInstallDirectory(), "etc");
+      OServerHandlerConfiguration hazelcastHandler = new OServerHandlerConfiguration();
+      hazelcastHandler.clazz = SharedHazelcastPlugin.class.getName();
+      hazelcastHandler.parameters = new OServerParameterConfiguration[] {
+          new OServerParameterConfiguration("enabled", "true"),
+          new OServerParameterConfiguration("nodeName", localNodeAccess.getId()),
+          // HACK: This is apparently needed, have to understand where/why/how this is used
+          new OServerParameterConfiguration("configuration.db.default", new File(etcDir, "default-distributed-db-config.json").getCanonicalPath())
+      };
+      config.handlers.add(hazelcastHandler);
+    }
+    catch (final ClassNotFoundException | LinkageError e) {
+      log.debug("Skipping optional Hazelcast handler: {}", e.toString());
+    }
 
     // configure JMX handler
     OServerHandlerConfiguration jmxHandler = new OServerHandlerConfiguration();

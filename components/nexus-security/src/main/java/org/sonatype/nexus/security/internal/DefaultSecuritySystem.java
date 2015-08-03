@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 import javax.cache.CacheManager;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.common.text.Strings2;
@@ -79,7 +80,7 @@ public class DefaultSecuritySystem
 
   private final EventBus eventBus;
 
-  private final CacheManager cacheManager;
+  private final Provider<CacheManager> cacheManager;
 
   private final RealmSecurityManager realmSecurityManager;
 
@@ -95,7 +96,7 @@ public class DefaultSecuritySystem
 
   @Inject
   public DefaultSecuritySystem(final EventBus eventBus,
-                               final CacheManager cacheManager,
+                               final Provider<CacheManager> cacheManager,
                                final RealmSecurityManager realmSecurityManager,
                                final RealmManager realmManager,
                                final AnonymousManager anonymousManager,
@@ -142,7 +143,7 @@ public class DefaultSecuritySystem
     }
 
     // prepare shiro cache
-    realmSecurityManager.setCacheManager(new ShiroJCacheManagerAdapter(cacheManager));
+    realmSecurityManager.setCacheManager(new ShiroJCacheManagerAdapter(cacheManager.get()));
 
     // TODO: Sort out better means to invoke lifecycle here, realm-manager is only here for start/stop now
     realmManager.start();
