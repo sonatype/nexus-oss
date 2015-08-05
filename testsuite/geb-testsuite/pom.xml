@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Sonatype Nexus (TM) Open Source Version
+    Copyright (c) 2008-present Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+
+    This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+    which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+
+    Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+    of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+    Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus.testsuite</groupId>
+    <artifactId>nexus-testsuite</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-geb-testsuite</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
+
+  <properties>
+    <!--
+    Testsuite auto-sharding support.
+    -->
+    <testsuite.basedir>${project.basedir}/..</testsuite.basedir>
+    <geb.version>0.12.0</geb.version>
+    <selenium.version>2.47.0</selenium.version>
+    <phantomjs.version>1.9.7</phantomjs.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-pax-exam</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.gebish</groupId>
+      <artifactId>geb-core</artifactId>
+      <version>${geb.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-support</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.spockframework</groupId>
+      <artifactId>spock-core</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-dep</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Geb browser automation -->
+    <dependency>
+      <groupId>org.gebish</groupId>
+      <artifactId>geb-spock</artifactId>
+      <version>${geb.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.gebish</groupId>
+      <artifactId>geb-junit4</artifactId>
+      <version>${geb.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-firefox-driver</artifactId>
+      <version>${selenium.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-chrome-driver</artifactId>
+      <version>${selenium.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-safari-driver</artifactId>
+      <version>${selenium.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-ie-driver</artifactId>
+      <version>${selenium.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.codeborne</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+      <version>1.2.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>servlet-api-2.5</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+    Base template bundle to be tested
+    -->
+    <dependency>
+      <groupId>${it.nexus.bundle.groupId}</groupId>
+      <artifactId>${it.nexus.bundle.artifactId}</artifactId>
+      <version>${it.nexus.bundle.version}</version>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+    Additional plugins on top of the base template
+    -->
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus</groupId>-->
+      <!--<artifactId>nexus-repository</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
+      <!--<artifactId>nexus-repository-maven</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>org.apache.httpcomponents</groupId>-->
+      <!--<artifactId>httpmime</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!--
+      Unpack shared test-data
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <outputDirectory>${project.build.directory}/it-resources</outputDirectory>
+          <excludes>META-INF/**</excludes>
+          <artifactItems>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-maven-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-nuget-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-raw-test-data</artifactId>
+            </item>
+            <item>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-ssl-test-data</artifactId>
+            </item>
+          </artifactItems>
+        </configuration>
+        <executions>
+          <execution>
+            <id>unpack-test-data</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+      Allow use of 'versionAsInProject' in Pax-Exam configuration
+      -->
+      <plugin>
+        <groupId>org.apache.servicemix.tooling</groupId>
+        <artifactId>depends-maven-plugin</artifactId>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>unpack-phantomjs-mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <configuration>
+              <outputDirectory>${project.build.directory}/phantomjs-maven-plugin</outputDirectory>
+              <excludes>META-INF/**</excludes>
+              <artifactItems>
+                <item>
+                  <groupId>com.github.klieber</groupId>
+                  <artifactId>phantomjs</artifactId>
+                  <version>${phantomjs.version}</version>
+                  <classifier>macosx</classifier>
+                  <type>zip</type>
+                </item>
+              </artifactItems>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>unpack-phantomjs-unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+          <name>!mac os x</name>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <configuration>
+              <outputDirectory>${project.build.directory}/phantomjs-maven-plugin</outputDirectory>
+              <excludes>META-INF/**</excludes>
+              <artifactItems>
+                <item>
+                  <groupId>com.github.klieber</groupId>
+                  <artifactId>phantomjs</artifactId>
+                  <version>${phantomjs.version}</version>
+                  <classifier>linux-x86_64</classifier>
+                  <type>tar.bz2</type>
+                </item>
+              </artifactItems>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>unpack-phantomjs-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <configuration>
+              <outputDirectory>${project.build.directory}/phantomjs-maven-plugin</outputDirectory>
+              <excludes>META-INF/**</excludes>
+              <artifactItems>
+                <item>
+                  <groupId>com.github.klieber</groupId>
+                  <artifactId>phantomjs</artifactId>
+                  <version>${phantomjs.version}</version>
+                  <classifier>windows</classifier>
+                  <type>zip</type>
+                </item>
+              </artifactItems>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
