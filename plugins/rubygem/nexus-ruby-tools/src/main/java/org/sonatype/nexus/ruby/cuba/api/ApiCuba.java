@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.ruby.cuba.api;
 
+import java.util.Arrays;
+import java.util.regex.Matcher;
+
 import org.sonatype.nexus.ruby.RubygemsFile;
 import org.sonatype.nexus.ruby.cuba.Cuba;
 import org.sonatype.nexus.ruby.cuba.RootCuba;
@@ -26,6 +29,13 @@ public class ApiCuba
     implements Cuba
 {
   public static final String V1 = "v1";
+
+  public static final String[] FILES;
+  static {
+      String[] files = new String[] { V1, RootCuba.QUICK, RootCuba.GEMS };
+      FILES = Arrays.copyOf(files, files.length + RootCuba.SPEC_FILES.length);
+      System.arraycopy(RootCuba.SPEC_FILES, 0, FILES, files.length, RootCuba.SPEC_FILES.length);
+  }
 
   private final Cuba v1;
 
@@ -52,9 +62,15 @@ public class ApiCuba
       case RootCuba.GEMS:
         return state.nested(gems);
       case "":
-        String[] items = {V1, RootCuba.QUICK, RootCuba.GEMS};
-        return state.context.factory.directory(state.context.original, items);
+        return state.context.factory.directory(state.context.original, FILES);
       default:
+        Matcher m = RootCuba.SPECS.matcher(state.name);
+        if (m.matches()) {
+          if (m.group(3) == null) {
+            return state.context.factory.specsIndexFile(m.group(1));
+          }
+          return state.context.factory.specsIndexZippedFile(m.group(1));
+        }
         return state.context.factory.notFound(state.context.original);
     }
   }

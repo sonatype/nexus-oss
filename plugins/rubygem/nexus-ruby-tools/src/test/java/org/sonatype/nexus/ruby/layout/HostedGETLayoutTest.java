@@ -305,9 +305,10 @@ public class HostedGETLayoutTest
     };
     assertFiletypeWithNullPayload(pathes, FileType.DIRECTORY);
 
-    assertDirectory("/", "api/", "quick/", "gems/", "maven/", "specs.4.8", "latest_specs.4.8", "prerelease_specs.4.8",
+    assertDirectory("/", "api", "quick", "gems", "maven", "specs.4.8", "latest_specs.4.8", "prerelease_specs.4.8",
         "specs.4.8.gz", "latest_specs.4.8.gz", "prerelease_specs.4.8.gz");
-    assertDirectory("/api", "v1", "quick", "gems");
+    assertDirectory("/api", "v1", "quick", "gems", "specs.4.8", "latest_specs.4.8", "prerelease_specs.4.8",
+         "specs.4.8.gz", "latest_specs.4.8.gz", "prerelease_specs.4.8.gz");
     assertDirectory("/api/v1", "api_key", "dependencies");
     assertDirectory("/api/v1/dependencies");//"hufflepuf.ruby", "pre.ruby", "zip.ruby" );
     assertDirectory("/api/quick", "Marshal.4.8");

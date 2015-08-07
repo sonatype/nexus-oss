@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.ruby.cuba;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +38,17 @@ public class RootCuba
 
   public static final String MAVEN = "maven";
 
-  private static final Pattern SPECS = Pattern.compile("^((prerelease_|latest_)?specs)" + _4_8 + "(" + GZ + ")?$");
+  public static final Pattern SPECS = Pattern.compile("^((prerelease_|latest_)?specs)" + _4_8 + "(" + GZ + ")?$");
+
+  public static final String[] SPEC_FILES = {"specs.4.8", "latest_specs.4.8", "prerelease_specs.4.8",
+      "specs.4.8.gz", "latest_specs.4.8.gz", "prerelease_specs.4.8.gz"};
+
+  public static final String[] FILES;
+  static {
+      String[] files = new String[] { API, QUICK, GEMS, MAVEN };
+      FILES = Arrays.copyOf(files, files.length + SPEC_FILES.length);
+      System.arraycopy(SPEC_FILES, 0, FILES, files.length, SPEC_FILES.length);
+  }
 
   private final Cuba api;
 
@@ -71,11 +82,7 @@ public class RootCuba
       case MAVEN:
         return state.nested(maven);
       case "":
-        return state.context.factory.directory(state.context.original,
-                "api/", "quick/", "gems/", "maven/",
-                "specs.4.8", "latest_specs.4.8", "prerelease_specs.4.8",
-                "specs.4.8.gz", "latest_specs.4.8.gz", "prerelease_specs.4.8.gz"
-            );
+        return state.context.factory.directory(state.context.original, FILES );
       default:
     }
     Matcher m = SPECS.matcher(state.name);

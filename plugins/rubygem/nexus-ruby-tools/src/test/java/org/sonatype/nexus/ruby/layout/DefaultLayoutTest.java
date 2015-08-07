@@ -424,6 +424,48 @@ public class DefaultLayoutTest
   }
 
   @Test
+  public void testApiSpecsIndexFile() throws Exception {
+    RubygemsFile file = fileSystem.get("/api/specs.4.8.gz");
+    assertThat(file, notNullValue());
+    assertThat(file.type(), equalTo(FileType.SPECS_INDEX_ZIPPED));
+    RubygemsFile file2 = fileSystem.get("/api/specs.4.8");
+    assertThat(file2.type(), equalTo(FileType.SPECS_INDEX));
+
+    assertThat((SpecsIndexZippedFile) file,
+        equalTo(((SpecsIndexFile) file2).zippedSpecsIndexFile()));
+    assertThat((SpecsIndexFile) file2,
+        equalTo(((SpecsIndexZippedFile) file).unzippedSpecsIndexFile()));
+  }
+
+  @Test
+  public void testApiLatestSpecsIndexFile() throws Exception {
+    RubygemsFile file = fileSystem.get("/api/latest_specs.4.8.gz");
+    assertThat(file, notNullValue());
+    assertThat(file.type(), equalTo(FileType.SPECS_INDEX_ZIPPED));
+    RubygemsFile file2 = fileSystem.get("/api/latest_specs.4.8");
+    assertThat(file2.type(), equalTo(FileType.SPECS_INDEX));
+
+    assertThat((SpecsIndexZippedFile) file,
+        equalTo(((SpecsIndexFile) file2).zippedSpecsIndexFile()));
+    assertThat((SpecsIndexFile) file2,
+        equalTo(((SpecsIndexZippedFile) file).unzippedSpecsIndexFile()));
+  }
+
+  @Test
+  public void testApiPrereleasedSpecsIndexFile() throws Exception {
+    RubygemsFile file = fileSystem.get("/api/prerelease_specs.4.8.gz");
+    assertThat(file, notNullValue());
+    assertThat(file.type(), equalTo(FileType.SPECS_INDEX_ZIPPED));
+    RubygemsFile file2 = fileSystem.get("/api/prerelease_specs.4.8");
+    assertThat(file2.type(), equalTo(FileType.SPECS_INDEX));
+
+    assertThat((SpecsIndexZippedFile) file,
+        equalTo(((SpecsIndexFile) file2).zippedSpecsIndexFile()));
+    assertThat((SpecsIndexFile) file2,
+        equalTo(((SpecsIndexZippedFile) file).unzippedSpecsIndexFile()));
+  }
+
+  @Test
   public void testNotFile() throws Exception {
     RubygemsFile file = fileSystem.get("/prereleased_specs.4.8.gz");
     assertThat(file, notNullValue());
