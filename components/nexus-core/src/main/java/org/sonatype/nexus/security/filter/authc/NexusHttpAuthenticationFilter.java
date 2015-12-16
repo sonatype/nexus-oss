@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.FilterChain;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -62,6 +63,8 @@ public class NexusHttpAuthenticationFilter
   public static final String FAKE_AUTH_SCHEME = "NxBASIC";
 
   public static final String ANONYMOUS_LOGIN = "nexus.anonymous";
+  
+  public static final String USERNAME_HEADER = "X-NEXUS-USER";
 
   private final Logger logger = Loggers.getLogger(getClass());
 
@@ -460,5 +463,34 @@ public class NexusHttpAuthenticationFilter
     }
 
     return null;
+  }
+  
+  
+  @Override
+  protected void executeChain(ServletRequest request, ServletResponse response, FilterChain chain) throws Exception {
+	  addUserInResponseHeader(request, response);
+	  
+	  super.executeChain(request, response, chain);
+  }
+  
+  private void addUserInResponseHeader(ServletRequest request, ServletResponse response) {
+    HttpServletResponse httpResponse = (HttpServletResponse) response;
+    if (httpResponse.containsHeader(USERNAME_HEADER)) {
+      return;
+    }
+
+    String username = null;
+    Subject currentUser = getSubject(request, response);
+    Object principal = currentUser.getPrincipal();
+    if (principal != null) {
+      username = principal.toString();
+    }
+
+	if (username == null || username.isEmpty()) {
+      username = "-";
+    } else {
+      httpResponse.setHeader(USERNAME_HEADER, username);
+    }
+    getLogger().debug(username);
   }
 }
